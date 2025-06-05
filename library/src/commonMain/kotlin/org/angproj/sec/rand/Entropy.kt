@@ -14,61 +14,84 @@
  */
 package org.angproj.sec.rand
 
+import kotlin.math.max
+import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 
 
+/**
+ * Entropy generates real True and conditioned natural entropy.
+ * The entropy is taken from nanosecond fluctuations in the system clock,
+ * in comparison to the number of clock cycles used which is not binary
+ * but analogous. And thereby rounds the nanoseconds in an unpredictable way.
+ * Thereby it is true random, however the entropy is conditioned to also be
+ * natural, that is clearing Monte Carlo testing closing in on real PI.
+ * */
 public object Entropy {
 
-    init {
-        val garble = GarbageGarbler()
-        source = buildSource { push(garble).seg(DataSize._128B).buf(DataSize._128B).bin() }
-        sink = buildSink { pull(garble).seg(DataSize._1K).buf(DataSize._1K).bin() }
-    }
-
-    private val moment = TimeSource.Monotonic.markNow()
-    private var entropy: Long = IV_3AC5.iv * moment.elapsedNow().inWholeNanoseconds
+    /**
+     * EntropyState holds the state of the entropy source, including the start time and the current entropy value.
+     *
+     * @property start The time when the entropy state was initialized.
+     * @property entropy The current entropy value, which is updated based on the elapsed time.
+     */
+    public data class EntropyState(
+        val start: TimeMark,
+        var entropy: Long
+    )
 
     /**
-     * Generates one byte of true random by snapping the nanosecond timestamp when
-     * something happened this could be a user generated event for example.
-     * */
-    public fun <E> snapTime(action: () -> E): E {
-        return catchMoment(action).also { source.writeByte(entropy.toByte()) }
+     * The entropy value is initialized based on a constant IV and the elapsed time since the start.
+     *
+     * @return An instance of [EntropyState] containing the start time and initial entropy value.
+     */
+    private fun initializeEntropy(): EntropyState {
+        return EntropyState(
+            start = TimeSource.Monotonic.markNow(),
+            entropy = InitializationVector.IV_3AC5.iv * TimeSource.Monotonic.markNow().elapsedNow().inWholeNanoseconds
+        )
     }
 
-    private fun <E> catchMoment(action: () -> E): E {
-        entropy = (moment.elapsedNow().inWholeNanoseconds * entropy).rotateLeft(32)
-        return action()
+    private fun entropyRound(state: EntropyState) {
+        state.entropy = ((-state.entropy.inv() * 5) xor state.start.elapsedNow().inWholeNanoseconds).rotateLeft(32)
+    }
+
+    private fun readLongEntropy(size: Int, state: EntropyState): Long {
+        var data: Long = 0
+        repeat(max(size, 8)) { _ ->
+            entropyRound(state)
+            data = (data shl 8) or (state.entropy and 0xFF)
+        }
+        return data
     }
 
     /**
-     * Natural random based on fluctuations on nanosecond intervals which produces byte level entropy.
-     * Actually costs precious processing time to generate, use sparsely.
-     * Also comes close to Monte Carlo but not perfect!
-     * */
-    public fun realTimeGatedEntropy(data: Binary) {
-        require(data.limit <= DataSize._256B.size) { "To large for time-gated entropy! Max 256 bytes." }
+     * Generates real time-gated entropy for a ByteArray.
+     *
+     * @param data The ByteArray to be filled with time-gated entropy.
+     */
+    public fun realTimeGatedEntropy(data: ByteArray) {
+        require(data.size <= 1024) { "To large for time-gated entropy! Max 1Kb." }
 
-        (0 until data.limit).forEach {
-            catchMoment { it.floorMod(16) }
-            data.storeByte(it, entropy.toByte())
+        val state = initializeEntropy()
+
+        repeat(data.size) { index ->
+            entropyRound(state)
+            data[index] = state.entropy.toByte()
         }
     }
 
     /**
-     * Allows reading up to 1GB of extraordinarily secure random data at a time based on presumably true entropy.
-     * */
-    public override fun read(bin: Binary): Int {
-        var index = 0
-        repeat(bin.limit / TypeSize.long) {
-            bin.storeLong(index, sink.readLong())
-            index += TypeSize.long
-        }
-        repeat(bin.limit % TypeSize.long) {
-            bin.storeByte(index, sink.readByte())
-            index++
-        }
-        return index
-    }
+     * Generates real time-gated entropy for a LongArray.
+     *
+     * @param data The LongArray to be filled with time-gated entropy.
+     */
+    internal fun realTimeGatedEntropy(data: LongArray) {
+        require(data.size <= 128) { "To large for time-gated entropy! Max 1Kb." }
+        val state = initializeEntropy()
 
+        repeat(data.size) { index ->
+            data[index] = readLongEntropy(8, state)
+        }
+    }
 }

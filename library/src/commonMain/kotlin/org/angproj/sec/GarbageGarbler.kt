@@ -14,10 +14,8 @@
  */
 package org.angproj.sec
 
-import org.angproj.aux.io.*
 import org.angproj.sec.rand.AbstractSponge1024
 import org.angproj.sec.rand.Entropy
-import org.angproj.aux.util.floorMod
 
 
 public class GarbageGarbler(

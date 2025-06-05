@@ -14,11 +14,9 @@
  */
 package org.angproj.sec
 
-import org.angproj.aux.io.*
 import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.Entropy
-import org.angproj.aux.util.floorMod
-import org.angproj.aux.util.useWith
+import org.angproj.sec.util.floorMod
 import kotlin.native.concurrent.ThreadLocal
 
 /**
@@ -26,64 +24,76 @@ import kotlin.native.concurrent.ThreadLocal
  * Supposed to pass Monte Carlo testing and security requirements of output quality.
  * */
 @ThreadLocal
-public object SecureEntropy : AbstractSponge256(), PumpReader, Reader {
-
-    private var _count: Long = 0
-    override val outputCount: Long
-        get() = _count
-
-    override val outputStale: Boolean = false
+public object SecureEntropy : AbstractSponge256() {
 
     init {
         revitalize()
     }
 
     private fun revitalize() {
-        binOf(visibleSize * TypeSize.long).useWith { bin ->
-            Entropy.realTimeGatedEntropy(bin)
-            (0 until visibleSize).forEach {
-                absorb(bin.retrieveLong(it * TypeSize.long), it)
-            }
-        }
+        Entropy.realTimeGatedEntropy(sponge)
         scramble()
     }
 
     private fun require(length: Int) {
         require(length.floorMod(byteSize) == 0) { "Length must be divisible by $byteSize." }
-        require(length <= DataSize._1K.size) { "Length must not surpass 1 Kilobyte." }
+        require(length <= 1024) { "Length must not surpass 1 Kilobyte." }
     }
 
-    private fun fill(data: Segment<*>) {
-        var index = 0
-        repeat(data.limit / byteSize) {
-            repeat(visibleSize) {
-                data.setLong(index, squeeze(it))
-                index += TypeSize.long
+    internal fun read(data: LongArray) {
+        var offset = 0
+        revitalize()
+
+        repeat(data.size) {
+            data[it] = squeeze(offset)
+            offset++
+            if (offset >= visibleSize) {
+                round()
+                offset = 0
             }
-            round()
         }
     }
 
-    override fun read(data: Segment<*>): Int {
-        require(data.limit)
+    public fun <E> read(data: E, offset: Int = 0, length: Int = 0, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+        require(length > 0) { "Zero length data" }
+
+        var index = 0
+        var pos = offset
         revitalize()
-        fill(data)
-        _count += data.limit
-        return data.limit
+
+        val loops = length / 8
+        val remaining = length % 8
+
+        repeat(loops) {
+            var rand = squeeze(index)
+
+            // Little-endian conversion
+            repeat(8) {
+                data.writeOctet(pos++, (rand and 0xFF).toByte())
+                rand = rand ushr 8
+            }
+
+            index++
+            if (index >= visibleSize) {
+                round()
+                index = 0
+            }
+        }
+
+        if (remaining > 0) {
+            var rand = squeeze(index)
+
+            // Little-endian conversion for remaining bytes
+            repeat(remaining) {
+                data.writeOctet(pos++, (rand and 0xFF).toByte())
+                rand = rand ushr 8
+            }
+        }
     }
 
-    override fun read(bin: Binary): Int {
-        require(bin.limit)
-        revitalize()
-        var index = 0
-        repeat(bin.limit / byteSize) {
-            repeat(visibleSize) {
-                bin.storeLong(index, squeeze(it))
-                index += TypeSize.long
-            }
-            round()
+    public fun read(data: ByteArray, offset: Int = 0, length: Int = data.size) {
+        read(data, offset, length) { index, value ->
+            this[index] = value
         }
-        _count += bin.limit
-        return bin.limit
     }
 }

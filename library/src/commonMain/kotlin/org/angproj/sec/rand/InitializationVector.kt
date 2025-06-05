@@ -59,7 +59,6 @@ package org.angproj.sec.rand
  * an equal amount of ones and zeroes quite arbitrarily but not perfect. So that no hidden
  * weaknesses would be disguised, and hopefully no speculations of planted backdoors may occur.
  * */
-
 public enum class InitializationVector(public val iv: Long) {
     IV_3569(0x3569356935693569uL.toLong()),
     IV_356A(0x356A356A356A356AuL.toLong()),
@@ -421,27 +420,4 @@ public enum class InitializationVector(public val iv: Long) {
     IV_CA93(0xCA93CA93CA93CA93uL.toLong()),
     IV_CA95(0xCA95CA95CA95CA95uL.toLong()),
     IV_CA96(0xCA96CA96CA96CA96uL.toLong());
-
-    /*public companion object {
-
-        private val moment = TimeSource.Monotonic.markNow()
-        private var entropy: Long = IV_3569.iv * moment.elapsedNow().inWholeNanoseconds
-
-        public fun <E> catchMoment(action: () -> E): E {
-            entropy = (moment.elapsedNow().inWholeNanoseconds * entropy).rotateLeft(32)
-            //source.writeByte(entropy.toByte())
-            return action()
-        }
-        public fun realTimeGatedEntropy(data: Binary) {
-            require(data.limit <= DataSize._256B.size) { "To large for time-gated entropy! Max 256 bytes." }
-
-            //var stub: Int = Int.MAX_VALUE
-            (0 until data.limit).forEach {
-                //repeat(it.floorMod(16)) { stub += stub * Int.MAX_VALUE }
-                //entropy = (moment.elapsedNow().inWholeNanoseconds * entropy).rotateLeft(32)
-                catchMoment { it.floorMod(16) }
-                data.storeByte(it, entropy.toByte())
-            }
-        }
-    }*/
 }

@@ -14,80 +14,143 @@
  */
 package org.angproj.sec
 
-import org.angproj.aux.io.*
-import org.angproj.aux.pipe.*
 import kotlin.native.concurrent.ThreadLocal
 
 /**
  * Portions a secure feed of random into a serviceable format of data for cryptographically secure use.
  * */
 @ThreadLocal
-public object SecureRandom : BinaryReadable, PumpReader, Reader {
+public object SecureRandom {
 
-    private val sink: BinarySink = buildSink { pull(SecureFeed).seg(DataSize._1K).buf(DataSize._1K).bin() }
+    private val buffer = LongArray(128)
+    private var position: Int = 0
 
-    /*private val sink: BinarySink = PullPipe(
-        Default,
-        PumpSource(SecureFeed),
-        DataSize._1K,
-        DataSize._1K
-    ).getBinSink()*/
-
-    override val count: Long
-        get() = sink.count
-
-    private var _outputCnt: Long = 0
-    override val outputCount: Long
-        get() = _outputCnt
-
-    override val outputStale: Boolean
-        get() = !sink.isOpen()
-
-    override fun readByte(): Byte = sink.readByte()
-    override fun readUByte(): UByte = sink.readUByte()
-    override fun readShort(): Short = sink.readShort()
-    override fun readUShort(): UShort = sink.readUShort()
-    override fun readInt(): Int = sink.readInt()
-    override fun readUInt(): UInt = sink.readUInt()
-    override fun readLong(): Long = sink.readLong()
-    override fun readULong(): ULong = sink.readULong()
-    override fun readFloat(): Float = sink.readFloat()
-    override fun readDouble(): Double = sink.readDouble()
-
-    override fun readRevShort(): Short = sink.readRevShort()
-    override fun readRevUShort(): UShort = sink.readRevUShort()
-    override fun readRevInt(): Int = sink.readRevInt()
-    override fun readRevUInt(): UInt = sink.readRevUInt()
-    override fun readRevLong(): Long = sink.readRevLong()
-    override fun readRevULong(): ULong = sink.readRevULong()
-    override fun readRevFloat(): Float = sink.readRevFloat()
-    override fun readRevDouble(): Double = sink.readRevDouble()
-
-    override fun read(data: Segment<*>): Int {
-        var index = 0
-        repeat(data.limit / TypeSize.long) {
-            data.setLong(index, sink.readLong())
-            index += TypeSize.long
-        }
-        repeat(data.limit % TypeSize.long) {
-            data.setByte(index, sink.readByte())
-            index++
-        }
-        _outputCnt += index
-        return index
+    init {
+        revitalize()
     }
 
-    override fun read(bin: Binary): Int {
-        var index = 0
-        repeat(bin.limit / TypeSize.long) {
-            bin.storeLong(index, sink.readLong())
-            index += TypeSize.long
+    private fun revitalize() {
+        SecureFeed.read(buffer)
+        position = 0
+    }
+
+    internal fun nextByte(): Long {
+        if (position >= 1024) revitalize()
+        val num = buffer[position / 8]
+        return (num ushr 8 * (position++ % 8)) and 0xff
+    }
+
+    internal fun nextShort(): Long = (nextByte() or (nextByte() shl 8)) and 0xffff
+    internal fun nextInt(): Long = (nextShort() or (nextShort() shl 16)) and 0xffffffffL
+    internal fun nextLong(): Long = (nextInt() or (nextInt() shl 32))
+
+
+    /**
+     * Reads a byte from the secure random source.
+     * The value is normalized to the range [-128, 127].
+     *
+     * @return A byte in the range [-128, 127].
+     */
+    public fun readByte(): Byte = nextByte().toByte()
+
+    /**
+     * Reads an unsigned byte from the secure random source.
+     * The value is normalized to the range [0, 255].
+     *
+     * @return An unsigned byte in the range [0, 255].
+     */
+    public fun readUByte(): UByte = nextByte().toUByte()
+
+    /**
+     * Reads a short integer from the secure random source.
+     * The value is normalized to the range [-32768, 32767].
+     *
+     * @return A short integer in the range [-32768, 32767].
+     */
+    public fun readShort(): Short = nextShort().toShort()
+
+    /**
+     * Reads an unsigned short integer from the secure random source.
+     * The value is normalized to the range [0, 65535].
+     *
+     * @return An unsigned short integer in the range [0, 65535].
+     */
+    public fun readUShort(): UShort = nextShort().toUShort()
+
+    /**
+     * Reads an integer from the secure random source.
+     * The value is normalized to the range [-2147483648, 2147483647].
+     *
+     * @return An integer in the range [-2147483648, 2147483647].
+     */
+    public fun readInt(): Int = nextInt().toInt()
+
+    /**
+     * Reads an unsigned integer from the secure random source.
+     * The value is normalized to the range [0, 4294967295].
+     *
+     * @return An unsigned integer in the range [0, 4294967295].
+     */
+    public fun readUInt(): UInt = nextInt().toUInt()
+
+    /**
+     * Reads a long integer from the secure random source.
+     * The value is normalized to the range [-9223372036854775808, 9223372036854775807].
+     *
+     * @return A long integer in the range [-9223372036854775808, 9223372036854775807].
+     */
+    public fun readLong(): Long = nextLong()
+
+    /**
+     * Reads an unsigned long integer from the secure random source.
+     * The value is normalized to the range [0, 18446744073709551615].
+     *
+     * @return An unsigned long integer in the range [0, 18446744073709551615].
+     */
+    public fun readULong(): ULong = nextLong().toULong()
+
+    /**
+     * Reads a single-precision floating-point number from the secure random source.
+     * The value is normalized to the range [0.0, 1.0) by dividing by 2^31.
+     *
+     * @return A single-precision floating-point number in the range [0.0, 1.0).
+     */
+    public fun readFloat(): Float = (readInt() and 0x7fffffff) / (1 shl 31).toFloat()
+
+    /**
+     * Reads a double-precision floating-point number from the secure random source.
+     * The value is normalized to the range [0.0, 1.0) by dividing by 2^63.
+     *
+     * @return A double-precision floating-point number in the range [0.0, 1.0).
+     */
+    public fun readDouble(): Double = (readLong() and 0x7fffffffffffffffL) / (1L shl 63).toDouble()
+
+    /**
+     * Reads bytes into a data structure from the secure random source.
+     *
+     * @param data The data structure to fill with random bytes.
+     * @param offset The starting index in the data structure to write to.
+     * @param length The number of bytes to read. Defaults to 0, meaning the entire data structure will be filled.
+     * @param writeOctet A function that writes a byte at a specific index in the data structure.
+     */
+    public fun <E> read(data: E, offset: Int = 0, length: Int = 0, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+        require(length > 0) { "Zero length data" }
+
+        repeat(length) { index ->
+            data.writeOctet(index + offset, readByte())
         }
-        repeat(bin.limit % TypeSize.long) {
-            bin.storeByte(index, sink.readByte())
-            index++
+    }
+
+    /**
+     * Reads bytes into a ByteArray from the secure random source.
+     *
+     * @param data The ByteArray to fill with random bytes.
+     * @param offset The starting index in the ByteArray to write to.
+     * @param length The number of bytes to read. Defaults to the size of the ByteArray.
+     */
+    public fun readBytes(data: ByteArray, offset: Int = 0, length: Int = data.size) {
+        read(data, offset, length) { index, value ->
+            this[index] = value
         }
-        _outputCnt += index
-        return index
     }
 }

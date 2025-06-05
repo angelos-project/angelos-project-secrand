@@ -14,20 +14,25 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.util.floorMod
+
 
 /**
- * AbstractSponge is a class that circumvents unnecessary
- * bugs when implementing a secure random sponge construction.
- * */
+ * AbstractSponge is an abstract class that implements a sponge construction
+ * with a real custom size and visible size. It provides methods for absorbing,
+ * squeezing, and scrambling the sponge state.
+ *
+ * @property spongeSize The total size of the sponge in long variables.
+ * @property visibleSize The number of long variables that are visible for output.
+ */
 public abstract class AbstractSponge(
     spongeSize: Int = 0,
     public val visibleSize: Int = 0,
-) : EndianAware {
-
+) {
     protected var counter: Long = 0
     protected var mask: Long = 0
     protected val sponge: LongArray = LongArray(spongeSize) { InitializationVector.entries[it + 1].iv }
-    public val byteSize: Int = visibleSize * TypeSize.long
+    public val byteSize: Int = visibleSize * Long.SIZE_BYTES
 
     init {
         require(visibleSize <= spongeSize) {
@@ -35,18 +40,37 @@ public abstract class AbstractSponge(
         }
     }
 
+    /**
+     * The round function is an abstract method that must be implemented by subclasses.
+     * It defines how the sponge state is transformed during each round of the sponge.
+     */
     protected abstract fun round()
 
+    /**
+     * Absorb a value into the sponge to a specific state.
+     *
+     * @param value The value to absorb.
+     * @param position The position in the sponge to absorb the value.
+     */
     protected fun absorb(value: Long, position: Int) {
         val offset = position.floorMod(visibleSize)
         sponge[offset] = sponge[offset] xor value
     }
 
+    /**
+     * Squeeze a value from the sponge from a specific state.
+     *
+     * @param position The position in the sponge to squeeze the value from.
+     * @return The squeezed value, which is a combination of the sponge state and a mask.
+     */
     protected fun squeeze(position: Int): Long {
         val offset = position.floorMod(visibleSize)
         return sponge[offset] xor (mask * export[offset])
     }
 
+    /**
+     * Scramble the sponge state by performing a number of rounds equal to the size of the sponge.
+     */
     protected fun scramble() {
         repeat(sponge.size) { round() }
     }

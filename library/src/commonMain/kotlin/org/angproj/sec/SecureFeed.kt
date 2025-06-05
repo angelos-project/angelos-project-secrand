@@ -14,10 +14,7 @@
  */
 package org.angproj.sec
 
-import org.angproj.aux.io.*
-import org.angproj.aux.pipe.*
 import org.angproj.sec.rand.AbstractSponge512
-import org.angproj.aux.util.floorMod
 import kotlin.native.concurrent.ThreadLocal
 
 /**
@@ -25,84 +22,84 @@ import kotlin.native.concurrent.ThreadLocal
  * about every 4th to 12th megabyte for high quality of secure output.
  * */
 @ThreadLocal
-public object SecureFeed : AbstractSponge512(), PumpReader, Reader {
-    private val ROUNDS_64K: Int = DataSize._64K.size
-    private val ROUNDS_128K: Int = DataSize._128K.size
+public object SecureFeed : AbstractSponge512() {
+    private val ROUNDS_64K: Int = Short.MAX_VALUE * 2
+    private val ROUNDS_128K: Int = Short.MAX_VALUE * 4
 
     private var next: Int = 0
 
-    private var _count: Long = 0
-    override val outputCount: Long
-        get() = _count
-
-    override val outputStale: Boolean = false
-
-    private val sink: BinarySink = buildSink { pull(SecureEntropy).seg(DataSize._32B).buf(DataSize._32B).bin() }
-
-    /*private val sink: BinarySink = PullPipe(
-        Default,
-        PumpSource(SecureEntropy),
-        DataSize._32B,
-        DataSize._32B
-    ).getBinSink()*/
-
     init {
-        require(SecureEntropy.byteSize == DataSize._32B.size)
         revitalize()
     }
 
     private fun revitalize() {
-        repeat(SecureEntropy.visibleSize) {
-            absorb(sink.readLong(), it) // Maybe only it, is division necessary or a bug?
-        }
+        SecureEntropy.read(sponge)
         scramble()
     }
 
-    private fun cycle() {
+    override fun round() {
         if (counter > next) {
             next = ROUNDS_128K + sponge.first().mod(ROUNDS_64K)
             revitalize()
             counter = 1
         }
-        round()
+        super.round()
     }
 
-    private fun require(length: Int) {
-        require(length.floorMod(byteSize) == 0) { "Length must be divisible by $byteSize." }
-        require(length <= DataSize._8K.size) { "Length must not surpass 8 Kilobyte." }
-    }
+    internal fun read(data: LongArray) {
+        var offset = 0
+        revitalize()
 
-    private fun fill(data: Segment<*>) {
-        var index = 0
-        repeat(data.limit / byteSize) {
-            repeat(visibleSize) {
-                data.setLong(index, squeeze(it))
-                index += TypeSize.long
+        repeat(data.size) {
+            data[it] = squeeze(offset)
+            offset++
+            if (offset >= visibleSize) {
+                round()
+                offset = 0
             }
-            cycle()
         }
     }
 
-    override fun read(data: Segment<*>): Int {
-        require(data.limit)
+    public fun <E> read(data: E, offset: Int = 0, length: Int = 0, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+        require(length > 0) { "Zero length data" }
+
+        var index = 0
+        var pos = offset
         revitalize()
-        fill(data)
-        _count += data.limit
-        return data.limit
+
+        val loops = length / 8
+        val remaining = length % 8
+
+        repeat(loops) {
+            var rand = squeeze(index)
+
+            // Little-endian conversion
+            repeat(8) {
+                data.writeOctet(pos++, (rand and 0xFF).toByte())
+                rand = rand ushr 8
+            }
+
+            index++
+            if (index >= visibleSize) {
+                round()
+                index = 0
+            }
+        }
+
+        if (remaining > 0) {
+            var rand = squeeze(index)
+
+            // Little-endian conversion for remaining bytes
+            repeat(remaining) {
+                data.writeOctet(pos++, (rand and 0xFF).toByte())
+                rand = rand ushr 8
+            }
+        }
     }
 
-    override fun read(bin: Binary): Int {
-        require(bin.limit)
-        revitalize()
-        var index = 0
-        repeat(bin.limit / byteSize) {
-            repeat(visibleSize) {
-                bin.storeLong(index, squeeze(it))
-                index += TypeSize.long
-            }
-            cycle()
+    public fun read(data: ByteArray, offset: Int = 0, length: Int = data.size) {
+        read(data, offset, length) { index, value ->
+            this[index] = value
         }
-        _count += bin.limit
-        return bin.limit
     }
 }
