@@ -16,4 +16,8 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "angelos-project-sec"
+rootProject.name = "angelos-project-secrand"
+
+include(":library")
+include(":jazzer")
+include(":benchmark")

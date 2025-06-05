@@ -14,9 +14,6 @@
  */
 package org.angproj.sec.rand
 
-import org.angproj.aux.io.TypeSize
-import org.angproj.aux.util.EndianAware
-import org.angproj.aux.util.floorMod
 
 /**
  * AbstractSponge is a class that circumvents unnecessary
@@ -55,6 +52,6 @@ public abstract class AbstractSponge(
     }
 
     protected companion object {
-        protected val export: IntArray = intArrayOf(3, 7, 11, 19, 23, 31, 43, 47, 59, 67, 71, 79, 83, 103, 107, 127)
+        protected val export: List<Int> = listOf(3, 7, 11, 19, 23, 31, 43, 47, 59, 67, 71, 79, 83, 103, 107, 127)
     }
 }

@@ -44,11 +44,4 @@ public abstract class AbstractSponge256 : AbstractSponge(4, 4) {
 
         counter++
     }
-
-    /*override fun squeeze(data: BinaryWritable) {
-        data.writeLong((sponge[0] xor (mask * 3)))
-        data.writeLong((sponge[1] xor (mask * 7)))
-        data.writeLong((sponge[2] xor (mask * 11)))
-        data.writeLong((sponge[3] xor (mask * 19)))
-    }*/
 }

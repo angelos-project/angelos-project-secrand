@@ -14,24 +14,10 @@
  */
 package org.angproj.sec.rand
 
-import org.angproj.aux.io.Binary
-import org.angproj.aux.io.DataSize
-import org.angproj.aux.io.Reader
-import org.angproj.aux.io.TypeSize
-import org.angproj.aux.pipe.BinarySink
-import org.angproj.aux.pipe.BinarySource
-import org.angproj.aux.pipe.buildSink
-import org.angproj.aux.pipe.buildSource
-import org.angproj.aux.rand.InitializationVector.IV_3AC5
-import org.angproj.sec.GarbageGarbler
-import org.angproj.aux.util.floorMod
 import kotlin.time.TimeSource
 
 
-public object Entropy: Reader {
-
-    private val source: BinarySource
-    private val sink: BinarySink
+public object Entropy {
 
     init {
         val garble = GarbageGarbler()
