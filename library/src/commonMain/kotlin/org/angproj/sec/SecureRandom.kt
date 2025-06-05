@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 by Kristoffer Paulsson <kristoffer.paulsson@talenten.se>.
+ * Copyright (c) 2024-2025 by Kristoffer Paulsson <kristoffer.paulsson@talenten.se>.
  *
  * This software is available under the terms of the MIT license. Parts are licensed
  * under different terms if stated. The legal terms are attached to the LICENSE file
@@ -14,13 +14,15 @@
  */
 package org.angproj.sec
 
-import kotlin.native.concurrent.ThreadLocal
+import org.angproj.sec.util.ExportOctets
 
 /**
- * Portions a secure feed of random into a serviceable format of data for cryptographically secure use.
- * */
-@ThreadLocal
-public object SecureRandom {
+ * *SecureRandom provides a high-quality source of random numbers
+ * using a secure entropy feed. It reads bytes, shorts, ints, longs,
+ * and floating-point numbers from the secure random source.
+ * The values are normalized to their respective ranges.
+ */
+public object SecureRandom : ExportOctets {
 
     private val buffer = LongArray(128)
     private var position: Int = 0
@@ -29,19 +31,54 @@ public object SecureRandom {
         revitalize()
     }
 
+    /**
+     * Revitalizes the secure random source by reading from the secure feed.
+     * This method is called when the internal buffer is exhausted.
+     * It fills the buffer with new random data
+     * and resets the position to zero.
+     */
     private fun revitalize() {
         SecureFeed.read(buffer)
         position = 0
     }
 
+    /**
+     * Reads the next byte from the secure random source.
+     * If the internal buffer is exhausted, it revitalizes the buffer.
+     *
+     * @return The next byte as a Long value.
+     */
     internal fun nextByte(): Long {
         if (position >= 1024) revitalize()
         val num = buffer[position / 8]
         return (num ushr 8 * (position++ % 8)) and 0xff
     }
 
+    /**
+     * Reads the next short integer from the secure random source.
+     * It combines two bytes to form a short value.
+     * If the internal buffer is exhausted, it revitalizes the buffer.
+     *
+     * @return The next short as a Long value.
+     */
     internal fun nextShort(): Long = (nextByte() or (nextByte() shl 8)) and 0xffff
+
+    /**
+     * Reads the next integer from the secure random source.
+     * It combines four bytes to form an integer value.
+     * If the internal buffer is exhausted, it revitalizes the buffer.
+     *
+     * @return The next integer as a Long value.
+     */
     internal fun nextInt(): Long = (nextShort() or (nextShort() shl 16)) and 0xffffffffL
+
+    /**
+     * Reads the next long integer from the secure random source.
+     * It combines eight bytes to form a long value.
+     * If the internal buffer is exhausted, it revitalizes the buffer.
+     *
+     * @return The next long as a Long value.
+     */
     internal fun nextLong(): Long = (nextInt() or (nextInt() shl 32))
 
 
@@ -127,13 +164,15 @@ public object SecureRandom {
 
     /**
      * Reads bytes into a data structure from the secure random source.
+     * The data structure must provide a way to write bytes at specific indices.
+     * This function allows for custom data structures to be filled with random bytes.
      *
      * @param data The data structure to fill with random bytes.
      * @param offset The starting index in the data structure to write to.
      * @param length The number of bytes to read. Defaults to 0, meaning the entire data structure will be filled.
      * @param writeOctet A function that writes a byte at a specific index in the data structure.
      */
-    public fun <E> read(data: E, offset: Int = 0, length: Int = 0, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+    override fun <E> export(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
         require(length > 0) { "Zero length data" }
 
         repeat(length) { index ->
@@ -149,7 +188,7 @@ public object SecureRandom {
      * @param length The number of bytes to read. Defaults to the size of the ByteArray.
      */
     public fun readBytes(data: ByteArray, offset: Int = 0, length: Int = data.size) {
-        read(data, offset, length) { index, value ->
+        export(data, offset, length) { index, value ->
             this[index] = value
         }
     }

@@ -15,14 +15,18 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge512
-import kotlin.native.concurrent.ThreadLocal
+import org.angproj.sec.util.ExportOctets
 
 /**
- * Feed of secure random, revitalized with conditioned secure entropy
- * about every 4th to 12th megabyte for high quality of secure output.
- * */
-@ThreadLocal
-public object SecureFeed : AbstractSponge512() {
+ * SecureFeed is a singleton object that provides a secure random number generator
+ * based on the AbstractSponge512 algorithm. It uses a secure entropy source to
+ * generate random numbers and provides methods to read random bytes into various
+ * data structures.
+ *
+ * The SecureFeed object is designed to be used in cryptographic applications where
+ * high-quality randomness is required.
+ */
+public object SecureFeed : AbstractSponge512(), ExportOctets {
     private val ROUNDS_64K: Int = Short.MAX_VALUE * 2
     private val ROUNDS_128K: Int = Short.MAX_VALUE * 4
 
@@ -32,11 +36,20 @@ public object SecureFeed : AbstractSponge512() {
         revitalize()
     }
 
+    /**
+     * Revitalizes the secure random source by reading from the secure entropy.
+     * This method is called to fill the sponge with new entropy and reset the counter.
+     */
     private fun revitalize() {
         SecureEntropy.read(sponge)
         scramble()
     }
 
+    /**
+     * Checks if the current counter exceeds the next threshold.
+     * If it does, it resets the next threshold and revitalizes the sponge.
+     * This is used to ensure that the sponge is periodically refreshed with new entropy.
+     */
     override fun round() {
         if (counter > next) {
             next = ROUNDS_128K + sponge.first().mod(ROUNDS_64K)
@@ -46,6 +59,13 @@ public object SecureFeed : AbstractSponge512() {
         super.round()
     }
 
+    /**
+     * Reads random longs into a LongArray from the secure random source.
+     * This function fills the LongArray with random numbers starting from a specified offset.
+     * The data is read in chunks, and the sponge state is updated accordingly.
+     *
+     * @param data The LongArray to fill with random numbers.
+     */
     internal fun read(data: LongArray) {
         var offset = 0
         revitalize()
@@ -60,7 +80,22 @@ public object SecureFeed : AbstractSponge512() {
         }
     }
 
-    public fun <E> read(data: E, offset: Int = 0, length: Int = 0, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+    /**
+     * Reads bytes into a data structure from the secure random source.
+     * This function fills the data structure with random bytes
+     * starting from a specified offset and for a specified length.
+     *
+     * The data structure must provide a way to write bytes at specific indices
+     * and the function will write bytes in little-endian order.
+     * This is useful for filling buffers, arrays, or any other
+     * data structure that can hold bytes.
+     *
+     * @param data The data structure to fill with random bytes.
+     * @param offset The starting index in the data structure to write to.
+     * @param length The number of bytes to read. Defaults to 0, meaning the entire data structure.
+     * @param writeOctet A function that writes a byte at a specific index in the data structure.
+     */
+    override fun <E> export(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
         require(length > 0) { "Zero length data" }
 
         var index = 0
@@ -94,12 +129,6 @@ public object SecureFeed : AbstractSponge512() {
                 data.writeOctet(pos++, (rand and 0xFF).toByte())
                 rand = rand ushr 8
             }
-        }
-    }
-
-    public fun read(data: ByteArray, offset: Int = 0, length: Int = data.size) {
-        read(data, offset, length) { index, value ->
-            this[index] = value
         }
     }
 }

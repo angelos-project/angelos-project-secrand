@@ -26,7 +26,7 @@ import kotlin.time.TimeSource
  * but analogous. And thereby rounds the nanoseconds in an unpredictable way.
  * Thereby it is true random, however the entropy is conditioned to also be
  * natural, that is clearing Monte Carlo testing closing in on real PI.
- * */
+ */
 public object Entropy {
 
     /**

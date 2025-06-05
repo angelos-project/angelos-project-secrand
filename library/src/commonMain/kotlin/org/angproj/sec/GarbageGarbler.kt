@@ -16,69 +16,125 @@ package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge1024
 import org.angproj.sec.rand.Entropy
+import org.angproj.sec.util.ExportOctets
+import org.angproj.sec.util.ImportOctets
 
 
-public class GarbageGarbler(
-    public val staleSize: DataSize = DataSize._1G,
-): AbstractSponge1024(), PumpWriter, PumpReader {
+public class GarbageGarbler: AbstractSponge1024(), ExportOctets, ImportOctets {
 
-    private var inputCnt: Long = 0
-    private var outputCnt: Long = 0
     private var _count: Int = 0
+    public val count: Int
+        get() = _count
+
+    public val depleted: Boolean
+        get() = _count >= Int.MAX_VALUE / 2
 
     init {
-        val start = binOf(byteSize)
-        Entropy.realTimeGatedEntropy(start)
-        repeat(16) { absorb(start.retrieveLong(it * TypeSize.long), it) }
+        Entropy.realTimeGatedEntropy(sponge)
+        scramble()
     }
 
-    override val outputCount: Long
-        get() = inputCnt + outputCnt
+    /**
+     * Writes bytes from a data structure to the secure random source.
+     * This function absorbs bytes starting from a specified offset and for a specified length.
+     * The data structure must provide a way to read bytes at specific indices,
+     * and the function will read bytes in little-endian order.
+     *
+     * @param data The data structure to read bytes from.
+     * @param offset The starting index in the data structure to read from.
+     * @param length The number of bytes to write. Defaults to 0, meaning the entire data structure.
+     * @param readOctet A function that reads a byte at a specific index in the data structure.
+     */
+    override fun <E> import(data: E, offset: Int, length: Int, readOctet: E.(index: Int) -> Byte) {
+        require(length > 0) { "Zero length data" }
 
-    override val inputCount: Long
-        get() =  inputCnt
-
-    override val inputStale: Boolean = false
-
-    override val outputStale: Boolean
-        get() = _count >= staleSize.size
-
-    private fun require(length: Int) {
-        require(length.floorMod(byteSize) == 0) { "Garble must be divisible by the length of the inner sponge." }
-    }
-
-    override fun write(data: Segment<*>): Int {
-        require(data.limit)
         var index = 0
-        repeat(data.limit / byteSize) {
-            repeat(16) {
-                absorb(data.getLong(index), it)
-                index += TypeSize.long
+        var pos = offset
+
+        val loops = length / 8
+        val remaining = length % 8
+
+        repeat(loops) {
+            var rand = 0L
+            // Little-endian conversion
+            repeat(8) {
+                rand = rand shl 8 or data.readOctet(pos++).toLong()
             }
+            absorb(rand, index++)
+
+            if (index >= visibleSize) {
+                round()
+                index = 0
+            }
+        }
+
+        if (remaining > 0) {
+            var rand = 0L
+
+            // Little-endian conversion for remaining bytes
+            repeat(remaining) {
+                rand = rand shl 8 or data.readOctet(pos++).toLong()
+            }
+            absorb(rand, index)
+        }
+
+        if(pos > 0) {
             scramble()
         }
-        inputCnt += data.limit
         _count = 0
-        return data.limit
     }
 
-    private fun fill(data: Segment<*>) {
+    /**
+     * Reads bytes into a data structure from the secure random source.
+     * This function fills the data structure with random bytes
+     * starting from a specified offset and for a specified length.
+     *
+     * The data structure must provide a way to write bytes at specific indices
+     * and the function will write bytes in little-endian order.
+     * This is useful for filling buffers, arrays, or any other
+     * data structure that can hold bytes.
+     *
+     * @param data The data structure to fill with random bytes.
+     * @param offset The starting index in the data structure to write to.
+     * @param length The number of bytes to read. Defaults to 0, meaning the entire data structure.
+     * @param writeOctet A function that writes a byte at a specific index in the data structure.
+     */
+    override fun <E> export(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+        check(depleted) { "Secure amount of random depleted" }
+        require(length > 0) { "Zero length data" }
+
         var index = 0
-        repeat(data.limit / byteSize) {
-            repeat(visibleSize) {
-                data.setLong(index, squeeze(it))
-                index += TypeSize.long
-            }
-            round()
-        }
-    }
+        var pos = offset
 
-    public override fun read(data: Segment<*>): Int {
-        require(data.limit)
-        if(data.limit + _count > staleSize.size) return 0
-        fill(data)
-        outputCnt += data.limit
-        _count += data.limit
-        return data.limit
+        val loops = length / 8
+        val remaining = length % 8
+
+        repeat(loops) {
+            var rand = squeeze(index)
+
+            // Little-endian conversion
+            repeat(8) {
+                data.writeOctet(pos++, (rand and 0xFF).toByte())
+                rand = rand ushr 8
+            }
+
+            index++
+            if (index >= visibleSize) {
+                round()
+                index = 0
+            }
+        }
+
+        if (remaining > 0) {
+            var rand = squeeze(index)
+
+            // Little-endian conversion for remaining bytes
+            repeat(remaining) {
+                data.writeOctet(pos++, (rand and 0xFF).toByte())
+                rand = rand ushr 8
+            }
+        }
+
+        _count += pos
     }
 }

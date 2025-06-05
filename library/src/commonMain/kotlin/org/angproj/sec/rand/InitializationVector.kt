@@ -58,7 +58,7 @@ package org.angproj.sec.rand
  * Each option repeating itself four times over to create a simple initialization vector with
  * an equal amount of ones and zeroes quite arbitrarily but not perfect. So that no hidden
  * weaknesses would be disguised, and hopefully no speculations of planted backdoors may occur.
- * */
+ */
 public enum class InitializationVector(public val iv: Long) {
     IV_3569(0x3569356935693569uL.toLong()),
     IV_356A(0x356A356A356A356AuL.toLong()),

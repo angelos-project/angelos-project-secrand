@@ -16,29 +16,30 @@ package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.Entropy
+import org.angproj.sec.util.ExportOctets
+import org.angproj.sec.util.ImportOctets
 import org.angproj.sec.util.floorMod
-import kotlin.native.concurrent.ThreadLocal
 
 /**
- * Conditioned entropy mixed with pseudo-random but revitalizes with real entropy on every read.
- * Supposed to pass Monte Carlo testing and security requirements of output quality.
- * */
-@ThreadLocal
-public object SecureEntropy : AbstractSponge256() {
+ * SecureEntropy is a singleton object that provides a secure source of entropy
+ * using a sponge construction with a size of 256 bits. It revitalizes the sponge
+ * with real-time gated entropy and provides methods to read random bytes.
+ */
+public object SecureEntropy : AbstractSponge256(), ExportOctets {
 
     init {
         revitalize()
     }
 
+    /**
+     * Revitalizes the sponge by reading real-time gated entropy and scrambling the state.
+     * This method is called to ensure that the sponge has fresh entropy before reading.
+     */
     private fun revitalize() {
         Entropy.realTimeGatedEntropy(sponge)
         scramble()
     }
 
-    private fun require(length: Int) {
-        require(length.floorMod(byteSize) == 0) { "Length must be divisible by $byteSize." }
-        require(length <= 1024) { "Length must not surpass 1 Kilobyte." }
-    }
 
     internal fun read(data: LongArray) {
         var offset = 0
@@ -54,7 +55,15 @@ public object SecureEntropy : AbstractSponge256() {
         }
     }
 
-    public fun <E> read(data: E, offset: Int = 0, length: Int = 0, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+    /**
+     * Reads random bytes into the provided data structure.
+     *
+     * @param data The data structure to write the random bytes into.
+     * @param offset The starting position in the data structure.
+     * @param length The number of bytes to read.
+     * @param writeOctet A function that writes a byte at a specific index in the data structure.
+     */
+    override fun <E> export(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
         require(length > 0) { "Zero length data" }
 
         var index = 0
@@ -88,12 +97,6 @@ public object SecureEntropy : AbstractSponge256() {
                 data.writeOctet(pos++, (rand and 0xFF).toByte())
                 rand = rand ushr 8
             }
-        }
-    }
-
-    public fun read(data: ByteArray, offset: Int = 0, length: Int = data.size) {
-        read(data, offset, length) { index, value ->
-            this[index] = value
         }
     }
 }

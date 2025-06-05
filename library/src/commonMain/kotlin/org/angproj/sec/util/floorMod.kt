@@ -16,4 +16,11 @@ package org.angproj.sec.util
 
 import kotlin.math.absoluteValue
 
+/**
+ * Returns the floor modulus of this integer with respect to another integer.
+ * The result is always non-negative, even if the original number is negative.
+ *
+ * @param other The divisor for the modulus operation.
+ * @return The non-negative floor modulus of this integer with respect to the other integer.
+ */
 public fun Int.floorMod(other: Int): Int = this.absoluteValue.mod(other.absoluteValue)
