@@ -14,28 +14,64 @@
  */
 package org.angproj.sec
 
+import org.angproj.sec.rand.AbstractRandom
 import org.angproj.sec.rand.AbstractSponge1024
 import org.angproj.sec.rand.Entropy
-import org.angproj.sec.util.ExportOctetByte
 import org.angproj.sec.util.ImportOctetByte
 
 
-public class GarbageGarbler: ExportOctetByte, ImportOctetByte {
+public class GarbageGarbler: AbstractRandom(), ImportOctetByte {
 
     private val sponge: AbstractSponge1024 = object : AbstractSponge1024() {}
 
+    private val entropy: ByteArray = ByteArray(128)
+    private var entropyPos = 0
+
     private var _count: Int = 0
     public val count: Int
-        get() = _count
+        get() = _count + position
 
     public val depleted: Boolean
-        get() = _count >= Int.MAX_VALUE / 2
+        get() = count >= Int.MAX_VALUE / 2
 
     init {
         Entropy.exportLongs(sponge, 0, sponge.visibleSize) { index, value ->
             sponge.absorb(value, index)
         }
         sponge.scramble()
+    }
+
+    private fun reseed() {
+        var position = 0
+
+        repeat(sponge.visibleSize) { idx ->
+            var seed = 0L
+            repeat(8) {
+                seed = (seed shl 8) or entropy[position++].toLong()
+            }
+            sponge.absorb(seed, idx)
+        }
+
+        sponge.scramble()
+        entropy.fill(0)
+
+        entropyPos = 0
+        _count = 0
+    }
+
+    override fun refill() {
+        check(!depleted) { "GarbageGarbler is depleted" }
+        var position = 0
+
+        repeat(buffer.size) {
+            buffer[it] = sponge.squeeze(position++)
+
+            if (position >= sponge.visibleSize) {
+                sponge.round()
+                position = 0
+            }
+        }
+        _count += this.position // Gets reset at every revitalize, therefore add to count
     }
 
     /**
@@ -52,40 +88,13 @@ public class GarbageGarbler: ExportOctetByte, ImportOctetByte {
     override fun <E> importBytes(data: E, offset: Int, length: Int, readOctet: E.(index: Int) -> Byte) {
         require(length > 0) { "Zero length data" }
 
-        var index = 0
-        var pos = offset
+        repeat(length) { index ->
+            entropy[entropyPos++] = data.readOctet(index + offset)
 
-        val loops = length / 8
-        val remaining = length % 8
-
-        repeat(loops) {
-            var rand = 0L
-            // Little-endian conversion
-            repeat(8) {
-                rand = rand shl 8 or data.readOctet(pos++).toLong()
-            }
-            sponge.absorb(rand, index++)
-
-            if (index >= sponge.visibleSize) {
-                sponge.round()
-                index = 0
+            if (entropyPos >= entropy.size) {
+                reseed()
             }
         }
-
-        if (remaining > 0) {
-            var rand = 0L
-
-            // Little-endian conversion for remaining bytes
-            repeat(remaining) {
-                rand = rand shl 8 or data.readOctet(pos++).toLong()
-            }
-            sponge.absorb(rand, index)
-        }
-
-        if(pos > 0) {
-            sponge.scramble()
-        }
-        _count = 0
     }
 
     /**
@@ -103,42 +112,8 @@ public class GarbageGarbler: ExportOctetByte, ImportOctetByte {
      * @param length The number of bytes to read. Defaults to 0, meaning the entire data structure.
      * @param writeOctet A function that writes a byte at a specific index in the data structure.
      */
-    override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
-        check(depleted) { "Secure amount of random depleted" }
-        require(length > 0) { "Zero length data" }
-
-        var index = 0
-        var pos = offset
-
-        val loops = length / 8
-        val remaining = length % 8
-
-        repeat(loops) {
-            var rand = sponge.squeeze(index)
-
-            // Little-endian conversion
-            repeat(8) {
-                data.writeOctet(pos++, (rand and 0xFF).toByte())
-                rand = rand ushr 8
-            }
-
-            index++
-            if (index >= sponge.visibleSize) {
-                sponge.round()
-                index = 0
-            }
-        }
-
-        if (remaining > 0) {
-            var rand = sponge.squeeze(index)
-
-            // Little-endian conversion for remaining bytes
-            repeat(remaining) {
-                data.writeOctet(pos++, (rand and 0xFF).toByte())
-                rand = rand ushr 8
-            }
-        }
-
-        _count += pos
-    }
+    /*override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+        super.exportBytes(data, offset, length, writeOctet)
+        _count += length
+    }*/
 }

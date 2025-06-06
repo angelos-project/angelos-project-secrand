@@ -47,21 +47,21 @@ public object Entropy: ExportOctetLong, ExportOctetByte {
      *
      * @return An instance of [EntropyState] containing the start time and initial entropy value.
      */
-    private fun initializeEntropy(): EntropyState {
+    private inline fun<reified R: Any> initializeEntropy(): EntropyState {
         val start = TimeSource.Monotonic.markNow()
         return EntropyState(
             start,InitializationVector.IV_3AC5.iv * start.elapsedNow().inWholeNanoseconds
         )
     }
 
-    private fun entropyRound(state: EntropyState) {
+    private inline fun<reified R: Any> entropyRound(state: EntropyState) {
         state.entropy = ((-state.entropy.inv() * 5) xor state.start.elapsedNow().inWholeNanoseconds).rotateLeft(32)
     }
 
-    private fun readLongEntropy(size: Int, state: EntropyState): Long {
+    private inline fun<reified R: Any> readLongEntropy(size: Int, state: EntropyState): Long {
         var data: Long = 0
         repeat(max(size, 8)) { _ ->
-            entropyRound(state)
+            entropyRound<Unit>(state)
             data = (data shl 8) or (state.entropy and 0xFF)
         }
         return data
@@ -74,10 +74,10 @@ public object Entropy: ExportOctetLong, ExportOctetByte {
      */
     override fun <E> exportLongs(data: E, offset: Int, length: Int, writeOctet: E.(Int, Long) -> Unit) {
         require(length <= 128) { "To large for time-gated entropy! Max 1Kb." }
-        val state = initializeEntropy()
+        val state = initializeEntropy<Unit>()
 
         repeat(length) { index ->
-            data.writeOctet(offset + index, readLongEntropy(8, state))
+            data.writeOctet(offset + index, readLongEntropy<Unit>(8, state))
         }
     }
 
@@ -89,10 +89,10 @@ public object Entropy: ExportOctetLong, ExportOctetByte {
     override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
         require(length <= 1024) { "To large for time-gated entropy! Max 1Kb." }
 
-        val state = initializeEntropy()
+        val state = initializeEntropy<Unit>()
 
         repeat(length) { index ->
-            entropyRound(state)
+            entropyRound<Unit>(state)
             data.writeOctet(offset + index, state.entropy.toByte())
         }
     }

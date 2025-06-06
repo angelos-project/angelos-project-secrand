@@ -1,6 +1,7 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractRandom
+import org.angproj.sec.rand.Entropy
 
 public fun main() {
     val samples = 10_000_000
@@ -25,4 +26,20 @@ public fun main() {
     }
     benchmark2.estimatePi()
     println(benchmark2)
+
+    val benchmark3 = MonteCarlo(samples) {
+        object : AbstractRandom() {
+            init {
+                refill()
+            }
+
+            override fun refill() {
+                Entropy.exportLongs(buffer, 0, buffer.size) { index, value ->
+                    buffer[index] = value
+                }
+            }
+        }
+    }
+    benchmark3.estimatePi()
+    println(benchmark3)
 }
