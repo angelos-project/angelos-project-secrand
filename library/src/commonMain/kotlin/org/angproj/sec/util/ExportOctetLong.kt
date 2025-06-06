@@ -14,6 +14,6 @@
  */
 package org.angproj.sec.util
 
-public interface ExportOctets {
-    public fun <E> export(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit)
+public interface ExportOctetLong {
+    public fun <E> exportLongs(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Long) -> Unit)
 }

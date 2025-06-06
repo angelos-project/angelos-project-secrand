@@ -14,6 +14,8 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.util.ExportOctetByte
+import org.angproj.sec.util.ExportOctetLong
 import kotlin.math.max
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
@@ -27,7 +29,7 @@ import kotlin.time.TimeSource
  * Thereby it is true random, however the entropy is conditioned to also be
  * natural, that is clearing Monte Carlo testing closing in on real PI.
  */
-public object Entropy {
+public object Entropy: ExportOctetLong, ExportOctetByte {
 
     /**
      * EntropyState holds the state of the entropy source, including the start time and the current entropy value.
@@ -66,32 +68,32 @@ public object Entropy {
     }
 
     /**
-     * Generates real time-gated entropy for a ByteArray.
-     *
-     * @param data The ByteArray to be filled with time-gated entropy.
-     */
-    public fun realTimeGatedEntropy(data: ByteArray) {
-        require(data.size <= 1024) { "To large for time-gated entropy! Max 1Kb." }
-
-        val state = initializeEntropy()
-
-        repeat(data.size) { index ->
-            entropyRound(state)
-            data[index] = state.entropy.toByte()
-        }
-    }
-
-    /**
      * Generates real time-gated entropy for a LongArray.
      *
      * @param data The LongArray to be filled with time-gated entropy.
      */
-    internal fun realTimeGatedEntropy(data: LongArray) {
-        require(data.size <= 128) { "To large for time-gated entropy! Max 1Kb." }
+    override fun <E> exportLongs(data: E, offset: Int, length: Int, writeOctet: E.(Int, Long) -> Unit) {
+        require(length <= 128) { "To large for time-gated entropy! Max 1Kb." }
         val state = initializeEntropy()
 
-        repeat(data.size) { index ->
-            data[index] = readLongEntropy(8, state)
+        repeat(length) { index ->
+            data.writeOctet(offset + index, readLongEntropy(8, state))
+        }
+    }
+
+    /**
+     * Generates real time-gated entropy for a ByteArray.
+     *
+     * @param data The ByteArray to be filled with time-gated entropy.
+     */
+    override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+        require(length <= 1024) { "To large for time-gated entropy! Max 1Kb." }
+
+        val state = initializeEntropy()
+
+        repeat(length) { index ->
+            entropyRound(state)
+            data.writeOctet(offset + index, state.entropy.toByte())
         }
     }
 }

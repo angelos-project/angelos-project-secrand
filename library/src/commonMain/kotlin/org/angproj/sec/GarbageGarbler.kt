@@ -15,12 +15,15 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge1024
+import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.Entropy
-import org.angproj.sec.util.ExportOctets
-import org.angproj.sec.util.ImportOctets
+import org.angproj.sec.util.ExportOctetByte
+import org.angproj.sec.util.ImportOctetByte
 
 
-public class GarbageGarbler: AbstractSponge1024(), ExportOctets, ImportOctets {
+public class GarbageGarbler: ExportOctetByte, ImportOctetByte {
+
+    private val sponge: AbstractSponge1024 = object : AbstractSponge1024() {}
 
     private var _count: Int = 0
     public val count: Int
@@ -30,8 +33,10 @@ public class GarbageGarbler: AbstractSponge1024(), ExportOctets, ImportOctets {
         get() = _count >= Int.MAX_VALUE / 2
 
     init {
-        Entropy.realTimeGatedEntropy(sponge)
-        scramble()
+        Entropy.exportLongs(sponge, 0, sponge.visibleSize) { index, value ->
+            sponge.absorb(value, index)
+        }
+        sponge.scramble()
     }
 
     /**
@@ -45,7 +50,7 @@ public class GarbageGarbler: AbstractSponge1024(), ExportOctets, ImportOctets {
      * @param length The number of bytes to write. Defaults to 0, meaning the entire data structure.
      * @param readOctet A function that reads a byte at a specific index in the data structure.
      */
-    override fun <E> import(data: E, offset: Int, length: Int, readOctet: E.(index: Int) -> Byte) {
+    override fun <E> importBytes(data: E, offset: Int, length: Int, readOctet: E.(index: Int) -> Byte) {
         require(length > 0) { "Zero length data" }
 
         var index = 0
@@ -60,10 +65,10 @@ public class GarbageGarbler: AbstractSponge1024(), ExportOctets, ImportOctets {
             repeat(8) {
                 rand = rand shl 8 or data.readOctet(pos++).toLong()
             }
-            absorb(rand, index++)
+            sponge.absorb(rand, index++)
 
-            if (index >= visibleSize) {
-                round()
+            if (index >= sponge.visibleSize) {
+                sponge.round()
                 index = 0
             }
         }
@@ -75,11 +80,11 @@ public class GarbageGarbler: AbstractSponge1024(), ExportOctets, ImportOctets {
             repeat(remaining) {
                 rand = rand shl 8 or data.readOctet(pos++).toLong()
             }
-            absorb(rand, index)
+            sponge.absorb(rand, index)
         }
 
         if(pos > 0) {
-            scramble()
+            sponge.scramble()
         }
         _count = 0
     }
@@ -99,7 +104,7 @@ public class GarbageGarbler: AbstractSponge1024(), ExportOctets, ImportOctets {
      * @param length The number of bytes to read. Defaults to 0, meaning the entire data structure.
      * @param writeOctet A function that writes a byte at a specific index in the data structure.
      */
-    override fun <E> export(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+    override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
         check(depleted) { "Secure amount of random depleted" }
         require(length > 0) { "Zero length data" }
 
@@ -110,7 +115,7 @@ public class GarbageGarbler: AbstractSponge1024(), ExportOctets, ImportOctets {
         val remaining = length % 8
 
         repeat(loops) {
-            var rand = squeeze(index)
+            var rand = sponge.squeeze(index)
 
             // Little-endian conversion
             repeat(8) {
@@ -119,14 +124,14 @@ public class GarbageGarbler: AbstractSponge1024(), ExportOctets, ImportOctets {
             }
 
             index++
-            if (index >= visibleSize) {
-                round()
+            if (index >= sponge.visibleSize) {
+                sponge.round()
                 index = 0
             }
         }
 
         if (remaining > 0) {
-            var rand = squeeze(index)
+            var rand = sponge.squeeze(index)
 
             // Little-endian conversion for remaining bytes
             repeat(remaining) {

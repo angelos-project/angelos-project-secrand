@@ -15,7 +15,9 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge512
-import org.angproj.sec.util.ExportOctets
+import org.angproj.sec.util.ExportOctetByte
+import org.angproj.sec.util.ExportOctetLong
+import org.angproj.sec.util.floorMod
 
 /**
  * SecureFeed is a singleton object that provides a secure random number generator
@@ -26,11 +28,14 @@ import org.angproj.sec.util.ExportOctets
  * The SecureFeed object is designed to be used in cryptographic applications where
  * high-quality randomness is required.
  */
-public object SecureFeed : AbstractSponge512(), ExportOctets {
+public object SecureFeed : ExportOctetLong, ExportOctetByte {
     private val ROUNDS_64K: Int = Short.MAX_VALUE * 2
     private val ROUNDS_128K: Int = Short.MAX_VALUE * 4
 
+    private val sponge: AbstractSponge512 = object : AbstractSponge512() {}
+
     private var next: Int = 0
+    private var counter: Int = 0
 
     init {
         revitalize()
@@ -41,8 +46,10 @@ public object SecureFeed : AbstractSponge512(), ExportOctets {
      * This method is called to fill the sponge with new entropy and reset the counter.
      */
     private fun revitalize() {
-        SecureEntropy.read(sponge)
-        scramble()
+        SecureEntropy.exportLongs(sponge, 0, sponge.visibleSize) { index, value ->
+            sponge.absorb(value, index)
+        }
+        sponge.scramble()
     }
 
     /**
@@ -50,13 +57,14 @@ public object SecureFeed : AbstractSponge512(), ExportOctets {
      * If it does, it resets the next threshold and revitalizes the sponge.
      * This is used to ensure that the sponge is periodically refreshed with new entropy.
      */
-    override fun round() {
+    private fun round() {
         if (counter > next) {
-            next = ROUNDS_128K + sponge.first().mod(ROUNDS_64K)
+            next = ROUNDS_128K + sponge.squeeze(0).toInt().floorMod(ROUNDS_64K)
             revitalize()
-            counter = 1
+            counter = 0
         }
-        super.round()
+        sponge.round()
+        counter++
     }
 
     /**
@@ -66,16 +74,19 @@ public object SecureFeed : AbstractSponge512(), ExportOctets {
      *
      * @param data The LongArray to fill with random numbers.
      */
-    internal fun read(data: LongArray) {
-        var offset = 0
-        revitalize()
+    override fun <E> exportLongs(data: E, offset: Int, length: Int, writeOctet: E.(Int, Long) -> Unit) {
+        require(length > 0) { "Zero length data" }
 
-        repeat(data.size) {
-            data[it] = squeeze(offset)
-            offset++
-            if (offset >= visibleSize) {
+        var index = 0
+        var pos = offset
+
+        repeat(length) {
+            data.writeOctet(pos++, sponge.squeeze(index))
+
+            index++
+            if (index >= sponge.visibleSize) {
                 round()
-                offset = 0
+                index = 0
             }
         }
     }
@@ -95,18 +106,17 @@ public object SecureFeed : AbstractSponge512(), ExportOctets {
      * @param length The number of bytes to read. Defaults to 0, meaning the entire data structure.
      * @param writeOctet A function that writes a byte at a specific index in the data structure.
      */
-    override fun <E> export(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+    override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
         require(length > 0) { "Zero length data" }
 
         var index = 0
         var pos = offset
-        revitalize()
 
         val loops = length / 8
         val remaining = length % 8
 
         repeat(loops) {
-            var rand = squeeze(index)
+            var rand = sponge.squeeze(index)
 
             // Little-endian conversion
             repeat(8) {
@@ -115,14 +125,14 @@ public object SecureFeed : AbstractSponge512(), ExportOctets {
             }
 
             index++
-            if (index >= visibleSize) {
+            if (index >= sponge.visibleSize) {
                 round()
                 index = 0
             }
         }
 
         if (remaining > 0) {
-            var rand = squeeze(index)
+            var rand = sponge.squeeze(index)
 
             // Little-endian conversion for remaining bytes
             repeat(remaining) {

@@ -14,7 +14,7 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.util.ExportOctets
+import org.angproj.sec.util.ExportOctetByte
 
 /**
  * *SecureRandom provides a high-quality source of random numbers
@@ -22,7 +22,7 @@ import org.angproj.sec.util.ExportOctets
  * and floating-point numbers from the secure random source.
  * The values are normalized to their respective ranges.
  */
-public object SecureRandom : ExportOctets {
+public object SecureRandom : ExportOctetByte {
 
     private val buffer = LongArray(128)
     private var position: Int = 0
@@ -38,7 +38,9 @@ public object SecureRandom : ExportOctets {
      * and resets the position to zero.
      */
     private fun revitalize() {
-        SecureFeed.read(buffer)
+        SecureEntropy.exportLongs(buffer, 0, buffer.size) { index, value ->
+            buffer[index] = value
+        }
         position = 0
     }
 
@@ -172,7 +174,7 @@ public object SecureRandom : ExportOctets {
      * @param length The number of bytes to read. Defaults to 0, meaning the entire data structure will be filled.
      * @param writeOctet A function that writes a byte at a specific index in the data structure.
      */
-    override fun <E> export(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+    override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
         require(length > 0) { "Zero length data" }
 
         repeat(length) { index ->
@@ -188,7 +190,7 @@ public object SecureRandom : ExportOctets {
      * @param length The number of bytes to read. Defaults to the size of the ByteArray.
      */
     public fun readBytes(data: ByteArray, offset: Int = 0, length: Int = data.size) {
-        export(data, offset, length) { index, value ->
+        exportBytes(data, offset, length) { index, value ->
             this[index] = value
         }
     }

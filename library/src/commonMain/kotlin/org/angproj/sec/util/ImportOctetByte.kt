@@ -12,20 +12,8 @@
  * Contributors:
  *      Kristoffer Paulsson - initial implementation
  */
-package org.anhproj.sec
+package org.angproj.sec.util
 
-import org.angproj.sec.SecureRandom
-import kotlin.test.Test
-
-class SecureRandomTest {
-
-    @OptIn(ExperimentalStdlibApi::class)
-    @Test
-    fun testReadBytes() {
-        val bytes = ByteArray(1024)
-        repeat(10) {
-            SecureRandom.readBytes(bytes)
-            println(bytes.toHexString())
-        }
-    }
+public interface ImportOctetByte {
+    public fun <E> importBytes(data: E, offset: Int, length: Int, readOctet: E.(index: Int) -> Byte)
 }

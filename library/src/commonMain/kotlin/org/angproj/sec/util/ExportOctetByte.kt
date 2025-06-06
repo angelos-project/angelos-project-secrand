@@ -14,6 +14,6 @@
  */
 package org.angproj.sec.util
 
-public interface ImportOctets {
-    public fun <E> import(data: E, offset: Int, length: Int, readOctet: E.(index: Int) -> Byte)
+public interface ExportOctetByte {
+    public fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit)
 }

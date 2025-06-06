@@ -24,3 +24,5 @@ import kotlin.math.absoluteValue
  * @return The non-negative floor modulus of this integer with respect to the other integer.
  */
 public fun Int.floorMod(other: Int): Int = this.absoluteValue.mod(other.absoluteValue)
+
+public fun Long.floorMod(other: Long): Long = this.absoluteValue.mod(other.absoluteValue)

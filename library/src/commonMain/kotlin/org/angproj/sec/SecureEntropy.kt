@@ -16,16 +16,17 @@ package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.Entropy
-import org.angproj.sec.util.ExportOctets
-import org.angproj.sec.util.ImportOctets
-import org.angproj.sec.util.floorMod
+import org.angproj.sec.util.ExportOctetByte
+import org.angproj.sec.util.ExportOctetLong
 
 /**
  * SecureEntropy is a singleton object that provides a secure source of entropy
  * using a sponge construction with a size of 256 bits. It revitalizes the sponge
  * with real-time gated entropy and provides methods to read random bytes.
  */
-public object SecureEntropy : AbstractSponge256(), ExportOctets {
+public object SecureEntropy : ExportOctetLong, ExportOctetByte {
+
+    private val sponge: AbstractSponge256 = object : AbstractSponge256() {}
 
     init {
         revitalize()
@@ -36,21 +37,26 @@ public object SecureEntropy : AbstractSponge256(), ExportOctets {
      * This method is called to ensure that the sponge has fresh entropy before reading.
      */
     private fun revitalize() {
-        Entropy.realTimeGatedEntropy(sponge)
-        scramble()
+        Entropy.exportLongs(sponge, 0, sponge.visibleSize) { index, value ->
+            sponge.absorb(value, index)
+        }
+        sponge.scramble()
     }
 
+    override fun <E> exportLongs(data: E, offset: Int, length: Int, writeOctet: E.(Int, Long) -> Unit) {
+        require(length > 0) { "Zero length data" }
 
-    internal fun read(data: LongArray) {
-        var offset = 0
+        var index = 0
+        var pos = offset
         revitalize()
 
-        repeat(data.size) {
-            data[it] = squeeze(offset)
-            offset++
-            if (offset >= visibleSize) {
-                round()
-                offset = 0
+        repeat(length) {
+            data.writeOctet(pos++, sponge.squeeze(index))
+
+            index++
+            if (index >= sponge.visibleSize) {
+                sponge.round()
+                index = 0
             }
         }
     }
@@ -63,7 +69,7 @@ public object SecureEntropy : AbstractSponge256(), ExportOctets {
      * @param length The number of bytes to read.
      * @param writeOctet A function that writes a byte at a specific index in the data structure.
      */
-    override fun <E> export(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+    override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
         require(length > 0) { "Zero length data" }
 
         var index = 0
@@ -74,7 +80,7 @@ public object SecureEntropy : AbstractSponge256(), ExportOctets {
         val remaining = length % 8
 
         repeat(loops) {
-            var rand = squeeze(index)
+            var rand = sponge.squeeze(index)
 
             // Little-endian conversion
             repeat(8) {
@@ -83,14 +89,14 @@ public object SecureEntropy : AbstractSponge256(), ExportOctets {
             }
 
             index++
-            if (index >= visibleSize) {
-                round()
+            if (index >= sponge.visibleSize) {
+                sponge.round()
                 index = 0
             }
         }
 
         if (remaining > 0) {
-            var rand = squeeze(index)
+            var rand = sponge.squeeze(index)
 
             // Little-endian conversion for remaining bytes
             repeat(remaining) {

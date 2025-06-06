@@ -25,7 +25,7 @@ package org.angproj.sec
  * @param length The number of bytes to read. Defaults to the size of the ByteArray.
  */
 public fun SecureFeed.read(data: ByteArray, offset: Int = 0, length: Int = data.size) {
-    export(data, offset, length) { index, value ->
+    exportBytes(data, offset, length) { index, value ->
         this[index] = value
     }
 }
@@ -39,7 +39,7 @@ public fun SecureFeed.read(data: ByteArray, offset: Int = 0, length: Int = data.
  * @param length The number of bytes to read. Defaults to the size of the ByteArray.
  */
 public fun SecureEntropy.read(data: ByteArray, offset: Int = 0, length: Int = data.size) {
-    export(data, offset, length) { index, value ->
+    exportBytes(data, offset, length) { index, value ->
         this[index] = value
     }
 }
@@ -55,7 +55,7 @@ public fun SecureEntropy.read(data: ByteArray, offset: Int = 0, length: Int = da
  * @param length The number of bytes to write. Defaults to the size of the ByteArray.
  */
 public fun GarbageGarbler.write(data: ByteArray, offset: Int = 0, length: Int = data.size) {
-    import(data, offset, length) { index ->
+    importBytes(data, offset, length) { index ->
         this[index]
     }
 }
@@ -71,7 +71,7 @@ public fun GarbageGarbler.write(data: ByteArray, offset: Int = 0, length: Int = 
  * @param length The number of bytes to read. Defaults to the size of the ByteArray.
  */
 public fun GarbageGarbler.read(data: ByteArray, offset: Int = 0, length: Int = data.size) {
-    export(data, offset, length) { index, value ->
+    exportBytes(data, offset, length) { index, value ->
         this[index] = value
     }
 }
