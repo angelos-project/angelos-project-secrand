@@ -27,20 +27,20 @@ public abstract class AbstractSponge256 : AbstractSponge(4, 4) {
         val r1 = sponge[1] xor sponge[3]
 
         val temp = -sponge[3].inv() * 29
-        sponge[3] = -sponge[2].inv() * 17
-        sponge[2] = -sponge[1].inv() * 13
-        sponge[1] = -sponge[0].inv() * 5
-        sponge[0] = temp.rotateLeft(32)
+        val sponge3 = -sponge[2].inv() * 17
+        val sponge2 = -sponge[1].inv() * 13
+        val sponge1 = -sponge[0].inv() * 5
+        val sponge0 = temp.rotateLeft(32)
 
-        mask = (sponge[0] and sponge[2] and counter and mask) xor
-                ((sponge[1] and sponge[3] and counter.inv()) * 2) xor
+        mask = (sponge0 and sponge2 and counter and mask) xor
+                ((sponge1 and sponge3 and counter.inv()) * 2) xor
                 ((r0 and r1) * 4) xor
                 (d * 8)
 
-        sponge[0] = sponge[0] xor r0
-        sponge[1] = sponge[1] xor r0
-        sponge[2] = sponge[2] xor r1
-        sponge[3] = sponge[3] xor r1
+        sponge[0] = sponge0 xor r0
+        sponge[1] = sponge1 xor r0
+        sponge[2] = sponge2 xor r1
+        sponge[3] = sponge3 xor r1
 
         counter++
     }
