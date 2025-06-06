@@ -26,7 +26,7 @@ import org.angproj.sec.util.floorMod
  * @property visibleSize The number of long variables that are visible for output.
  */
 public abstract class AbstractSponge(
-    spongeSize: Int = 0,
+    public val spongeSize: Int = 0,
     public val visibleSize: Int = 0,
 ) {
     protected var counter: Long = 0
