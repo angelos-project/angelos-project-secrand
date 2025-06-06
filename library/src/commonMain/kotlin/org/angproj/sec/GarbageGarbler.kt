@@ -15,7 +15,6 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge1024
-import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.Entropy
 import org.angproj.sec.util.ExportOctetByte
 import org.angproj.sec.util.ImportOctetByte

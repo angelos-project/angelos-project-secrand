@@ -1,5 +1,28 @@
 package org.angproj.sec
 
+import org.angproj.sec.rand.AbstractRandom
+
 public fun main() {
-    println("Future benchmarking code will go here.")
+    val samples = 10_000_000
+    val benchmark = MonteCarlo(samples) {
+        SecureRandom
+    }
+    benchmark.estimatePi()
+    println(benchmark)
+
+    val benchmark2 = MonteCarlo(samples) {
+        object : AbstractRandom() {
+            init {
+                refill()
+            }
+
+            override fun refill() {
+                SecureEntropy.exportLongs(buffer, 0, buffer.size) { index, value ->
+                    buffer[index] = value
+                }
+            }
+        }
+    }
+    benchmark2.estimatePi()
+    println(benchmark2)
 }

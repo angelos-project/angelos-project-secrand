@@ -48,9 +48,9 @@ public object Entropy: ExportOctetLong, ExportOctetByte {
      * @return An instance of [EntropyState] containing the start time and initial entropy value.
      */
     private fun initializeEntropy(): EntropyState {
+        val start = TimeSource.Monotonic.markNow()
         return EntropyState(
-            start = TimeSource.Monotonic.markNow(),
-            entropy = InitializationVector.IV_3AC5.iv * TimeSource.Monotonic.markNow().elapsedNow().inWholeNanoseconds
+            start,InitializationVector.IV_3AC5.iv * start.elapsedNow().inWholeNanoseconds
         )
     }
 

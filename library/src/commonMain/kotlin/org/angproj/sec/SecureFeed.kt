@@ -79,6 +79,7 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte {
 
         var index = 0
         var pos = offset
+        round()
 
         repeat(length) {
             data.writeOctet(pos++, sponge.squeeze(index))
@@ -114,6 +115,7 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte {
 
         val loops = length / 8
         val remaining = length % 8
+        round()
 
         repeat(loops) {
             var rand = sponge.squeeze(index)

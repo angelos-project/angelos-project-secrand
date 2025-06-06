@@ -74,10 +74,10 @@ public object SecureEntropy : ExportOctetLong, ExportOctetByte {
 
         var index = 0
         var pos = offset
-        revitalize()
 
         val loops = length / 8
         val remaining = length % 8
+        revitalize()
 
         repeat(loops) {
             var rand = sponge.squeeze(index)
