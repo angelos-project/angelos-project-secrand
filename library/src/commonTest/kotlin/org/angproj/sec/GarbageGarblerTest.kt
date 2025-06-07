@@ -31,13 +31,12 @@ class GarbageGarblerTest {
         val garbler = GarbageGarbler()
 
         repeat(256) { garbler.readDouble() }
-        val count = garbler.count
-        assertEquals(2048, count)
+        assertEquals(1024, garbler.count)
 
         // Use the importBytes to fill entropy and trigger reseed
         val seed = ByteArray(128) { it.toByte() }
         garbler.importBytes(seed, 0, seed.size) { idx -> this[idx] }
-        assertTrue { count > garbler.count }
+        assertEquals(0, garbler.count)
     }
 
     @Test
@@ -55,8 +54,98 @@ class GarbageGarblerTest {
         try {
             garbler.importBytes(data, 0, 0) { idx -> this[idx] }
             assertTrue(false)
-        } catch (e: IllegalArgumentException) {
+        } catch (_: IllegalArgumentException) {
             assertTrue(true)
+        }
+    }
+
+    @Test
+    fun testReadByteRange() {
+        val garbler = GarbageGarbler()
+        repeat(1000) {
+            val value = garbler.readByte()
+            assertTrue(value in Byte.MIN_VALUE..Byte.MAX_VALUE)
+        }
+    }
+
+    @Test
+    fun testReadUByteRange() {
+        val garbler = GarbageGarbler()
+        repeat(1000) {
+            val value = garbler.readUByte()
+            assertTrue(value in UByte.MIN_VALUE..UByte.MAX_VALUE)
+        }
+    }
+
+    @Test
+    fun testReadShortRange() {
+        val garbler = GarbageGarbler()
+        repeat(1000) {
+            val value = garbler.readShort()
+            assertTrue(value in Short.MIN_VALUE..Short.MAX_VALUE)
+        }
+    }
+
+    @Test
+    fun testReadUShortRange() {
+        val garbler = GarbageGarbler()
+        repeat(1000) {
+            val value = garbler.readUShort()
+            assertTrue(value in UShort.MIN_VALUE..UShort.MAX_VALUE)
+        }
+    }
+
+    @Test
+    fun testReadIntRange() {
+        val garbler = GarbageGarbler()
+        repeat(1000) {
+            val value = garbler.readInt()
+            assertTrue(value in Int.MIN_VALUE..Int.MAX_VALUE)
+        }
+    }
+
+    @Test
+    fun testReadUIntRange() {
+        val garbler = GarbageGarbler()
+        repeat(1000) {
+            val value = garbler.readUInt()
+            assertTrue(value in UInt.MIN_VALUE..UInt.MAX_VALUE)
+        }
+    }
+
+    @Test
+    fun testReadLongRange() {
+        val garbler = GarbageGarbler()
+        repeat(1000) {
+            val value = garbler.readLong()
+            assertTrue(value in Long.MIN_VALUE..Long.MAX_VALUE)
+        }
+    }
+
+    @Test
+    fun testReadULongRange() {
+        val garbler = GarbageGarbler()
+        repeat(1000) {
+            val value = garbler.readULong()
+            assertTrue(value in ULong.MIN_VALUE..ULong.MAX_VALUE)
+        }
+    }
+
+    @Test
+    fun testReadFloatRange() {
+        val garbler = GarbageGarbler()
+        repeat(1000) {
+            val value = garbler.readFloat()
+            assertTrue(value in 0.0f..1.0f)
+        }
+    }
+
+    @Test
+    fun testReadDoubleRange() {
+        val garbler = GarbageGarbler()
+        repeat(1000) {
+            val value = garbler.readDouble()
+            assertTrue(value in 0.0..1.0)
         }
     }
 }

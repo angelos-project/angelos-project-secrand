@@ -1,12 +1,11 @@
 package org.angproj.sec
 
-import org.mockito.Mockito
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-class GarbageGarblerTest {
+class GarbageGarblerMockitoTest {
 
     @Test
     fun testDepletedFlagWithMockito() {

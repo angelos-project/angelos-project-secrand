@@ -73,8 +73,7 @@ kotlin {
             implementation(libs.kotlin.test)
         }
         jvmTest.dependencies {
-            implementation(libs.kotlin.jazzer)
-            implementation(libs.kotlin.jazzer.api)
+            implementation(libs.kotlin.mockito)
 
         }
     }

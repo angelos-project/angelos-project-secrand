@@ -76,7 +76,6 @@ public class GarbageGarbler: AbstractRandom(), ImportOctetByte {
                 position = 0
             }
         }
-        _count += this.position // Gets reset at every revitalize, therefore add to count
     }
 
     /**
@@ -98,6 +97,7 @@ public class GarbageGarbler: AbstractRandom(), ImportOctetByte {
 
             if (entropyPos >= entropy.lastIndex) {
                 reseed()
+                revitalize()
             }
         }
     }
@@ -117,8 +117,4 @@ public class GarbageGarbler: AbstractRandom(), ImportOctetByte {
      * @param length The number of bytes to read. Defaults to 0, meaning the entire data structure.
      * @param writeOctet A function that writes a byte at a specific index in the data structure.
      */
-    /*override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
-        super.exportBytes(data, offset, length, writeOctet)
-        _count += length
-    }*/
 }
