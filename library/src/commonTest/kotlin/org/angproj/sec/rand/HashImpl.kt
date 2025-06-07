@@ -12,11 +12,7 @@
  * Contributors:
  *      Kristoffer Paulsson - initial implementation
  */
-package org.anhproj.sec.rand
-
-import org.angproj.sec.rand.AbstractSponge1024
-import org.angproj.sec.rand.AbstractSponge256
-import org.angproj.sec.rand.AbstractSponge512
+package org.angproj.sec.rand
 
 
 interface Hash {

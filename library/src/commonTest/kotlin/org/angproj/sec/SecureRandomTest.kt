@@ -12,7 +12,7 @@
  * Contributors:
  *      Kristoffer Paulsson - initial implementation
  */
-package org.anhproj.sec
+package org.angproj.sec
 
 import org.angproj.sec.SecureRandom
 import kotlin.test.Test

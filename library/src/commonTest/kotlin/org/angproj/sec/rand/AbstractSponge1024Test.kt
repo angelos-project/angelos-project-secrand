@@ -12,12 +12,12 @@
  * Contributors:
  *      Kristoffer Paulsson - initial implementation
  */
-package org.anhproj.sec.rand
+package org.angproj.sec.rand
 
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 
-class TestAbstractSponge1024 {
+class AbstractSponge1024Test {
 
     val empty = byteArrayOf(
         19, 21, -7, 126, 126, -49, 127, -103, 119, 63, 84, 54, -108, -46, -8, -24, 116, -108, 91, 89, 88,

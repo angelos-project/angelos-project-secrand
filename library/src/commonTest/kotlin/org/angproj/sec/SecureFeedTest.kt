@@ -1,11 +1,11 @@
-package org.anhproj.sec
+package org.angproj.sec
 
 import org.angproj.sec.SecureFeed
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-class TestSecureFeed {
+class SecureFeedTest {
 
     @Test
     fun testExportBytesLengthAndRandomness() {

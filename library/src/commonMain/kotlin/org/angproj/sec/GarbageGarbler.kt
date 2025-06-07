@@ -35,15 +35,20 @@ public class GarbageGarbler: AbstractRandom(), ImportOctetByte {
         get() = count >= Int.MAX_VALUE / 2
 
     init {
+        // Seed the sponge
         Entropy.exportLongs(sponge, 0, sponge.visibleSize) { index, value ->
             sponge.absorb(value, index)
         }
         sponge.scramble()
+
+        // Output random to read buffer in AbstractRandom
+        revitalize()
     }
 
     private fun reseed() {
         var position = 0
 
+        // Feed entropy into sponge
         repeat(sponge.visibleSize) { idx ->
             var seed = 0L
             repeat(8) {
@@ -52,11 +57,11 @@ public class GarbageGarbler: AbstractRandom(), ImportOctetByte {
             sponge.absorb(seed, idx)
         }
 
-        sponge.scramble()
-        entropy.fill(0)
+        sponge.scramble() // Scramble the sponge
+        entropy.fill(0) // Reset entropy buffer
 
-        entropyPos = 0
-        _count = 0
+        entropyPos = 0 // Reset entropy pos
+        _count = 0 // Reset output counter
     }
 
     override fun refill() {
@@ -91,7 +96,7 @@ public class GarbageGarbler: AbstractRandom(), ImportOctetByte {
         repeat(length) { index ->
             entropy[entropyPos++] = data.readOctet(index + offset)
 
-            if (entropyPos >= entropy.size) {
+            if (entropyPos >= entropy.lastIndex) {
                 reseed()
             }
         }

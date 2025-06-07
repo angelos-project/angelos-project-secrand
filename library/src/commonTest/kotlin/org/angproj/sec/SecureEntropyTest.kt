@@ -1,11 +1,11 @@
-package org.anhproj.sec
+package org.angproj.sec
 
 import org.angproj.sec.SecureEntropy
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-class TestSecureEntropy {
+class SecureEntropyTest {
 
     @Test
     fun testExportBytesLengthAndRandomness() {

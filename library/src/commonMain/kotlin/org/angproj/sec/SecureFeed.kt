@@ -58,13 +58,14 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte {
      * This is used to ensure that the sponge is periodically refreshed with new entropy.
      */
     private fun round() {
-        if (counter > next) {
+        if (counter >= next) {
             next = ROUNDS_128K + sponge.squeeze(0).toInt().floorMod(ROUNDS_64K)
             revitalize()
             counter = 0
+        } else {
+            sponge.round()
+            counter++
         }
-        sponge.round()
-        counter++
     }
 
     /**
