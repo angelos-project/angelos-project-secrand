@@ -19,6 +19,13 @@ import kotlin.test.assertContentEquals
 
 class AbstractSponge1024Test {
 
+
+    class Hash1024 : AbstractSponge1024(), Hash {
+        init {
+            scramble()
+        }
+    }
+
     val empty = byteArrayOf(
         19, 21, -7, 126, 126, -49, 127, -103, 119, 63, 84, 54, -108, -46, -8, -24, 116, -108, 91, 89, 88,
         -58, 31, 10, 85, 84, 101, -53, 42, -55, -46, -52, 4, 25, 81, 44, 76, 78, 90, 2, 64, -74, 90, 81,
