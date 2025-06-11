@@ -3,6 +3,7 @@ package org.angproj.sec
 import org.angproj.sec.rand.AbstractSponge1024
 import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.AbstractSponge512
+import org.angproj.sec.rand.Entropy
 import org.angproj.sec.rand.Sponge
 
 
@@ -19,6 +20,51 @@ public class SpongeAvalancheObject(obj: Sponge): AvalancheObject<Sponge>(obj) {
             data[it] = obj.squeeze(it)
         }
         obj.round()
+    }
+}
+
+public class EntropyAvalancheObject(obj: Entropy): AvalancheObject<Entropy>(obj) {
+    public override val bufferSize: Int
+        get() = 8
+
+    public override val digestSize: Int
+        get() = bufferSize * 8
+
+
+    public override fun digest(data: LongArray) {
+        obj.exportLongs(data, 0, data.size) { index, value ->
+            data[index] = value
+        }
+    }
+}
+
+public class SecureRandomAvalancheObject(obj: SecureRandom): AvalancheObject<SecureRandom>(obj) {
+    public override val bufferSize: Int
+        get() = 8
+
+    public override val digestSize: Int
+        get() = bufferSize * 8
+
+
+    public override fun digest(data: LongArray) {
+        repeat(bufferSize) {
+            data[it] = obj.readLong()
+        }
+    }
+}
+
+public class GarbageGarblerAvalancheObject(obj: GarbageGarbler): AvalancheObject<GarbageGarbler>(obj) {
+    public override val bufferSize: Int
+        get() = 16
+
+    public override val digestSize: Int
+        get() = bufferSize * 8
+
+
+    public override fun digest(data: LongArray) {
+        repeat(bufferSize) {
+            data[it] = obj.readLong()
+        }
     }
 }
 
@@ -46,4 +92,25 @@ public fun main() {
     benchmark3.calculateData()
     println("AbstractSponge256")
     println(benchmark3)
+
+    val benchmark5 = AvalancheEffect(samples) {
+        SecureRandomAvalancheObject(SecureRandom)
+    }
+    benchmark5.calculateData()
+    println("SecureRandom")
+    println(benchmark5)
+
+    val benchmark6 = AvalancheEffect(samples) {
+        GarbageGarblerAvalancheObject(GarbageGarbler())
+    }
+    benchmark6.calculateData()
+    println("GarbageGarbler")
+    println(benchmark6)
+
+    val benchmark4 = AvalancheEffect(samples) {
+        EntropyAvalancheObject(Entropy)
+    }
+    benchmark4.calculateData()
+    println("Entropy")
+    println(benchmark4)
 }

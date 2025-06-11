@@ -3,6 +3,7 @@ package org.angproj.sec
 import org.angproj.sec.rand.AbstractSponge1024
 import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.AbstractSponge512
+import org.angproj.sec.rand.Entropy
 import org.angproj.sec.rand.Sponge
 import kotlin.math.absoluteValue
 
@@ -17,6 +18,43 @@ public class SpongeMonteObject(obj: Sponge): MonteObject<Sponge>(obj) {
 
     public override val bufferSize: Int
         get() = this.obj.visibleSize
+}
+
+public class EntropyMonteObject(obj: Entropy): MonteObject<Entropy>(obj) {
+    public override fun readNextDouble(data: DoubleArray) {
+        val arr = LongArray(data.size)
+        obj.exportLongs(arr, 0, arr.size) { index, value ->
+            arr[index] = value
+        }
+        repeat(bufferSize) {
+            data[it] = ((arr[it] and 0x7fffffffffffffffL) / (1L shl 63).toDouble()).absoluteValue
+        }
+    }
+
+    public override val bufferSize: Int
+        get() = 16
+}
+
+public class SecureRandomMonteObject(obj: SecureRandom): MonteObject<SecureRandom>(obj) {
+    public override fun readNextDouble(data: DoubleArray) {
+        repeat(8) {
+            data[it] = obj.readDouble()
+        }
+    }
+
+    public override val bufferSize: Int
+        get() = 8
+}
+
+public class GarbageGarblerMonteObject(obj: GarbageGarbler): MonteObject<GarbageGarbler>(obj) {
+    public override fun readNextDouble(data: DoubleArray) {
+        repeat(16) {
+            data[it] = obj.readDouble()
+        }
+    }
+
+    public override val bufferSize: Int
+        get() = 16
 }
 
 public fun main() {
@@ -42,4 +80,25 @@ public fun main() {
     benchmark3.calculateData()
     println("AbstractSponge256")
     println(benchmark3)
+
+    val benchmark5 = MonteCarlo(samples) {
+        SecureRandomMonteObject(SecureRandom)
+    }
+    benchmark5.calculateData()
+    println("SecureRandom")
+    println(benchmark5)
+
+    val benchmark6 = MonteCarlo(samples) {
+        GarbageGarblerMonteObject(GarbageGarbler())
+    }
+    benchmark6.calculateData()
+    println("GarbageGarbler")
+    println(benchmark6)
+
+    val benchmark4 = MonteCarlo(samples) {
+        EntropyMonteObject(Entropy)
+    }
+    benchmark4.calculateData()
+    println("Entropy")
+    println(benchmark4)
 }
