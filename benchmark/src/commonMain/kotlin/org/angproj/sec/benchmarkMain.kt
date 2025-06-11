@@ -3,7 +3,7 @@ package org.angproj.sec
 import org.angproj.sec.rand.AbstractRandom
 import org.angproj.sec.rand.Entropy
 
-public fun main() {
+/*public fun main() {
     val samples = 10_000_000
     val benchmark = MonteCarlo(samples) {
         SecureRandom
@@ -42,4 +42,4 @@ public fun main() {
     }
     benchmark3.estimatePi()
     println(benchmark3)
-}
+}*/

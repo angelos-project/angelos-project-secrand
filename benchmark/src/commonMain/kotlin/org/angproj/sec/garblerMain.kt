@@ -2,7 +2,7 @@ package org.angproj.sec
 
 import kotlin.time.measureTime
 
-public fun main() {
+/*public fun main() {
     val garbler = GarbageGarbler()
     val samples = 10_000_000
     val benchmark = MonteCarlo(samples) { garbler }
@@ -33,4 +33,4 @@ public fun main() {
         }
     }
     println("1Gb of ByteArray: " + time)
-}
+}*/

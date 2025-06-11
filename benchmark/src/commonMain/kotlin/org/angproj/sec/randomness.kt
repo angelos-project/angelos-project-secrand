@@ -12,6 +12,7 @@ public interface Digest : Sponge {
         repeat(visibleSize) {
             data[it] = squeeze(it)
         }
+        round()
     }
 }
 
