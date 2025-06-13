@@ -101,20 +101,4 @@ public class GarbageGarbler: AbstractRandom(), ImportOctetByte {
             }
         }
     }
-
-    /**
-     * Reads bytes into a data structure from the secure random source.
-     * This function fills the data structure with random bytes
-     * starting from a specified offset and for a specified length.
-     *
-     * The data structure must provide a way to write bytes at specific indices
-     * and the function will write bytes in little-endian order.
-     * This is useful for filling buffers, arrays, or any other
-     * data structure that can hold bytes.
-     *
-     * @param data The data structure to fill with random bytes.
-     * @param offset The starting index in the data structure to write to.
-     * @param length The number of bytes to read. Defaults to 0, meaning the entire data structure.
-     * @param writeOctet A function that writes a byte at a specific index in the data structure.
-     */
 }

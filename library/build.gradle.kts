@@ -38,6 +38,10 @@ kotlin {
     wasmWasi { nodejs() }
     // Android
     androidTarget {
+        /*@OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }*/
         publishLibraryVariants("release")
     }
     androidNativeArm32()
@@ -85,10 +89,10 @@ android {
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
-    /*compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }*/
+    compileOptions {
+        //sourceCompatibility = JavaVersion.VERSION_11
+        //targetCompatibility = JavaVersion.VERSION_11
+    }
 }
 
 mavenPublishing {
@@ -96,7 +100,7 @@ mavenPublishing {
 
     //signAllPublications()
 
-    coordinates(group.toString(), "library", version.toString())
+Fixing     coordinates(group.toString(), version.toString())
 
     pom {
         name.set(This.longName)
