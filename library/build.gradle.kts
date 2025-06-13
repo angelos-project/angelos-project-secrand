@@ -100,7 +100,7 @@ mavenPublishing {
 
     //signAllPublications()
 
-Fixing     coordinates(group.toString(), version.toString())
+    coordinates(group.toString(), version.toString())
 
     pom {
         name.set(This.longName)
