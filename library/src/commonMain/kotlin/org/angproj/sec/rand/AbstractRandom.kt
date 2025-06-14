@@ -167,8 +167,6 @@ public abstract class AbstractRandom : ExportOctetByte {
      * @param writeOctet A function that writes a byte at a specific index in the data structure.
      */
     override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
-        require(length > 0) { "Zero length data" }
-
         repeat(length) { index ->
             data.writeOctet(index + offset, readByte())
         }

@@ -44,7 +44,7 @@ public object SecureEntropy : ExportOctetLong, ExportOctetByte {
     }
 
     override fun <E> exportLongs(data: E, offset: Int, length: Int, writeOctet: E.(Int, Long) -> Unit) {
-        require(length > 0) { "Zero length data" }
+        if(length <= 0) return
 
         var index = 0
         var pos = offset
@@ -70,7 +70,7 @@ public object SecureEntropy : ExportOctetLong, ExportOctetByte {
      * @param writeOctet A function that writes a byte at a specific index in the data structure.
      */
     override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
-        require(length > 0) { "Zero length data" }
+        if(length <= 0) return
 
         var index = 0
         var pos = offset
