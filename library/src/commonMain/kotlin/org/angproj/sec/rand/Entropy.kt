@@ -16,6 +16,7 @@ package org.angproj.sec.rand
 
 import org.angproj.sec.util.ExportOctetByte
 import org.angproj.sec.util.ExportOctetLong
+import org.angproj.sec.util.TypeSize
 import kotlin.math.max
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
@@ -55,7 +56,7 @@ public object Entropy: ExportOctetLong, ExportOctetByte {
     }
 
     private inline fun<reified R: Any> entropyRound(state: EntropyState) {
-        state.entropy = ((-state.entropy.inv() * 5) xor state.start.elapsedNow().inWholeNanoseconds).rotateLeft(32)
+        state.entropy = ((-state.entropy.inv() * 5) xor state.start.elapsedNow().inWholeNanoseconds).rotateLeft(TypeSize.intBits)
     }
 
     private inline fun<reified R: Any> readLongEntropy(size: Int, state: EntropyState): Long {

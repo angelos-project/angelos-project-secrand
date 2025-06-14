@@ -14,6 +14,8 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.util.TypeSize
+
 /**
  * Qualifies both using ent for a balanced natural random, and with die-harder on a high level when running:
  * > dieharder -g AES_OFB -a -f random.bin
@@ -36,7 +38,7 @@ public abstract class AbstractSponge512 : AbstractSponge(9, 8) {
         val sponge3 = -sponge[2].inv() * 17
         val sponge2 = -sponge[1].inv() * 13
         val sponge1 = -sponge[0].inv() * 5
-        val sponge0 = temp.rotateLeft(32)
+        val sponge0 = temp.rotateLeft(TypeSize.intBits)
 
         mask = (mask and -counter.inv() and sponge0 and sponge3 and sponge6) xor
                 ((sponge1 and sponge4 and sponge7 and sponge8) * 2) xor

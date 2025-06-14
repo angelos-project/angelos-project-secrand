@@ -15,6 +15,7 @@
 package org.angproj.sec.rand
 
 import org.angproj.sec.util.ExportOctetByte
+import org.angproj.sec.util.TypeSize
 import kotlin.math.absoluteValue
 
 public abstract class AbstractRandom : ExportOctetByte {
@@ -72,7 +73,7 @@ public abstract class AbstractRandom : ExportOctetByte {
      *
      * @return The next long as a Long value.
      */
-    protected inline fun<reified R: Any> nextLong(): Long = (nextInt<Unit>() or (nextInt<Unit>() shl 32))
+    protected inline fun<reified R: Any> nextLong(): Long = (nextInt<Unit>() or (nextInt<Unit>() shl TypeSize.intBits))
 
 
     /**

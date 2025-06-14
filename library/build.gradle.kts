@@ -17,7 +17,7 @@ plugins {
 }
 
 group = "org.angproj.sec"
-version = "0.9.8"
+version = "0.10.0"
 
 kotlin {
     explicitApi()
@@ -100,7 +100,11 @@ mavenPublishing {
 
     //signAllPublications()
 
-    coordinates(group.toString(), version.toString())
+    /**
+     * The temporary artifact setup, final is coming later at some point.
+     * */
+    coordinates(group.toString(), rootProject.name, version.toString())
+    //coordinates(group.toString(), version.toString())
 
     pom {
         name.set(This.longName)
