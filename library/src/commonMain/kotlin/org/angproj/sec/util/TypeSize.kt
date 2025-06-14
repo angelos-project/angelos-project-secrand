@@ -15,5 +15,8 @@
 package org.angproj.sec.util
 
 public object TypeSize {
+    public const val byteBits: Int = Byte.SIZE_BITS
+    public const val shortBits: Int = Short.SIZE_BITS
     public const val intBits: Int = Int.SIZE_BITS
+    public const val longBits: Int = Long.SIZE_BITS
 }
