@@ -102,6 +102,7 @@ mavenPublishing {
 
     /**
      * The temporary artifact setup, final is coming later at some point.
+     * DO NOT USE FOR SONATYPE NEXUS
      * */
     coordinates(group.toString(), rootProject.name, version.toString())
     //coordinates(group.toString(), version.toString())

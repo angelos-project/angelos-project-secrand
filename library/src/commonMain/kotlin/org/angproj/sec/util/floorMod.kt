@@ -17,12 +17,27 @@ package org.angproj.sec.util
 import kotlin.math.absoluteValue
 
 /**
- * Returns the floor modulus of this integer with respect to another integer.
- * The result is always non-negative, even if the original number is negative.
+ * Computes the floor modulus of this integer with respect to [other].
+ *
+ * The floor modulus is always non-negative and is defined as:
+ * `(a mod b + b) mod b`, ensuring the result is in the range `0 <= result < |b|`,
+ * even if this value is negative.
  *
  * @param other The divisor for the modulus operation.
- * @return The non-negative floor modulus of this integer with respect to the other integer.
+ * @return The non-negative floor modulus of this integer with respect to [other].
+ * @throws ArithmeticException if [other] is zero.
  */
 public fun Int.floorMod(other: Int): Int = this.absoluteValue.mod(other.absoluteValue)
 
+/**
+ * Computes the floor modulus of this long value with respect to [other].
+ *
+ * The floor modulus is always non-negative and is defined as:
+ * `(a mod b + b) mod b`, ensuring the result is in the range `0 <= result < |b|`,
+ * even if this value is negative.
+ *
+ * @param other The divisor for the modulus operation.
+ * @return The non-negative floor modulus of this long value with respect to [other].
+ * @throws ArithmeticException if [other] is zero.
+ */
 public fun Long.floorMod(other: Long): Long = this.absoluteValue.mod(other.absoluteValue)
