@@ -187,5 +187,9 @@ tasks {
 
 kover {
     reports {
+        total {
+            xml.onCheck.set(true)
+            html.onCheck.set(true)
+        }
     }
 }
