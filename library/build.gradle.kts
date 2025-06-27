@@ -13,11 +13,11 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.dokka)
-    jacoco
+    alias(libs.plugins.kover)
 }
 
 group = "org.angproj.sec"
-version = "0.10.4"
+version = "0.11.0"
 
 kotlin {
     explicitApi()
@@ -149,7 +149,7 @@ tasks.dokkaHtml {
     }
 }
 
-jacoco {
+/*jacoco {
     toolVersion = "0.8.12"
     reportsDirectory.set(layout.buildDirectory.dir("reports/jacoco"))
 }
@@ -182,5 +182,10 @@ tasks {
             csv.required.set(true)
             html.required.set(true)
         }
+    }
+}*/
+
+kover {
+    reports {
     }
 }

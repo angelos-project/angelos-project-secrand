@@ -75,13 +75,6 @@ public abstract class AbstractSponge(
         return sponge[offset] xor (mask * export[offset])
     }
 
-    /**
-     * Scramble the sponge state by performing a number of rounds equal to the size of the sponge.
-     */
-    override fun scramble() {
-        repeat(sponge.size) { round() }
-    }
-
     protected companion object {
         protected val export: List<Int> = listOf(3, 7, 11, 19, 23, 31, 43, 47, 59, 67, 71, 79, 83, 103, 107, 127)
     }

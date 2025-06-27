@@ -26,7 +26,11 @@ package org.angproj.sec.util
  * @return The ceiling of the division.
  * @throws ArithmeticException if [chunkSize] is zero.
  */
-public fun Int.ceilDiv(chunkSize: Int): Int = floorDiv(chunkSize) + if(floorMod(chunkSize) > 0) 1 else 0
+public fun Int.ceilDiv(other: Int): Int {
+    val qout = this / other
+    if ((this xor other) >= 0 && (qout * other != this)) return qout + 1
+    return qout
+}
 
 /**
  * Performs ceiling division of this long value by [chunkSize].
@@ -40,4 +44,8 @@ public fun Int.ceilDiv(chunkSize: Int): Int = floorDiv(chunkSize) + if(floorMod(
  * @return The ceiling of the division.
  * @throws ArithmeticException if [chunkSize] is zero.
  */
-public fun Long.ceilDiv(chunkSize: Int): Long = floorDiv(chunkSize) + if(floorMod(chunkSize.toLong()) > 0) 1 else 0
+public fun Long.ceilDiv(other: Long): Long {
+    val quot = this / other
+    if ((this xor other) >= 0 && (quot * other != this)) return quot + 1
+    return quot
+}

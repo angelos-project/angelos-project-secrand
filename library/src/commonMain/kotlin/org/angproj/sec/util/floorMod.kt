@@ -14,8 +14,6 @@
  */
 package org.angproj.sec.util
 
-import kotlin.math.absoluteValue
-
 /**
  * Computes the floor modulus of this integer with respect to [other].
  *
@@ -27,7 +25,8 @@ import kotlin.math.absoluteValue
  * @return The non-negative floor modulus of this integer with respect to [other].
  * @throws ArithmeticException if [other] is zero.
  */
-public fun Int.floorMod(other: Int): Int = this.absoluteValue.mod(other.absoluteValue)
+public fun Int.floorMod(other: Int): Int = this - this.floorDiv(other) * other
+
 
 /**
  * Computes the floor modulus of this long value with respect to [other].
@@ -40,4 +39,4 @@ public fun Int.floorMod(other: Int): Int = this.absoluteValue.mod(other.absolute
  * @return The non-negative floor modulus of this long value with respect to [other].
  * @throws ArithmeticException if [other] is zero.
  */
-public fun Long.floorMod(other: Long): Long = this.absoluteValue.mod(other.absoluteValue)
+public fun Long.floorMod(other: Long): Long = this - this.floorDiv(other) * other

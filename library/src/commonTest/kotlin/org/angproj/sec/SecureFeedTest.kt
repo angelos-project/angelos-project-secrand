@@ -22,7 +22,7 @@ class SecureFeedTest {
 
     @Test
     fun testExportBytesLengthAndRandomness() {
-        val size = 32
+        val size = 34
         val buffer1 = ByteArray(size)
         val buffer2 = ByteArray(size)
 
@@ -37,7 +37,7 @@ class SecureFeedTest {
 
     @Test
     fun testExportLongsLengthAndRandomness() {
-        val size = 8
+        val size = 10
         val buffer1 = LongArray(size)
         val buffer2 = LongArray(size)
 
