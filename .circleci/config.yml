@@ -1,33 +1,9 @@
 version: 2.1
+
+orbs:
+  gradle: circleci/gradle@8.1.1
+
 workflows:
-  parallel-workflow:
+  checkout-build-test:
     jobs:
-      - Gradle
-      # - Maven
-
-jobs:
-  Gradle:
-    docker:
-      - image: cimg/openjdk:19.0.2
-    steps:
-      - checkout # Checks out source code
-      - run:
-          name: Clean and Build
-          command: ./gradlew clean build
-      - run:
-          name: Run Tests
-          command: ./gradlew test
-      - run:
-          name: Coverage Report
-          command: ./gradlew koverXmlReport
-
-
-  # Maven:
-  #  docker:
-  #    - image: cimg/openjdk:17.0.1
-  #  steps:
-  #    - checkout # Checks out source code
-  #    - run:
-  #        name: Clean and Package
-  #        command: mvn clean package
-
+      - gradle/test
