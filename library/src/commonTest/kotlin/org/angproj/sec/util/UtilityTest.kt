@@ -3,6 +3,7 @@ package org.angproj.sec.util
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertFailsWith
 
 class UtilityTest {
 
@@ -120,5 +121,21 @@ class UtilityTest {
         assertEquals(size, buffer2.size)
         // With high probability, two random arrays should not be equal
         assertNotEquals(buffer1.toList(), buffer2.toList())
+    }
+
+    @Test
+    fun testEnsureException() {
+        // This should pass without throwing an exception
+        ensure(1 < 2) { RuntimeException("This should not fail") }
+        assertFailsWith<RuntimeException> {
+            ensure(2 < 1) { RuntimeException("This should fail") }
+        }
+    }
+
+    @Test
+    fun testEnsureMandatory() {
+        assertFailsWith<RuntimeException> {
+            ensure { RuntimeException("This should fail") }
+        }
     }
 }
