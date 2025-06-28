@@ -15,6 +15,20 @@
 package org.angproj.sec.util
 
 /**
+ * Evaluates the specified exception constructor [exc] and throws the exception of type [T].
+ *
+ * This function is intended for scenarios where an exception needs to be thrown unconditionally.
+ * The caller provides a lambda [exc] that constructs the exception to be thrown, allowing for custom exception types and messages.
+ * By using a reified type parameter, the function enables flexible error signaling and supports a wide range of exception types.
+ *
+ * @param exc A lambda that returns an instance of the exception type [T] to be thrown.
+ * @throws T The exception instance returned by [exc] is thrown unconditionally.
+ */
+public inline fun <reified T: Throwable> ensure(exc: () -> T): Nothing {
+    throw exc()
+}
+
+/**
  * Evaluates the specified boolean condition [expr] and throws an exception of type [T] if the condition is false.
  *
  * This function is intended for enforcing preconditions, invariants, or postconditions in a generic and type-safe manner.
@@ -25,16 +39,4 @@ package org.angproj.sec.util
  * @param exc A lambda that returns an instance of the exception type [T] to be thrown if [expr] is false.
  * @throws T If [expr] evaluates to false, the exception instance returned by [exc] is thrown.
  */
-public inline fun <reified T: Throwable> ensure(expr: Boolean, exc: () -> T) { if (!expr) throw exc() }
-
-/**
- * Evaluates the specified exception constructor [exc] and throws the exception of type [T].
- *
- * This function is intended for scenarios where an exception needs to be thrown unconditionally.
- * The caller provides a lambda [exc] that constructs the exception to be thrown, allowing for custom exception types and messages.
- * By using a reified type parameter, the function enables flexible error signaling and supports a wide range of exception types.
- *
- * @param exc A lambda that returns an instance of the exception type [T] to be thrown.
- * @throws T The exception instance returned by [exc] is thrown unconditionally.
- */
-public inline fun <reified T: Throwable> ensure(exc: () -> T) { ensure(false, exc) }
+public inline fun <reified T: Throwable> ensure(expr: Boolean, exc: () -> T) { if (!expr) ensure(exc) }
