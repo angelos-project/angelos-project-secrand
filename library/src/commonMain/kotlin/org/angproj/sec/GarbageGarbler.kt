@@ -16,7 +16,7 @@ package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractRandom
 import org.angproj.sec.rand.AbstractSponge1024
-import org.angproj.sec.rand.Entropy
+import org.angproj.sec.rand.JitterEntropy
 import org.angproj.sec.util.ImportOctetByte
 
 
@@ -36,7 +36,7 @@ public class GarbageGarbler: AbstractRandom(), ImportOctetByte {
 
     init {
         // Seed the sponge
-        Entropy.exportLongs(sponge, 0, sponge.visibleSize) { index, value ->
+        JitterEntropy.exportLongs(sponge, 0, sponge.visibleSize) { index, value ->
             sponge.absorb(value, index)
         }
         sponge.scramble()

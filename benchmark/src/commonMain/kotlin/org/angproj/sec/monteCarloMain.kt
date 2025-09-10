@@ -30,7 +30,7 @@ public class SpongeMonteObject(obj: Sponge): MonteObject<Sponge>(obj) {
         get() = this.obj.visibleSize
 }
 
-public class EntropyMonteObject(obj: Entropy): MonteObject<Entropy>(obj) {
+public class EntropyMonteObject(obj: JitterEntropy): MonteObject<JitterEntropy>(obj) {
     public override fun readNextDouble(data: DoubleArray) {
         val arr = LongArray(data.size)
         obj.exportLongs(arr, 0, arr.size) { index, value ->
@@ -106,7 +106,7 @@ public fun main() {
     println(benchmark6)
 
     val benchmark4 = MonteCarlo(samples) {
-        EntropyMonteObject(Entropy)
+        EntropyMonteObject(JitterEntropy)
     }
     benchmark4.calculateData()
     println("Entropy")

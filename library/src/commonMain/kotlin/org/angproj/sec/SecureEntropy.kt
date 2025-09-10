@@ -15,7 +15,7 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge256
-import org.angproj.sec.rand.Entropy
+import org.angproj.sec.rand.JitterEntropy
 import org.angproj.sec.util.ExportOctetByte
 import org.angproj.sec.util.ExportOctetLong
 
@@ -37,7 +37,7 @@ public object SecureEntropy : ExportOctetLong, ExportOctetByte {
      * This method is called to ensure that the sponge has fresh entropy before reading.
      */
     private fun revitalize() {
-        Entropy.exportLongs(sponge, 0, sponge.visibleSize) { index, value ->
+        JitterEntropy.exportLongs(sponge, 0, sponge.visibleSize) { index, value ->
             sponge.absorb(value, index)
         }
         sponge.scramble()

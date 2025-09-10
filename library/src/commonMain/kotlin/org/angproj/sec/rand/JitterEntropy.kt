@@ -16,9 +16,7 @@ package org.angproj.sec.rand
 
 import org.angproj.sec.util.ExportOctetByte
 import org.angproj.sec.util.ExportOctetLong
-import org.angproj.sec.util.TypeSize
-import kotlin.math.max
-import kotlin.time.TimeMark
+import kotlin.math.*
 import kotlin.time.TimeSource
 
 
@@ -30,42 +28,28 @@ import kotlin.time.TimeSource
  * Thereby it is true random, however the entropy is conditioned to also be
  * natural, that is clearing Monte Carlo testing closing in on real PI.
  */
-public object Entropy: ExportOctetLong, ExportOctetByte {
+public object JitterEntropy: ExportOctetLong, ExportOctetByte {
 
-    /**
-     * EntropyState holds the state of the entropy source, including the start time and the current entropy value.
-     *
-     * @property start The time when the entropy state was initialized.
-     * @property entropy The current entropy value, which is updated based on the elapsed time.
-     */
-    public data class EntropyState(
-        val start: TimeMark,
-        var entropy: Long
-    )
+    public class JitterEntropyState {
+        private val start = TimeSource.Monotonic.markNow();
 
-    /**
-     * The entropy value is initialized based on a constant IV and the elapsed time since the start.
-     *
-     * @return An instance of [EntropyState] containing the start time and initial entropy value.
-     */
-    private inline fun<reified R: Any> initializeEntropy(): EntropyState {
-        val start = TimeSource.Monotonic.markNow()
-        return EntropyState(
-            start,InitializationVector.IV_3AC5.iv * start.elapsedNow().inWholeNanoseconds
-        )
-    }
+        public fun nextJitter(bits: Int): Int {
+            require(bits in 1..32)
+            val recent = start.elapsedNow()
+            val nano: Double = 1.0 / recent.inWholeNanoseconds
+            val micro: Double = 1.0 - (1.0 / recent.inWholeMicroseconds)
 
-    private inline fun<reified R: Any> entropyRound(state: EntropyState) {
-        state.entropy = ((-state.entropy.inv() * 5) xor state.start.elapsedNow().inWholeNanoseconds).rotateLeft(TypeSize.intBits)
-    }
+            val nanoBits: Long = sin(nano).toRawBits()
+            val microBits: Long = cos(micro).toRawBits()
+            val comboBits: Long = atan2(nano, micro).toRawBits()
 
-    private inline fun<reified R: Any> readLongEntropy(size: Int, state: EntropyState): Long {
-        var data: Long = 0
-        repeat(max(size, 8)) { _ ->
-            entropyRound<Unit>(state)
-            data = (data shl 8) or (state.entropy and 0xFF)
+            val trimmedNanoBits: Long = nanoBits shl nanoBits.countLeadingZeroBits()
+            val trimmedMicroBits: Long = microBits ushr microBits.countTrailingZeroBits()
+
+            val mixedBits: Long = (trimmedNanoBits xor trimmedMicroBits) xor comboBits.rotateLeft(41)
+
+            return ((mixedBits ushr 32).toInt() xor (mixedBits and 0xffffffff).toInt()) ushr (32 - bits)
         }
-        return data
     }
 
     /**
@@ -75,10 +59,19 @@ public object Entropy: ExportOctetLong, ExportOctetByte {
      */
     override fun <E> exportLongs(data: E, offset: Int, length: Int, writeOctet: E.(Int, Long) -> Unit) {
         require(length <= 128) { "To large for time-gated entropy! Max 1Kb." }
-        val state = initializeEntropy<Unit>()
+        val state = JitterEntropyState()
+        var entropy: Long = 0
+
+        // Warmup
+        repeat(16) {
+            entropy = entropy shl 8 xor state.nextJitter(32).toLong()
+        }
 
         repeat(length) { index ->
-            data.writeOctet(offset + index, readLongEntropy<Unit>(8, state))
+            repeat(8) {
+                entropy = entropy shl 8 xor state.nextJitter(32).toLong()
+            }
+            data.writeOctet(offset + index, entropy)
         }
     }
 
@@ -89,12 +82,17 @@ public object Entropy: ExportOctetLong, ExportOctetByte {
      */
     override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
         require(length <= 1024) { "To large for time-gated entropy! Max 1Kb." }
+        val state = JitterEntropyState()
+        var entropy: Long = 0
 
-        val state = initializeEntropy<Unit>()
+        // Warmup
+        repeat(16) {
+            entropy = entropy shl 8 xor state.nextJitter(32).toLong()
+        }
 
         repeat(length) { index ->
-            entropyRound<Unit>(state)
-            data.writeOctet(offset + index, state.entropy.toByte())
+            entropy = entropy shl 8 xor state.nextJitter(32).toLong()
+            data.writeOctet(offset + index, entropy.toByte())
         }
     }
 }

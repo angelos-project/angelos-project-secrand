@@ -33,7 +33,7 @@ public class SpongeAvalancheObject(obj: Sponge): AvalancheObject<Sponge>(obj) {
     }
 }
 
-public class EntropyAvalancheObject(obj: Entropy): AvalancheObject<Entropy>(obj) {
+public class EntropyAvalancheObject(obj: JitterEntropy): AvalancheObject<JitterEntropy>(obj) {
     public override val bufferSize: Int
         get() = 8
 
@@ -118,7 +118,7 @@ public fun main() {
     println(benchmark6)
 
     val benchmark4 = AvalancheEffect(samples) {
-        EntropyAvalancheObject(Entropy)
+        EntropyAvalancheObject(JitterEntropy)
     }
     benchmark4.calculateData()
     println("Entropy")
