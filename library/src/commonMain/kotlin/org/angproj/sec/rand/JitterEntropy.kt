@@ -52,6 +52,9 @@ public object JitterEntropy: ExportOctetLong, ExportOctetByte {
         }
     }
 
+    private val state = JitterEntropyState()
+
+
     /**
      * Generates real time-gated entropy for a LongArray.
      *
@@ -59,7 +62,6 @@ public object JitterEntropy: ExportOctetLong, ExportOctetByte {
      */
     override fun <E> exportLongs(data: E, offset: Int, length: Int, writeOctet: E.(Int, Long) -> Unit) {
         require(length <= 128) { "To large for time-gated entropy! Max 1Kb." }
-        val state = JitterEntropyState()
         var entropy: Long = 0
 
         // Warmup
@@ -82,7 +84,6 @@ public object JitterEntropy: ExportOctetLong, ExportOctetByte {
      */
     override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
         require(length <= 1024) { "To large for time-gated entropy! Max 1Kb." }
-        val state = JitterEntropyState()
         var entropy: Long = 0
 
         // Warmup
