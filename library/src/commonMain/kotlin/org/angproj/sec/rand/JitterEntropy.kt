@@ -70,6 +70,14 @@ public object JitterEntropy : ExportOctetLong, ExportOctetByte {
     // Single instance of the entropy state
     private val state = JitterEntropyState()
 
+    private inline fun<reified E: Any> generateEntropy(entropy: Long, loops: Int): Long {
+        var data = entropy
+        repeat(loops) {
+            data = data shl 8 xor state.nextJitter(32).toLong()
+        }
+        return data
+    }
+
     /**
      * Exports pseudo-random [Long] values to the provided data structure.
      * Generates up to 128 [Long] values (1024 bytes) to prevent excessive computation.
@@ -85,15 +93,11 @@ public object JitterEntropy : ExportOctetLong, ExportOctetByte {
         var entropy: Long = 0
 
         // Warmup phase to stabilize the entropy pool
-        repeat(16) {
-            entropy = entropy shl 8 xor state.nextJitter(32).toLong()
-        }
+        entropy = generateEntropy<Unit>(entropy, 16)
 
         // Generate and write random Long values
         repeat(length) { index ->
-            repeat(8) {
-                entropy = entropy shl 8 xor state.nextJitter(32).toLong()
-            }
+            entropy = generateEntropy<Unit>(entropy, 8)
             data.writeOctet(offset + index, entropy)
         }
     }
@@ -113,9 +117,8 @@ public object JitterEntropy : ExportOctetLong, ExportOctetByte {
         var entropy: Long = 0
 
         // Warmup phase to stabilize the entropy pool
-        repeat(16) {
-            entropy = entropy shl 8 xor state.nextJitter(32).toLong()
-        }
+        entropy = generateEntropy<Unit>(entropy, 16)
+
 
         // Generate and write random Byte values
         repeat(length) { index ->
