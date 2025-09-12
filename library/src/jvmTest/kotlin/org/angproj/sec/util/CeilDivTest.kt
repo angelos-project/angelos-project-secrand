@@ -40,8 +40,8 @@ class CeilDivTest {
 
     @Test
     fun testFixAndTrix() {
-        val size = 25
-        val width = 5
+        val size = 9
+        val width = 3
         for (i in 0 until size) {
             // Map linear index to 4x4 matrix coordinates
             val row = i / width
@@ -52,7 +52,7 @@ class CeilDivTest {
             val right = row * width + ((col + 1) % width) // row, (col + 1) % 4
             val left = row * width + ((col - 1 + width) % width) // row, (col - 1) % 4
             // Mix with neighbors (up, down, left, right, wrapping around)
-            println("val sponge$i = diffuse<Unit>($i, $up, $down, $right, $left)")
+            println("val sponge$i = diffuse<Unit>(sponge[$i], $up, $down, $right, $left)")
         }
 
         for(i in 0 until size) {
