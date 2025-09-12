@@ -25,7 +25,6 @@ public class AbstractSponge21024:  AbstractSponge(16, 16) {
      * Treats the linear state as a 4x4 matrix for neighbor operations.
      */
     override fun round() {
-        val temp = LongArray(spongeSize)
         // Step 1: Linear mixing (matrix-like diffusion)
         val sponge0 = diffuse<Unit>(sponge[0], 4, 12, 1, 3)
         val sponge1 = diffuse<Unit>(sponge[1], 5, 13, 2, 0)
@@ -80,15 +79,7 @@ public class AbstractSponge21024:  AbstractSponge(16, 16) {
         sponge[14] = confuse<Unit>(sponge14)
         sponge[15] = confuse<Unit>(sponge15)
 
-        /*for(i in 0..15) {
-            val x = temp[i]
-            // Step 2: Non-linear transformation (S-box-like substitution)
-            sponge[i] = x xor (-x.inv() * 11) xor (-x.inv() * 7)
-            //state[i] = x xor (x shl 17) xor (x ushr 23)
-        }*/
-
         // Step 3: Add round constant to prevent fixed points
-        // Apply to the first register (equivalent to state[0][0] in 4x4 matrix)
         sponge[0] = sponge[0] xor (-0x5a5a5a5a5a5a5a5bL xor counter)
     }
 }
