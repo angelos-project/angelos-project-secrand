@@ -1,6 +1,5 @@
 import com.vanniktech.maven.publish.SonatypeHost
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
-import java.net.URL
+import java.net.URI
 
 object This {
     const val longName = "Secure Random - Angelos Project™"
@@ -28,14 +27,12 @@ kotlin {
         browser()
         nodejs()
     }
-    // WASM and similar
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
+    // Wasm
+    /**wasmJs {
         browser()
         nodejs()
     }
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmWasi { nodejs() }
+    wasmWasi { nodejs() }*/
     // Android
     androidTarget {
         /*@OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -142,7 +139,7 @@ tasks.dokkaHtml {
             includes.from("Module.md")
             sourceLink {
                 localDirectory.set(file("src/commonMain/kotlin"))
-                remoteUrl.set(URL(This.url + "/tree/master/src/commonMain/kotlin"))
+                remoteUrl.set(URI(This.url + "/tree/master/src/commonMain/kotlin").toURL())
                 remoteLineSuffix.set("#L")
             }
         }

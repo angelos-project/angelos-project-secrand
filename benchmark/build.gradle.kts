@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -17,14 +16,12 @@ kotlin {
         browser()
         nodejs()
     }
-    // WASM and similar
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
+    // Wasm
+    /*wasmJs {
         browser()
         nodejs()
     }
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmWasi { nodejs() }
+    wasmWasi { nodejs() }*/
     // Android
     androidTarget {
         publishLibraryVariants("release")
