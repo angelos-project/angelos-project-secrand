@@ -1,5 +1,18 @@
+/**
+ * Copyright (c) 2025 by Kristoffer Paulsson <kristoffer.paulsson@talenten.se>.
+ *
+ * This software is available under the terms of the MIT license. Parts are licensed
+ * under different terms if stated. The legal terms are attached to the LICENSE file
+ * and are made available on:
+ *
+ *      https://opensource.org/licenses/MIT
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Contributors:
+ *      Kristoffer Paulsson - initial implementation
+ */
 package org.angproj.sec.rand
-
 
 /**
  * Custom cryptographic sponge with a linear 16-state array of 64-bit registers,
@@ -42,19 +55,6 @@ public class AbstractSponge21024:  AbstractSponge(16, 16) {
         val sponge13 = diffuse<Unit>(sponge[13], 1, 9, 14, 12)
         val sponge14 = diffuse<Unit>(sponge[14], 2, 10, 15, 13)
         val sponge15 = diffuse<Unit>(sponge[15], 3, 11, 12, 14)
-
-        /*for (i in 0..15) {
-            // Map linear index to 4x4 matrix coordinates
-            val row = i / 4
-            val col = i % 4
-            // Map neighbor indices to linear array
-            val up = ((row + 1) % 4) * 4 + col // (row + 1) % 4, col
-            val down = ((row - 1 + 4) % 4) * 4 + col // (row - 1) % 4, col
-            val right = row * 4 + ((col + 1) % 4) // row, (col + 1) % 4
-            val left = row * 4 + ((col - 1 + 4) % 4) // row, (col - 1) % 4
-            // Mix with neighbors (up, down, left, right, wrapping around)
-            temp[i] = diffuse<Unit>(i, up, down, right, left)
-        }*/
 
         mask = (mask and -counter.inv() and sponge1 and sponge2 and sponge3) xor
                 ((sponge4 and sponge5 and sponge6 and sponge7) * 2) xor
