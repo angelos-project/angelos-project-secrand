@@ -75,7 +75,6 @@ kotlin {
         }
         jvmTest.dependencies {
             implementation(libs.kotlin.mockito)
-
         }
     }
 }
