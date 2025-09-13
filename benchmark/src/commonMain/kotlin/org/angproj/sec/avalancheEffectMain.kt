@@ -82,26 +82,47 @@ public class GarbageGarblerAvalancheObject(obj: GarbageGarbler): AvalancheObject
 public fun main() {
     val samples = 10_000_000
 
-    val benchmark = AvalancheEffect(samples) {
+    val benchmark0a = AvalancheEffect(samples) {
+        SpongeAvalancheObject(object : AbstractSponge21024(){})
+    }
+    benchmark0a.calculateData()
+    println("AbstractSponge21024")
+    println(benchmark0a)
+
+    val benchmark0b = AvalancheEffect(samples) {
         SpongeAvalancheObject(object : AbstractSponge1024(){})
     }
-    benchmark.calculateData()
+    benchmark0b.calculateData()
     println("AbstractSponge1024")
-    println(benchmark)
+    println(benchmark0b)
 
-    val benchmark2 = AvalancheEffect(samples) {
+    val benchmark1a = AvalancheEffect(samples) {
+        SpongeAvalancheObject(object : AbstractSponge2512(){})
+    }
+    benchmark1a.calculateData()
+    println("AbstractSponge2512")
+    println(benchmark1a)
+
+    val benchmark1b = AvalancheEffect(samples) {
         SpongeAvalancheObject(object : AbstractSponge512(){})
     }
-    benchmark2.calculateData()
+    benchmark1b.calculateData()
     println("AbstractSponge512")
-    println(benchmark2)
+    println(benchmark1b)
 
-    val benchmark3 = AvalancheEffect(samples) {
+    val benchmark2a = AvalancheEffect(samples) {
+        SpongeAvalancheObject(object : AbstractSponge2256(){})
+    }
+    benchmark2a.calculateData()
+    println("AbstractSponge2256")
+    println(benchmark2a)
+
+    val benchmark2b = AvalancheEffect(samples) {
         SpongeAvalancheObject(object : AbstractSponge256(){})
     }
-    benchmark3.calculateData()
+    benchmark2b.calculateData()
     println("AbstractSponge256")
-    println(benchmark3)
+    println(benchmark2b)
 
     val benchmark5 = AvalancheEffect(samples) {
         SecureRandomAvalancheObject(SecureRandom)

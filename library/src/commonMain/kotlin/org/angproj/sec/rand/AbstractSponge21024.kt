@@ -19,7 +19,7 @@ package org.angproj.sec.rand
  * interpreted as a 4x4 matrix for operations.
  * Deterministic initialization, single-round permutation for absorb/squeeze, 16 rounds for scramble.
  */
-public class AbstractSponge21024:  AbstractSponge(16, 16) {
+public abstract class AbstractSponge21024:  AbstractSponge(16, 16) {
 
     private inline fun<reified R: Any> diffuse(value: Long, up: Int, down: Int, right: Int, left: Int): Long {
         return value xor
