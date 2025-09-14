@@ -20,18 +20,6 @@ package org.angproj.sec.rand
  * A sponge construction is a flexible cryptographic primitive used for hashing, random number generation,
  * and authenticated encryption. It operates by absorbing input data into an internal state, applying
  * a permutation (round function), and squeezing output data from the state.
- *
- * Properties:
- * - `spongeSize`: Total number of elements in the internal state.
- * - `visibleSize`: Number of elements in the state that are accessible for input/output operations.
- * - `byteSize`: Size in bytes of the visible portion of the state.
- *
- * Methods:
- * - `reset()`: Restores the sponge to its initial state.
- * - `round()`: Applies the permutation to the internal state (must be implemented by subclasses).
- * - `absorb(value, position)`: Incorporates a value into the visible part of the state at the given position.
- * - `squeeze(position)`: Extracts a value from the visible part of the state at the given position.
- * - `scramble()`: Applies the round function `spongeSize` times to thoroughly mix the state.
  */
 public interface Sponge {
 
