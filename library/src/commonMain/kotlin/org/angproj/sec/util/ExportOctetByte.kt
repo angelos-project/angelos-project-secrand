@@ -14,6 +14,28 @@
  */
 package org.angproj.sec.util
 
+/**
+ * Interface for exporting a sequence of bytes from some data object.
+ *
+ * Implementations define how to extract bytes from a given data structure and write them
+ * using a provided lambda function. This is useful for serializing objects or transferring
+ * byte data in a customizable way.
+ *
+ * @param E The type of the data object to export bytes from.
+ */
 public interface ExportOctetByte {
-    public fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit)
+    /**
+     * Exports a range of bytes from the given data object.
+     *
+     * @param data The data object to export bytes from.
+     * @param offset The starting index in the data object.
+     * @param length The number of bytes to export.
+     * @param writeOctet Lambda function to write each byte, given its index and value.
+     */
+    public fun <E> exportBytes(
+        data: E,
+        offset: Int,
+        length: Int,
+        writeOctet: E.(index: Int, value: Byte) -> Unit
+    )
 }
