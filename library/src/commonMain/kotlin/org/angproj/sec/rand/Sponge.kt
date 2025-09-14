@@ -15,56 +15,70 @@
 package org.angproj.sec.rand
 
 /**
- * The `Sponge` interface defines the contract for a cryptographic sponge construction.
- * It provides methods for absorbing, squeezing, and scrambling data, as well as properties
- * describing the sponge's configuration.
+ * Interface representing a cryptographic sponge construction.
+ *
+ * A sponge construction is a flexible cryptographic primitive used for hashing, random number generation,
+ * and authenticated encryption. It operates by absorbing input data into an internal state, applying
+ * a permutation (round function), and squeezing output data from the state.
+ *
+ * Properties:
+ * - `spongeSize`: Total number of elements in the internal state.
+ * - `visibleSize`: Number of elements in the state that are accessible for input/output operations.
+ * - `byteSize`: Size in bytes of the visible portion of the state.
+ *
+ * Methods:
+ * - `reset()`: Restores the sponge to its initial state.
+ * - `round()`: Applies the permutation to the internal state (must be implemented by subclasses).
+ * - `absorb(value, position)`: Incorporates a value into the visible part of the state at the given position.
+ * - `squeeze(position)`: Extracts a value from the visible part of the state at the given position.
+ * - `scramble()`: Applies the round function `spongeSize` times to thoroughly mix the state.
  */
 public interface Sponge {
 
     /**
-     * The total number of states in the sponge.
-     * */
+     * Total number of elements in the sponge's internal state.
+     */
     public val spongeSize: Int
 
     /**
-     * The size of the visible part of the sponge state.
-     * */
+     * Number of elements in the visible portion of the state.
+     */
     public val visibleSize: Int
 
     /**
-     * The size in bytes of the visible part of the sponge state.
-     * */
+     * Size in bytes of the visible portion of the state.
+     */
     public val byteSize: Int
 
     /**
-     * Resets states and the sponge to its original initialization vectors.
-     * */
+     * Resets the sponge to its initial state.
+     */
     public fun reset()
 
     /**
-     * The round function is an abstract method that subclasses must implement.
-     * It defines how the sponge state is transformed during each round of the permutation.
+     * Applies the permutation to the internal state.
+     * Must be implemented by subclasses.
      */
     public fun round()
 
     /**
-     * Absorb a value into the sponge at a specific offset, of the visible portion of the state.
+     * Absorbs a value into the visible part of the state at the specified position.
      *
-     * @param value The value to absorb.
-     * @param position The position in the sponge to absorb the value.
+     * @param value Value to absorb.
+     * @param position Index in the visible state to absorb the value.
      */
     public fun absorb(value: Long, position: Int)
 
     /**
-     * Squeeze a value from the sponge from a specific offset, of the visible portion of the state.
+     * Squeezes a value from the visible part of the state at the specified position.
      *
-     * @param position The position in the sponge to squeeze the value from.
-     * @return The squeezed value, which is a combination of the sponge state and a mask.
+     * @param position Index in the visible state to squeeze the value from.
+     * @return Extracted value.
      */
     public fun squeeze(position: Int): Long
 
     /**
-     * Scramble the sponge state by performing a number of rounds equal to the size of the sponge.
+     * Applies the round function `spongeSize` times to scramble the state.
      */
     public fun scramble() {
         repeat(spongeSize) { round() }
