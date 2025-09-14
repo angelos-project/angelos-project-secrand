@@ -15,10 +15,10 @@
 package org.angproj.sec.rand
 
 /**
- * In order to get a balanced variety of ones and zeroes in clusters with minimum gaps
+ * To get a balanced variety of ones and zeroes in clusters with minimum gaps
  * but individual patterns, the following six hexadecimals was chosen: 0x3, 0x5, 0x6, 0x9, 0xA and 0xC.
  *
- * All 6 hexadecimals gives a combination with two ones and two zeroes:
+ * All 6 hexadecimals give a combination with two ones and two zeroes:
  *
  * 0x3 -> 0011
  * 0x5 -> 0101
@@ -27,8 +27,10 @@ package org.angproj.sec.rand
  * 0xA -> 1010
  * 0xC -> 1100
  *
- * If the six hexadecimals are clustered in groups of four and everyone only appears once
- * there is a total 360 possible combinations. Which is in ascending order:
+ * If the six hexadecimals are clustered in groups of four and everyone only appears once, there are a
+ * total 360 possible combinations.
+ *
+ * Those are in ascending order:
  *
  * 3569, 356A, 356C, 3596, 359A, 359C, 35A6, 35A9, 35AC, 35C6, 35C9, 35CA, 3659, 365A, 365C,
  * 3695, 369A, 369C, 36A5, 36A9, 36AC, 36C5, 36C9, 36CA, 3956, 395A, 395C, 3965, 396A, 396C,
@@ -56,8 +58,8 @@ package org.angproj.sec.rand
  * C9A3, C9A5, C9A6, CA35, CA36, CA39, CA53, CA56, CA59, CA63, CA65, CA69, CA93, CA95, CA96.
  *
  * Each option repeating itself four times over to create a simple initialization vector with
- * an equal amount of ones and zeroes quite arbitrarily but not perfect. So that no hidden
- * weaknesses would be disguised, and hopefully no speculations of planted backdoors may occur.
+ * an equal number of ones and zeroes quite arbitrarily but not perfectly. So that no hidden
+ * weaknesses would be disguised, and hopefully, no speculations of planted backdoors may occur.
  */
 public enum class InitializationVector(public val iv: Long) {
     IV_3569(0x3569356935693569uL.toLong()),
