@@ -16,7 +16,7 @@ package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.JitterEntropy
-import org.angproj.sec.rand.Randomizer
+import org.angproj.sec.rand.Security
 import org.angproj.sec.util.ExportOctetByte
 import org.angproj.sec.util.ExportOctetLong
 
@@ -27,18 +27,8 @@ import org.angproj.sec.util.ExportOctetLong
  */
 public object SecureEntropy : ExportOctetLong, ExportOctetByte {
 
-    private val sponge = object : AbstractSponge256(), Randomizer {
-        private var position: Int = 0
-
-        override fun getNextBits(bits: Int): Int {
-            val random = squeeze(position++)
-
-            if(position >= visibleSize) {
-                round()
-                position = 0
-            }
-            return Randomizer.reduceBits<Unit>(bits, Randomizer.foldBits<Unit>(random))
-        }
+    private val sponge: Security = object : AbstractSponge256(), Security {
+        override var position: Int = 0
     }
 
     init {
@@ -78,20 +68,6 @@ public object SecureEntropy : ExportOctetLong, ExportOctetByte {
             entropy = generateEntropy<Unit>(entropy, 8)
             data.writeOctet(offset + index, entropy)
         }
-
-        /*var index = 0
-        var pos = offset
-        revitalize()
-
-        repeat(length) {
-            data.writeOctet(pos++, sponge.squeeze(index))
-
-            index++
-            if (index >= sponge.visibleSize) {
-                sponge.round()
-                index = 0
-            }
-        }*/
     }
 
     /**
@@ -116,38 +92,5 @@ public object SecureEntropy : ExportOctetLong, ExportOctetByte {
             entropy = entropy shl 8 xor sponge.getNextBits(32).toLong()
             data.writeOctet(offset + index, entropy.toByte())
         }
-
-        /*var index = 0
-        var pos = offset
-
-        val loops = length / 8
-        val remaining = length % 8
-        revitalize()
-
-        repeat(loops) {
-            var rand = sponge.squeeze(index)
-
-            // Little-endian conversion
-            repeat(8) {
-                data.writeOctet(pos++, (rand and 0xFF).toByte())
-                rand = rand ushr 8
-            }
-
-            index++
-            if (index >= sponge.visibleSize) {
-                sponge.round()
-                index = 0
-            }
-        }
-
-        if (remaining > 0) {
-            var rand = sponge.squeeze(index)
-
-            // Little-endian conversion for remaining bytes
-            repeat(remaining) {
-                data.writeOctet(pos++, (rand and 0xFF).toByte())
-                rand = rand ushr 8
-            }
-        }*/
     }
 }

@@ -15,6 +15,7 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge512
+import org.angproj.sec.rand.Security
 import org.angproj.sec.util.ExportOctetByte
 import org.angproj.sec.util.ExportOctetLong
 import org.angproj.sec.util.floorMod
@@ -32,7 +33,9 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte {
     private val ROUNDS_64K: Int = Short.MAX_VALUE * 2
     private val ROUNDS_128K: Int = Short.MAX_VALUE * 4
 
-    private val sponge: AbstractSponge512 = object : AbstractSponge512() {}
+    private val sponge: Security = object : AbstractSponge512(), Security {
+        override var position: Int = 0
+    }
 
     private var next: Int = 0
     private var counter: Int = 0
@@ -63,9 +66,16 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte {
             revitalize()
             counter = 0
         } else {
-            sponge.round()
             counter++
         }
+    }
+
+    private inline fun<reified R: Any> generateEntropy(entropy: Long, loops: Int): Long {
+        var data = entropy
+        repeat(loops) {
+            data = data shl 8 xor sponge.getNextBits(32).toLong()
+        }
+        return data
     }
 
     /**
@@ -78,18 +88,16 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte {
     override fun <E> exportLongs(data: E, offset: Int, length: Int, writeOctet: E.(Int, Long) -> Unit) {
         if(length <= 0) return
 
-        var index = 0
-        var pos = offset
         round()
+        var entropy: Long = 0
 
-        repeat(length) {
-            data.writeOctet(pos++, sponge.squeeze(index))
+        // Warmup phase to stabilize the entropy pool
+        entropy = generateEntropy<Unit>(entropy, 16)
 
-            index++
-            if (index >= sponge.visibleSize) {
-                round()
-                index = 0
-            }
+        // Generate and write random Long values
+        repeat(length) { index ->
+            entropy = generateEntropy<Unit>(entropy, 8)
+            data.writeOctet(offset + index, entropy)
         }
     }
 
@@ -111,37 +119,16 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte {
     override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
         if(length <= 0) return
 
-        var index = 0
-        var pos = offset
-
-        val loops = length / 8
-        val remaining = length % 8
         round()
+        var entropy: Long = 0
 
-        repeat(loops) {
-            var rand = sponge.squeeze(index)
+        // Warmup phase to stabilize the entropy pool
+        entropy = generateEntropy<Unit>(entropy, 16)
 
-            // Little-endian conversion
-            repeat(8) {
-                data.writeOctet(pos++, (rand and 0xFF).toByte())
-                rand = rand ushr 8
-            }
-
-            index++
-            if (index >= sponge.visibleSize) {
-                round()
-                index = 0
-            }
-        }
-
-        if (remaining > 0) {
-            var rand = sponge.squeeze(index)
-
-            // Little-endian conversion for remaining bytes
-            repeat(remaining) {
-                data.writeOctet(pos++, (rand and 0xFF).toByte())
-                rand = rand ushr 8
-            }
+        // Generate and write random Byte values
+        repeat(length) { index ->
+            entropy = entropy shl 8 xor sponge.getNextBits(32).toLong()
+            data.writeOctet(offset + index, entropy.toByte())
         }
     }
 }
