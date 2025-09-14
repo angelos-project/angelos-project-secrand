@@ -30,7 +30,7 @@ public object JitterEntropy : ExportOctetLong, ExportOctetByte {
     /**
      * Internal state for tracking timing measurements and generating jitter-based entropy.
      */
-    public class JitterEntropyState {
+    public class JitterEntropyState : Randomizer {
         // Monotonic clock mark to measure elapsed time for entropy generation
         private val start = TimeSource.Monotonic.markNow()
 
@@ -41,7 +41,7 @@ public object JitterEntropy : ExportOctetLong, ExportOctetByte {
          * @return A pseudo-random [Int] containing the requested number of bits.
          * @throws IllegalArgumentException If [bits] is not in the range 1–32.
          */
-        public fun nextJitter(bits: Int): Int {
+        override fun getNextBits(bits: Int): Int {
             require(bits in 1..32) { "Bits must be between 1 and 32" }
 
             // Measure elapsed time since the start mark
@@ -63,7 +63,7 @@ public object JitterEntropy : ExportOctetLong, ExportOctetByte {
             val mixedBits: Long = (trimmedNanoBits xor trimmedMicroBits) xor comboBits.rotateLeft(41)
 
             // Combine high and low 32 bits and extract the requested number of bits
-            return ((mixedBits ushr 32).toInt() xor (mixedBits and 0xffffffff).toInt()) ushr (32 - bits)
+            return Randomizer.reduceBits<Unit>(bits, Randomizer.foldBits<Unit>(mixedBits))
         }
     }
 
@@ -73,7 +73,7 @@ public object JitterEntropy : ExportOctetLong, ExportOctetByte {
     private inline fun<reified R: Any> generateEntropy(entropy: Long, loops: Int): Long {
         var data = entropy
         repeat(loops) {
-            data = data shl 8 xor state.nextJitter(32).toLong()
+            data = data shl 8 xor state.getNextBits(32).toLong()
         }
         return data
     }
@@ -121,7 +121,7 @@ public object JitterEntropy : ExportOctetLong, ExportOctetByte {
 
         // Generate and write random Byte values
         repeat(length) { index ->
-            entropy = entropy shl 8 xor state.nextJitter(32).toLong()
+            entropy = entropy shl 8 xor state.getNextBits(32).toLong()
             data.writeOctet(offset + index, entropy.toByte())
         }
     }
