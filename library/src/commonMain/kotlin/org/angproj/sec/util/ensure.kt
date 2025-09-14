@@ -15,7 +15,7 @@
 package org.angproj.sec.util
 
 /**
- * Evaluates the specified exception constructor [exc] and throws the exception of type [T].
+ * Unconditionally throws the specified exception from [exc] of type [T].
  *
  * This function is intended for scenarios where an exception needs to be thrown unconditionally.
  * The caller provides a lambda [exc] that constructs the exception to be thrown, allowing for custom exception types and messages.
