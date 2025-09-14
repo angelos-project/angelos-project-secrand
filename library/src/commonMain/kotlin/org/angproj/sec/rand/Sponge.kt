@@ -14,27 +14,41 @@
  */
 package org.angproj.sec.rand
 
+/**
+ * The `Sponge` interface defines the contract for a cryptographic sponge construction.
+ * It provides methods for absorbing, squeezing, and scrambling data, as well as properties
+ * describing the sponge's configuration.
+ */
 public interface Sponge {
 
+    /**
+     * The total number of states in the sponge.
+     * */
     public val spongeSize: Int
 
+    /**
+     * The size of the visible part of the sponge state.
+     * */
     public val visibleSize: Int
 
+    /**
+     * The size in bytes of the visible part of the sponge state.
+     * */
     public val byteSize: Int
 
     /**
-     * Resets states and the sponge to its original initialization vectors,
+     * Resets states and the sponge to its original initialization vectors.
      * */
     public fun reset()
 
     /**
-     * The round function is an abstract method that must be implemented by subclasses.
-     * It defines how the sponge state is transformed during each round of the sponge.
+     * The round function is an abstract method that subclasses must implement.
+     * It defines how the sponge state is transformed during each round of the permutation.
      */
     public fun round()
 
     /**
-     * Absorb a value into the sponge at a specific offset.
+     * Absorb a value into the sponge at a specific offset, of the visible portion of the state.
      *
      * @param value The value to absorb.
      * @param position The position in the sponge to absorb the value.
@@ -42,7 +56,7 @@ public interface Sponge {
     public fun absorb(value: Long, position: Int)
 
     /**
-     * Squeeze a value from the sponge from a specific offset.
+     * Squeeze a value from the sponge from a specific offset, of the visible portion of the state.
      *
      * @param position The position in the sponge to squeeze the value from.
      * @return The squeezed value, which is a combination of the sponge state and a mask.
