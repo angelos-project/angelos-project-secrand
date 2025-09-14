@@ -14,4 +14,12 @@
  */
 package org.angproj.sec.util
 
+/**
+ * Abstract base class representing an object to be benchmarked.
+ *
+ * @param B The type of the object being benchmarked.
+ * @property obj The instance of the object to benchmark.
+ *
+ * Extend this class to wrap the object you want to measure performance for.
+ */
 public abstract class BenchmarkObject<B>(public val obj: B)

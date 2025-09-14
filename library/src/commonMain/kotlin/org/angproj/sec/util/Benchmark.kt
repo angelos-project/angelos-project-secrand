@@ -14,12 +14,30 @@
  */
 package org.angproj.sec.util
 
+/**
+ * Abstract base class for running benchmarks on a given object.
+ *
+ * @param B The type of the object being benchmarked.
+ * @param E The type of the BenchmarkObject wrapper.
+ * @property samples The number of samples to collect during benchmarking.
+ * @property obj The benchmark object instance, created by the provided config function.
+ *
+ * Extend this class to implement specific benchmarking logic.
+ * Use the config function to initialize the object to be benchmarked.
+ */
 public abstract class Benchmark<B, E: BenchmarkObject<B>>(
     public val samples: Int,
     config: () -> E
 ) {
     protected val obj: E = config()
+
+    /**
+     * Runs the benchmark and collects data.
+     */
     public abstract fun calculateData()
 
+    /**
+     * Returns a string representation of the benchmark results.
+     */
     public abstract override fun toString(): String
 }
