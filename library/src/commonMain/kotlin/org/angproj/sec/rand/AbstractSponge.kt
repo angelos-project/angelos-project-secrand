@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.floorMod
 
 /**
@@ -77,7 +78,7 @@ public abstract class AbstractSponge(
     protected var counter: Long = 0      // Round counter for uniqueness
     protected var mask: Long = 0         // Dynamic mask for output obfuscation
     protected val sponge: LongArray = LongArray(spongeSize) // Internal state array
-    override val byteSize: Int = visibleSize * Long.SIZE_BYTES // Output size in bytes
+    override val byteSize: Int = visibleSize * TypeSize.longSize // Output size in bytes
 
     init {
         // Ensure visible size does not exceed sponge size for safe output
