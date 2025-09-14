@@ -15,6 +15,7 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge512
+import org.angproj.sec.rand.Randomizer
 import org.angproj.sec.rand.Security
 import org.angproj.sec.util.ExportOctetByte
 import org.angproj.sec.util.ExportOctetLong
@@ -29,9 +30,11 @@ import org.angproj.sec.util.floorMod
  * The SecureFeed object is designed to be used in cryptographic applications where
  * high-quality randomness is required.
  */
-public object SecureFeed : ExportOctetLong, ExportOctetByte {
-    private val ROUNDS_64K: Int = Short.MAX_VALUE * 2
-    private val ROUNDS_128K: Int = Short.MAX_VALUE * 4
+public object SecureFeed : ExportOctetLong, ExportOctetByte, Randomizer {
+    private const val MULTIPLE = 32
+
+    private const val ROUNDS_64K: Int = Short.MAX_VALUE * 2 * MULTIPLE
+    private const val ROUNDS_128K: Int = Short.MAX_VALUE * 4 * MULTIPLE
 
     private val sponge: Security = object : AbstractSponge512(), Security {
         override var position: Int = 0
@@ -60,13 +63,13 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte {
      * If it does, it resets the next threshold and revitalizes the sponge.
      * This is used to ensure that the sponge is periodically refreshed with new entropy.
      */
-    private fun round() {
+    private fun round(count: Int = 1) {
         if (counter >= next) {
             next = ROUNDS_128K + sponge.squeeze(0).toInt().floorMod(ROUNDS_64K)
             revitalize()
             counter = 0
         } else {
-            counter++
+            counter += count
         }
     }
 
@@ -88,7 +91,7 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte {
     override fun <E> exportLongs(data: E, offset: Int, length: Int, writeOctet: E.(Int, Long) -> Unit) {
         if(length <= 0) return
 
-        round()
+        round(MULTIPLE)
         var entropy: Long = 0
 
         // Warmup phase to stabilize the entropy pool
@@ -119,7 +122,7 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte {
     override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
         if(length <= 0) return
 
-        round()
+        round(MULTIPLE)
         var entropy: Long = 0
 
         // Warmup phase to stabilize the entropy pool
@@ -130,5 +133,11 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte {
             entropy = entropy shl 8 xor sponge.getNextBits(32).toLong()
             data.writeOctet(offset + index, entropy.toByte())
         }
+    }
+
+    override fun getNextBits(bits: Int): Int {
+        require(bits in 1..32) { "Bits must be between 1 and 32" }
+        round(1)
+        return sponge.getNextBits(bits)
     }
 }

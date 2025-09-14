@@ -21,7 +21,7 @@ import kotlin.time.TimeSource
 
 
 /**
- * A singleton object for generating pseudo-random numbers based on timing jitter in a Kotlin Multiplatform (KMP) environment.
+ * A singleton object for generating true random numbers based on timing jitter in a Kotlin Multiplatform (KMP) environment.
  * It implements [ExportOctetLong] and [ExportOctetByte] to export random data as [Long] or [Byte] values.
  * The entropy is derived from system monotonic clock measurements, processed through trigonometric and bitwise operations.
  */
@@ -35,7 +35,7 @@ public object JitterEntropy : ExportOctetLong, ExportOctetByte {
         private val start = TimeSource.Monotonic.markNow()
 
         /**
-         * Generates a pseudo-random [Int] with the specified number of bits (1 to 32) based on timing jitter.
+         * Generates a true random [Int] with the specified number of bits (1 to 32) based on timing jitter.
          *
          * @param bits The number of random bits to generate (1–32).
          * @return A pseudo-random [Int] containing the requested number of bits.
@@ -79,7 +79,7 @@ public object JitterEntropy : ExportOctetLong, ExportOctetByte {
     }
 
     /**
-     * Exports pseudo-random [Long] values to the provided data structure.
+     * Exports true random [Long] values to the provided data structure.
      * Generates up to 128 [Long] values (1024 bytes) to prevent excessive computation.
      *
      * @param data The target data structure to write to.
@@ -103,7 +103,7 @@ public object JitterEntropy : ExportOctetLong, ExportOctetByte {
     }
 
     /**
-     * Exports pseudo-random [Byte] values to the provided data structure.
+     * Exports true random [Byte] values to the provided data structure.
      * Generates up to 1024 [Byte] values to prevent excessive computation.
      *
      * @param data The target data structure to write to.

@@ -17,7 +17,7 @@ package org.angproj.sec
 import org.angproj.sec.rand.AbstractRandom
 
 /**
- * *SecureRandom provides a high-quality source of random numbers
+ * SecureRandom provides a high-quality source of random numbers
  * using a secure entropy feed. It reads bytes, shorts, ints, longs,
  * and floating-point numbers from the secure random source.
  * The values are normalized to their respective ranges.
