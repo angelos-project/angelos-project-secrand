@@ -48,6 +48,21 @@ public class EntropyAvalancheObject(obj: JitterEntropy): AvalancheObject<JitterE
     }
 }
 
+public class SecureFeedAvalancheObject(obj: SecureFeed): AvalancheObject<SecureFeed>(obj) {
+    public override val bufferSize: Int
+        get() = 8
+
+    public override val digestSize: Int
+        get() = bufferSize * 8
+
+
+    public override fun digest(data: LongArray) {
+        obj.exportLongs(data, 0, data.size) { index, value ->
+            data[index] = value
+        }
+    }
+}
+
 public class SecureRandomAvalancheObject(obj: SecureRandom): AvalancheObject<SecureRandom>(obj) {
     public override val bufferSize: Int
         get() = 8
@@ -123,6 +138,13 @@ public fun main() {
     benchmark2b.calculateData()
     println("AbstractSponge256")
     println(benchmark2b)
+
+    val benchmarkf = AvalancheEffect(samples) {
+        SecureFeedAvalancheObject(SecureFeed)
+    }
+    benchmarkf.calculateData()
+    println("SecureFeed")
+    println(benchmarkf)
 
     val benchmark5 = AvalancheEffect(samples) {
         SecureRandomAvalancheObject(SecureRandom)

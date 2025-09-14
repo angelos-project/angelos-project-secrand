@@ -45,6 +45,21 @@ public class EntropyMonteObject(obj: JitterEntropy): MonteObject<JitterEntropy>(
         get() = 16
 }
 
+public class SecureFeedMonteObject(obj: SecureFeed): MonteObject<SecureFeed>(obj) {
+    public override fun readNextDouble(data: DoubleArray) {
+        val arr = LongArray(data.size)
+        obj.exportLongs(arr, 0, arr.size) { index, value ->
+            arr[index] = value
+        }
+        repeat(bufferSize) {
+            data[it] = ((arr[it] and 0x7fffffffffffffffL) / (1L shl 63).toDouble()).absoluteValue
+        }
+    }
+
+    public override val bufferSize: Int
+        get() = 16
+}
+
 public class SecureRandomMonteObject(obj: SecureRandom): MonteObject<SecureRandom>(obj) {
     public override fun readNextDouble(data: DoubleArray) {
         repeat(8) {
@@ -90,6 +105,13 @@ public fun main() {
     benchmark3.calculateData()
     println("AbstractSponge256")
     println(benchmark3)
+
+    val benchmarkf = MonteCarlo(samples) {
+        SecureFeedMonteObject(SecureFeed)
+    }
+    benchmarkf.calculateData()
+    println("SecureFeed")
+    println(benchmarkf)
 
     val benchmark5 = MonteCarlo(samples) {
         SecureRandomMonteObject(SecureRandom)

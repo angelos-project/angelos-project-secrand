@@ -19,6 +19,7 @@ import org.angproj.sec.rand.Randomizer
 import org.angproj.sec.rand.Security
 import org.angproj.sec.util.ExportOctetByte
 import org.angproj.sec.util.ExportOctetLong
+import org.angproj.sec.util.ceilDiv
 import org.angproj.sec.util.floorMod
 
 /**
@@ -31,10 +32,6 @@ import org.angproj.sec.util.floorMod
  * high-quality randomness is required.
  */
 public object SecureFeed : ExportOctetLong, ExportOctetByte, Randomizer {
-    private const val MULTIPLE = 32
-
-    private const val ROUNDS_64K: Int = Short.MAX_VALUE * 2 * MULTIPLE
-    private const val ROUNDS_128K: Int = Short.MAX_VALUE * 4 * MULTIPLE
 
     private val sponge: Security = object : AbstractSponge512(), Security {
         override var position: Int = 0
@@ -63,9 +60,9 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte, Randomizer {
      * If it does, it resets the next threshold and revitalizes the sponge.
      * This is used to ensure that the sponge is periodically refreshed with new entropy.
      */
-    private fun round(count: Int = 1) {
+    private fun round(count: Int) {
         if (counter >= next) {
-            next = ROUNDS_128K + sponge.squeeze(0).toInt().floorMod(ROUNDS_64K)
+            next = (Int.MAX_VALUE / 4) + sponge.squeeze(0).toInt().floorMod(Int.MAX_VALUE / 8)
             revitalize()
             counter = 0
         } else {
@@ -91,7 +88,7 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte, Randomizer {
     override fun <E> exportLongs(data: E, offset: Int, length: Int, writeOctet: E.(Int, Long) -> Unit) {
         if(length <= 0) return
 
-        round(MULTIPLE)
+        round(length)
         var entropy: Long = 0
 
         // Warmup phase to stabilize the entropy pool
@@ -122,7 +119,7 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte, Randomizer {
     override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
         if(length <= 0) return
 
-        round(MULTIPLE)
+        round(length)
         var entropy: Long = 0
 
         // Warmup phase to stabilize the entropy pool
@@ -137,7 +134,7 @@ public object SecureFeed : ExportOctetLong, ExportOctetByte, Randomizer {
 
     override fun getNextBits(bits: Int): Int {
         require(bits in 1..32) { "Bits must be between 1 and 32" }
-        round(1)
+        round(bits.ceilDiv(8))
         return sponge.getNextBits(bits)
     }
 }
