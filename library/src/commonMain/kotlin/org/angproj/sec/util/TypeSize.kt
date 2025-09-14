@@ -14,6 +14,19 @@
  */
 package org.angproj.sec.util
 
+/**
+ * Utility object providing constants for the bit and byte sizes of Kotlin primitive types.
+ *
+ * Includes both signed and unsigned types, as well as floating-point types.
+ * Useful for buffer management, serialization, and low-level data manipulation.
+ *
+ * - `byteBits`, `shortBits`, `intBits`, `longBits`: Number of bits in signed types.
+ * - `uByteBits`, `uShortBits`, `uIntBits`, `uLongBits`: Number of bits in unsigned types.
+ * - `floatBits`, `doubleBits`: Number of bits in floating-point types.
+ * - `uByteSize`, `uShortSize`, `uIntSize`, `uLongSize`: Number of bytes in signed types.
+ * - `byteSize`, `shortSize`, `intSize`, `longSize`: Number of bytes in unsigned types.
+ * - `floatSize`, `doubleSize`: Number of bytes in floating-point types.
+ */
 public object TypeSize {
     public const val byteBits: Int = Byte.SIZE_BITS
     public const val shortBits: Int = Short.SIZE_BITS
