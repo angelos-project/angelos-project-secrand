@@ -93,8 +93,7 @@ public abstract class AbstractSponge(
      */
     override fun reset() {
         repeat(spongeSize) {
-            // Initialization vectors are indexed from 1 for extra entropy
-            sponge[it] = InitializationVector.entries[it + 1].iv
+            sponge[it] = InitializationVector.entries[it].iv
         }
     }
 
