@@ -65,6 +65,6 @@ public abstract class AbstractSponge2512:  AbstractSponge(9, 8) {
         sponge[8] = confuse<Unit>(sponge8)
 
         // Step 3: Add round constant to prevent fixed points
-        sponge[0] = sponge[0] xor (-0x5a5a5a5a5a5a5a5bL xor counter)
+        sponge[0] = sponge[0] xor (-0x5a5a5a5a5a5a5a5bL xor counter++)
     }
 }
