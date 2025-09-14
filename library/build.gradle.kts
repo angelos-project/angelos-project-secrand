@@ -28,7 +28,7 @@ kotlin {
         nodejs()
     }
     // Wasm
-    /**wasmJs {
+    /*wasmJs {
         browser()
         nodejs()
     }
