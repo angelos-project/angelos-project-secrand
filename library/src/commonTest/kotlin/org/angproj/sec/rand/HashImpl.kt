@@ -36,7 +36,7 @@ abstract class Hash<E: Sponge>(private val sponge: E) {
             start = end + TypeSize.longSize
             var value: Long = 0
             (start-1 downTo end).forEach { byte ->
-                value = (value shl 8) or (byte.toLong() and 0xff)
+                value = (value shl 8) or (remainder[byte].toLong() and 0xff)
             }
             sponge.absorb(value, position++ % sponge.visibleSize)
             if(position == sponge.visibleSize) {
@@ -64,8 +64,7 @@ abstract class Hash<E: Sponge>(private val sponge: E) {
         var pos = 0
         repeat(sponge.visibleSize) {
             var state = sponge.squeeze(it)
-            // Convert little endian Long to big endian bytes
-            (7 downTo 0).forEach {
+            repeat(8) {
                 digestBytes[pos++] = (state and 0xff).toByte()
                 state = state ushr 8
             }

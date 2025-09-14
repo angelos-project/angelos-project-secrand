@@ -20,11 +20,8 @@ import kotlin.test.assertContentEquals
 class AbstractSponge21024Test {
 
 
-    class Hash1024 : AbstractSponge21024(), Hash {
-        init {
-            scramble()
-        }
-    }
+    class Hash21024 : Hash<AbstractSponge21024>(object : AbstractSponge21024() {})
+
 
     val empty = byteArrayOf(
         110, -55, 28, -3, -82, -57, 44, -68, 82, 31, 66, -71, 15, -39, -95, -21, 106, -23, 16, 116, 67,
@@ -37,7 +34,7 @@ class AbstractSponge21024Test {
 
     @Test
     fun testSqueeze() {
-        val hash = Hash1024()
+        val hash = Hash21024()
         val digest = hash.digest()
 
         assertContentEquals(digest, empty)

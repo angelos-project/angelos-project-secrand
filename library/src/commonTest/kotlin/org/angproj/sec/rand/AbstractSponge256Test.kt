@@ -20,11 +20,7 @@ import kotlin.test.assertContentEquals
 class AbstractSponge256Test {
 
 
-    class Hash256 : AbstractSponge256(), Hash {
-        init {
-            scramble()
-        }
-    }
+    class Hash256 : Hash<AbstractSponge256>(object : AbstractSponge256() {})
 
     val empty = byteArrayOf(
         88, 99, 17, -16, 127, 111, 73, -16, -40, 70, -70, 68, -128, -100, 85, 71, -120, 4,
