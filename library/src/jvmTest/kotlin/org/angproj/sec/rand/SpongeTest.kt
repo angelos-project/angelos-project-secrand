@@ -9,31 +9,6 @@ import kotlin.test.assertEquals
 
 class SpongeTest {
 
-    class MySponge: Sponge {
-        override val spongeSize: Int
-            get() = -1
-        override val visibleSize: Int
-            get() = -1
-        override val byteSize: Int
-            get() = -1
-
-        override fun reset() {
-            throw UnsupportedOperationException()
-        }
-
-        override fun round() {
-            throw UnsupportedOperationException()
-        }
-
-        override fun absorb(value: Long, position: Int) {
-            throw UnsupportedOperationException()
-        }
-
-        override fun squeeze(position: Int): Long {
-            return -1
-        }
-    }
-
     @Mock
     var spongeMock: Sponge = mock()
 
