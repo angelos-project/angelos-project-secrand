@@ -15,9 +15,30 @@
 package org.angproj.sec.rand
 
 /**
- * Custom cryptographic sponge with a linear 16-state array of 64-bit registers,
- * interpreted as a 4x4 matrix for operations.
- * Deterministic initialization, single-round permutation for absorb/squeeze, 16 rounds for scramble.
+ * `AbstractSponge2256` is an abstract class implementing a cryptographic sponge construction
+ * with a 2x2 state matrix (4 x 64-bit registers). It extends `AbstractSponge`, providing
+ * specialized permutation logic for secure mixing of state, suitable for random number generation,
+ * hashing, and other cryptographic applications.
+ *
+ * ## Design Overview
+ * - **State Representation:** The sponge state is a linear array, conceptually a 2x2 matrix.
+ * - **Diffusion:** Achieved by mixing each value with its matrix neighbors using bitwise shifts and XORs.
+ * - **Confusion:** Non-linear transformation obscures input-output relationships, enhancing security.
+ * - **Permutation Round:** Combines diffusion, confusion, and round constants to update the state.
+ *
+ * ## Key Methods
+ * - `diffuse`: Mixes a value with its neighbors to spread input influence across the state.
+ * - `confuse`: Applies non-linear operations to obscure relationships and resist cryptanalysis.
+ * - `round`: Executes a single permutation round, updating the state with diffusion, confusion, and round constants.
+ *
+ * ## Security Rationale
+ * - **Diffusion** ensures that each bit of input affects many bits of output, making it hard to trace.
+ * - **Confusion** introduces non-linearity, preventing attackers from predicting or reversing transformations.
+ * - **Round Constants** prevent fixed points and ensure each round is unique, thwarting certain attacks.
+ *
+ * ## Usage
+ * This class is intended for cryptographic contexts where strong mixing and unpredictability are required.
+ * Subclasses should implement additional logic for absorbing input and squeezing output as needed.
  */
 public abstract class AbstractSponge2256:  AbstractSponge(4, 4) {
 
@@ -33,12 +54,7 @@ public abstract class AbstractSponge2256:  AbstractSponge(4, 4) {
         return value xor (-value.inv() * 11) xor (-value.inv() * 7)
     }
 
-    /**
-     * Single round of permutation, combining linear and non-linear transformations.
-     * Treats the linear state as a 4x4 matrix for neighbor operations.
-     */
     override fun round() {
-        // Step 1: Linear mixing (matrix-like diffusion)
         val sponge0 = diffuse<Unit>(sponge[0], 2, 2, 1, 1)
         val sponge1 = diffuse<Unit>(sponge[1], 3, 3, 0, 0)
         val sponge2 = diffuse<Unit>(sponge[2], 0, 0, 3, 3)
@@ -54,7 +70,6 @@ public abstract class AbstractSponge2256:  AbstractSponge(4, 4) {
         sponge[2] = confuse<Unit>(sponge2)
         sponge[3] = confuse<Unit>(sponge3)
 
-        // Step 3: Add round constant to prevent fixed points
         sponge[0] = sponge[0] xor (-0x5a5a5a5a5a5a5a5bL xor counter++)
     }
 }
