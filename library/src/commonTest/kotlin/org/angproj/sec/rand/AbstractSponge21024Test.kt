@@ -27,6 +27,7 @@ class AbstractSponge21024Test {
     private val nopqHash = "1a91acf997f54c3777d21535ab58b05013a7d4b9eaf288b2bd667a0d47672e00e03a11c9a38ec2709e0c0bf48aa3a7a7ac6b68de05320fc16499f735352d95fdf77a11b85be4eb342a7e5d98cbce75add2f12a4e2f5616427e0964caa273868cf5c620238041d2149b65186125ecc38e3cf768f4a09f9cee562802c8f5d9c650"
     private val alphaNumHash = "66cb18a502eef80656c59d59eb1cc664e84d4dc7a7d66446530ebdf5e75ef887034bd4177250bb2efb77135e5b1b9add162535443c1d0997ada70de80b5c5d9ebd0e62ba647a221f8089850b1e44f7befd97c99366833b4c776e4827f871c11b85006eda41284e886b382a6d1df1337e53f8102e5b6c01e8cc84fbe41ef08fb0"
     private val eightNumHash = "8649f0fee2f68cb856736d7bc72157965822457173be14741d11e7ba254b7bef82be69c618a4be216aa6f6b0d5c1464c4adac4b422e1466f50d51423c999ac6f48766911f9b1064ebf52054982820647efa70b91b7b748389b0780ca38d6cd7567b058d6efc990601b6c4a74530b4aa29d2d6b43161df951f050ae78d3ec854a"
+    private val millionAHash = "f515ed02a861610f8d9a8ff6b9032f128e9b0b537c634c0b3850db47e5c2563c365c69e2db180e686fefe0f72c7248ee401e37159964a4fbaca33693663db5263f7b6dfd3e9b3215d825e0a11cc1b777d41dbc0c57cb700884d7fddd88c50fd51a682bb2b5d44886690df37559ed54b746b63ccd0a89a1aba6a6c4a47954c08b"
 
 
     class Hash21024 : Hash<AbstractSponge21024>(object : AbstractSponge21024() {})
@@ -85,5 +86,12 @@ class AbstractSponge21024Test {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_EIGHT_NUM, Hash21024())
         println(hash)
         assertEquals(hash, eightNumHash)
+    }
+
+    @Test
+    fun testMillionA() {
+        val hash = TestGen().runTest(TestGen.NamedTest.TEST_MILLION_A, Hash21024())
+        println(hash)
+        assertEquals(hash, millionAHash)
     }
 }

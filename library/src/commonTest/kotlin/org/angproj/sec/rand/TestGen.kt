@@ -24,7 +24,7 @@ class TestGen {
         NamedTest.TEST_NOPQ -> nopqTest(hash)
         NamedTest.TEST_ALPHA_NUM -> alphaNumTest(hash)
         NamedTest.TEST_EIGHT_NUM -> eightNumTest(hash)
-        NamedTest.TEST_MILLION_A -> TODO()
+        NamedTest.TEST_MILLION_A -> millionATest(hash)
     }.toHexString(HexFormat.Default)
 
     private fun<E: Sponge> emptyTest(hash: Hash<E>): ByteArray {
@@ -65,6 +65,14 @@ class TestGen {
     private fun<E: Sponge> eightNumTest(hash: Hash<E>): ByteArray {
         val num = numGenerator().encodeToByteArray()
         repeat(8) {
+            hash.update(num)
+        }
+        return hash.digest()
+    }
+
+    private fun<E: Sponge> millionATest(hash: Hash<E>): ByteArray {
+        val num = "a".repeat(100).encodeToByteArray()
+        repeat(10_000) {
             hash.update(num)
         }
         return hash.digest()
