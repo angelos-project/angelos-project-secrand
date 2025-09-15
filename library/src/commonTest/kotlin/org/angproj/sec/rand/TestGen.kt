@@ -19,7 +19,7 @@ class TestGen {
         NamedTest.TEST_EMPTY -> emptyTest(hash)
         NamedTest.TEST_A -> singleATest(hash)
         NamedTest.TEST_ABC -> abcTest(hash)
-        NamedTest.TEST_MD -> TODO()
+        NamedTest.TEST_MD -> mdTest(hash)
         NamedTest.TEST_A_TO_Z -> TODO()
         NamedTest.TEST_ABC_OPQ -> TODO()
         NamedTest.TEST_ALPHA_NUM -> TODO()
@@ -39,6 +39,11 @@ class TestGen {
 
     private fun<E: Sponge> abcTest(hash: Hash<E>): ByteArray {
         hash.update("abc".encodeToByteArray())
+        return hash.digest()
+    }
+
+    private fun<E: Sponge> mdTest(hash: Hash<E>): ByteArray {
+        hash.update("message digest".encodeToByteArray())
         return hash.digest()
     }
 }
