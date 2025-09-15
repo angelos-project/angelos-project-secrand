@@ -17,45 +17,20 @@ class MiscTest {
         assertEquals(intData.toString(16), byteData.toHexString(HexFormat.Default))
     }
 
-    fun leIntBA(srcData: Int, toData: ByteArray): ByteArray {
-        var fromData = srcData
-        repeat(TypeSize.intSize) {
-            toData[3 - it] = (fromData and 0xff).toByte()
-            fromData = fromData ushr 8
-        }
-        return toData
-    }
-
-    fun leIntBA2(src: Int, dst: ByteArray, offset: Int) {
-        repeat(TypeSize.intSize) {
-            dst[it + offset] = ((src ushr (3 - it) * 8) and 0xff).toByte()
+    fun writeLeLong2BeBinary(src: Long, dst: ByteArray, index: Int, size: Int) {
+        repeat(size) {
+            dst[it + index] = ((src ushr ((size - 1) - it) * 8) and 0xff).toByte()
         }
     }
 
     @Test
     fun testLittleEndianIntToByteArray() {
         val toData = ByteArray(TypeSize.intSize)
-        leIntBA2(intData, toData, 0)
+        writeLeLong2BeBinary(intData.toLong(), toData, 0, 4)
         assertContentEquals(toData, byteData)
     }
 
-    fun baLeInt(srcData: ByteArray): Int {
-        var toData = 0
-        repeat(TypeSize.intSize) {
-            toData = toData or (srcData[3 - it].toInt() shl (8 * it))
-        }
-        return toData
-    }
-
-    fun baLeInt2(srcData: ByteArray, offset: Int): Int {
-        var toData = 0
-        repeat(TypeSize.intSize) {
-            toData = toData or (srcData[offset + it].toInt() shl (8 * (3 - it)))
-        }
-        return toData
-    }
-
-    fun baLeInt3(src: ByteArray, index: Int, size: Int): Long {
+    fun readBeBinary2LeLong(src: ByteArray, index: Int, size: Int): Long {
         var dst: Long = 0
         repeat(size) {
             dst = dst or (src[index + it].toLong() shl (8 * ((size - 1) - it)))
@@ -65,7 +40,7 @@ class MiscTest {
 
     @Test
     fun testByteArrayToLittleEndianInt() {
-        val toData = baLeInt3(byteData, 0, 4).toInt()
+        val toData = readBeBinary2LeLong(byteData, 0, 4).toInt()
         assertEquals(toData, intData)
     }
 }
