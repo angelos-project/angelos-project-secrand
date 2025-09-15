@@ -63,7 +63,7 @@ abstract class Hash<E: Sponge>(private val sponge: E) {
      */
     fun digest(): ByteArray {
         if(remainder.isNotEmpty()) {
-            update(ByteArray(TypeSize.longSize - remainder.size % TypeSize.longSize))
+            update(ByteArray(TypeSize.longSize - remainder.size.mod(TypeSize.longSize)))
         }
         if(offset != 0) {
             sponge.round()
