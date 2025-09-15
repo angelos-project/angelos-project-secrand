@@ -33,22 +33,29 @@ inline fun<reified R: Any> readBeBinary2LeLong(src: ByteArray, index: Int, size:
 }
 
 
-abstract class Hash<E: Sponge>(private val sponge: E) {
+abstract class Hash<E: Sponge>(private val sponge: E, public val debug: Boolean = false) {
 
     var remainder = byteArrayOf()
     var offset = 0
+
+    protected fun printDebug(output: String) {
+        if(debug) println(output)
+    }
 
     /**
      * Absorbs the input ByteArray into the sponge state, treating the input as big endian.
      * On a little endian system, bytes are reversed before conversion to Long.
      */
     fun update(input: ByteArray) {
+        printDebug("UPDATE - " + sponge::class.toString() + " : " + input.size)
         val data = remainder + input
-        (0 until (data.size - TypeSize.longSize) step TypeSize.longSize).forEach { pos ->
+        val loops = (data.size - data.size.mod(TypeSize.longSize)).div(TypeSize.longSize)
+        repeat(loops){
             sponge.absorb(
-                readBeBinary2LeLong<Unit>(data, pos, TypeSize.longSize),
+                readBeBinary2LeLong<Unit>(data, it * TypeSize.longSize, TypeSize.longSize),
                 offset++ % sponge.visibleSize
             )
+            printDebug("ABSORB")
             if(offset == sponge.visibleSize) {
                 offset = 0
                 sponge.round()
@@ -62,6 +69,7 @@ abstract class Hash<E: Sponge>(private val sponge: E) {
      * Converts each internal little endian Long to big endian bytes.
      */
     fun digest(): ByteArray {
+        printDebug("DIGEST - " + sponge::class.toString())
         if(remainder.isNotEmpty()) {
             update(ByteArray(TypeSize.longSize - remainder.size.mod(TypeSize.longSize)))
         }

@@ -17,7 +17,7 @@ class TestGen {
 
     fun<E: Sponge> runTest(name: NamedTest, hash: Hash<E>): String = when(name) {
         NamedTest.TEST_EMPTY -> emptyTest(hash)
-        NamedTest.TEST_A -> TODO()
+        NamedTest.TEST_A -> singleATest(hash)
         NamedTest.TEST_ABC -> TODO()
         NamedTest.TEST_MD -> TODO()
         NamedTest.TEST_A_TO_Z -> TODO()
@@ -29,6 +29,11 @@ class TestGen {
 
     private fun<E: Sponge> emptyTest(hash: Hash<E>): ByteArray {
         hash.update(byteArrayOf())
+        return hash.digest()
+    }
+
+    private fun<E: Sponge> singleATest(hash: Hash<E>): ByteArray {
+        hash.update("a".encodeToByteArray())
         return hash.digest()
     }
 }

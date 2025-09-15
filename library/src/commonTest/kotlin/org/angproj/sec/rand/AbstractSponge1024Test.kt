@@ -14,29 +14,29 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.rand.AbstractSponge21024Test.Hash21024
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
 
 class AbstractSponge1024Test {
 
+    private val emptyHash = "dbd87a113a4a1e7d01567ddec404d2ed914e844e72f078f69288bcdd13ffd3f424c9c7bd33bac9004b5937fccabe8498efd7c8df32d19d6126b6f7a44bcc47db3511f1b7ebccfb705c8d5c092bb4ae8728c3281e201f49615b0b38db8f5a93d0ee6f624ef0af92512061ebf569e95cb44720adedf8cd073bd02ba2d65fa34af3"
+    private val singleAHash = "3e45ca38b5daf449b5beb41440a6eb4075cc11f4d5c6d4670db184bfc5ec8870539b336ba7a065b74d2283cb803e084868108bffce8f7cfeaa297fb754cf4def5081066fa947ff5d6938f8cf213774261ff7819e3a51048b9813aaeaca607741245216cc961d65018ad27c7910064440ecd080290c55a647cac40b72e9ff366a"
 
     class Hash1024 : Hash<AbstractSponge1024>(object : AbstractSponge1024() {})
 
-
-    val empty = byteArrayOf(
-        19, 21, -7, 126, 126, -49, 127, -103, 119, 63, 84, 54, -108, -46, -8, -24, 116, -108, 91, 89, 88,
-        -58, 31, 10, 85, 84, 101, -53, 42, -55, -46, -52, 4, 25, 81, 44, 76, 78, 90, 2, 64, -74, 90, 81,
-        -65, 63, -52, -47, 37, -39, -102, -39, 45, 115, -41, 84, 73, -111, -13, -11, -95, 97, 96, 59, 92,
-        -103, 33, 103, -83, 80, -41, 74, -42, -5, 84, -30, 24, -94, -9, 26, -60, 70, 120, 66, 90, -123,
-        32, 47, -51, 34, -30, -73, 77, 96, -43, -50, -46, 35, 38, -125, 119, 42, -29, -5, 83, -53, -95,
-        -100, -102, 15, 2, 117, 81, -83, -77, -37, -52, -118, -9, -60, -57, -52, -71, 79, -76, 2, -65, 73
-    )
+    @Test
+    fun testEmpty() {
+        val hash = TestGen().runTest(TestGen.NamedTest.TEST_EMPTY, Hash1024())
+        println(hash)
+        assertEquals(hash, emptyHash)
+    }
 
     @Test
-    fun testSqueeze() {
-        val hash = Hash1024()
-        val digest = hash.digest()
-
-        assertContentEquals(digest, empty)
+    fun testSingleA() {
+        val hash = TestGen().runTest(TestGen.NamedTest.TEST_A, Hash1024())
+        println(hash)
+        assertEquals(hash, singleAHash)
     }
 }
