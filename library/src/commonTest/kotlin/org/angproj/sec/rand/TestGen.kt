@@ -52,9 +52,19 @@ class TestGen {
         return hash.digest()
     }
 
-    private fun aToZGenerator(): String {
+    public fun aToZGenerator(): String {
         val sb = StringBuilder()
-        (97 .. 122).forEach { sb.append(it) }
+        (97 .. 122).forEach { sb.append(it.toChar()) }
+        return sb.toString()
+    }
+
+    public fun nopqGenerator(): String {
+        val sb = StringBuilder()
+        val alphabet = aToZGenerator()
+        (0 .. (110 - 97)).forEach {
+            println(it)
+            sb.append(alphabet.substring(it, it + 4))
+        }
         return sb.toString()
     }
 }

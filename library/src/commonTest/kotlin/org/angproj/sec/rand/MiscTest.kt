@@ -43,4 +43,14 @@ class MiscTest {
         val toData = readBeBinary2LeLong(byteData, 0, 4).toInt()
         assertEquals(toData, intData)
     }
+
+    @Test
+    fun testAtoZ2Generator() {
+        assertEquals(TestGen().aToZGenerator(), "abcdefghijklmnopqrstuvwxyz")
+    }
+
+    @Test
+    fun testNopqGenerator() {
+        assertEquals(TestGen().nopqGenerator(), "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq")
+    }
 }

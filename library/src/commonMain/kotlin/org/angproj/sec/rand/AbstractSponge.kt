@@ -96,6 +96,8 @@ public abstract class AbstractSponge(
         repeat(spongeSize) {
             sponge[it] = InitializationVector.entries[it].iv
         }
+        counter = 0
+        mask = 0
     }
 
     /**
