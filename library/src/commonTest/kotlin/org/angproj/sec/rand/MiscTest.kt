@@ -55,9 +55,17 @@ class MiscTest {
         return toData
     }
 
+    fun baLeInt3(src: ByteArray, index: Int, size: Int): Long {
+        var dst: Long = 0
+        repeat(size) {
+            dst = dst or (src[index + it].toLong() shl (8 * ((size - 1) - it)))
+        }
+        return dst
+    }
+
     @Test
     fun testByteArrayToLittleEndianInt() {
-        val toData = baLeInt2(byteData, 0)
+        val toData = baLeInt3(byteData, 0, 4).toInt()
         assertEquals(toData, intData)
     }
 }
