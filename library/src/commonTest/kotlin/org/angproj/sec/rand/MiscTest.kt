@@ -20,7 +20,7 @@ class MiscTest {
     fun leIntBA(srcData: Int, toData: ByteArray): ByteArray {
         var fromData = srcData
         repeat(TypeSize.intSize) {
-            toData[3-it] = (fromData and 0xff).toByte()
+            toData[3 - it] = (fromData and 0xff).toByte()
             fromData = fromData ushr 8
         }
         return toData
@@ -42,7 +42,7 @@ class MiscTest {
     fun baLeInt(srcData: ByteArray): Int {
         var toData = 0
         repeat(TypeSize.intSize) {
-            toData = toData or (srcData[3-it].toInt() shl (8 * it))
+            toData = toData or (srcData[3 - it].toInt() shl (8 * it))
         }
         return toData
     }
