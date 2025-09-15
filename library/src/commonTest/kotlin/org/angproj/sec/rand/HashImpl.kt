@@ -17,10 +17,26 @@ package org.angproj.sec.rand
 import org.angproj.sec.util.TypeSize
 
 
+inline fun<reified R: Any> writeLeLong2BeBinary(src: Long, dst: ByteArray, index: Int, size: Int) {
+    repeat(size) {
+        dst[it + index] = ((src ushr ((size - 1) - it) * 8) and 0xff).toByte()
+    }
+}
+
+
+inline fun<reified R: Any> readBeBinary2LeLong(src: ByteArray, index: Int, size: Int): Long {
+    var dst: Long = 0
+    repeat(size) {
+        dst = dst or (src[index + it].toLong() shl (8 * ((size - 1) - it)))
+    }
+    return dst
+}
+
+
 abstract class Hash<E: Sponge>(private val sponge: E) {
 
     var remainder = byteArrayOf()
-    var position = 0
+    var offset = 0
 
     /**
      * Absorbs the input ByteArray into the sponge state, treating the input as big endian.
@@ -28,23 +44,17 @@ abstract class Hash<E: Sponge>(private val sponge: E) {
      */
     fun update(input: ByteArray) {
         val data = remainder + input
-        var chunks = data.size.floorDiv(TypeSize.longSize)
-        var end = 0
-        var start = 0
-        repeat(chunks) { index ->
-            end = index * TypeSize.longSize
-            start = end + TypeSize.longSize
-            var value: Long = 0
-            (start-1 downTo end).forEach { byte ->
-                value = (value shl 8) or (remainder[byte].toLong() and 0xff)
-            }
-            sponge.absorb(value, position++ % sponge.visibleSize)
-            if(position == sponge.visibleSize) {
-                position = 0
+        (0 until (data.size - TypeSize.longSize) step TypeSize.longSize).forEach { pos ->
+            sponge.absorb(
+                readBeBinary2LeLong<Unit>(data, pos, TypeSize.longSize),
+                offset++ % sponge.visibleSize
+            )
+            if(offset == sponge.visibleSize) {
+                offset = 0
                 sponge.round()
             }
         }
-        remainder = data.copyOfRange(start, data.size)
+        remainder = data.copyOfRange(data.size - (data.size.mod(TypeSize.longSize)), data.size)
     }
 
     /**
@@ -55,19 +65,19 @@ abstract class Hash<E: Sponge>(private val sponge: E) {
         if(remainder.isNotEmpty()) {
             update(ByteArray(TypeSize.longSize - remainder.size % TypeSize.longSize))
         }
-        if(position != 0) {
+        if(offset != 0) {
             sponge.round()
         }
         sponge.scramble()
 
-        val digestBytes = ByteArray(sponge.visibleSize * TypeSize.longSize)
-        var pos = 0
+        val digestBytes = ByteArray(sponge.byteSize)
         repeat(sponge.visibleSize) {
-            var state = sponge.squeeze(it)
-            repeat(8) {
-                digestBytes[pos++] = (state and 0xff).toByte()
-                state = state ushr 8
-            }
+            writeLeLong2BeBinary<Unit>(
+                sponge.squeeze(it),
+                digestBytes,
+                it * TypeSize.longSize,
+                TypeSize.longSize
+            )
         }
         return digestBytes
     }
