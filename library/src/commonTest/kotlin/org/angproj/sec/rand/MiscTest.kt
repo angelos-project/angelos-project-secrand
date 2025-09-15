@@ -50,7 +50,7 @@ class MiscTest {
     fun baLeInt2(srcData: ByteArray, offset: Int): Int {
         var toData = 0
         repeat(TypeSize.intSize) {
-            toData = toData or (srcData[offset + (3-it)].toInt() shl (8 * it))
+            toData = toData or (srcData[offset + it].toInt() shl (8 * (3 - it)))
         }
         return toData
     }
