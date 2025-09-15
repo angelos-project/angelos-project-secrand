@@ -25,6 +25,8 @@ class AbstractSponge21024Test {
     private val mdHash = "f4c28343a0cdf9d16167acbf343e16bf253ca600c42c2ea64216258435c62d180f108a16670b4a7d3cd7c69858f40ea89c78daa76aaaa5a3eb6f23f4e0faffc53a3628c15580c9b06f1a84be14542c630a8b8665912af8e2d9626a13af31f3ab4956fd49e6fd7bef05325deffe42c8ae2c9ea4754b60146f0fbbc02ceeee7e69"
     private val aToZHash = "0ee1a4df1fb40266f534e995af5ec7ad5f17679a93b11c2c496e0b2f43bf29c18cb5786e0f7d0e1fe1562eb9761b9bee47ba70ea45f0c9798a51f09a96ba9ed98fea0adbb3db860671edcc16c24e32439b07cd08376d3b03135faaa044a3e3f0ae81d235d42779e60790a8e31decd736711f32bfc9a9d53104e8f9e9d1b069dd"
     private val nopqHash = "1a91acf997f54c3777d21535ab58b05013a7d4b9eaf288b2bd667a0d47672e00e03a11c9a38ec2709e0c0bf48aa3a7a7ac6b68de05320fc16499f735352d95fdf77a11b85be4eb342a7e5d98cbce75add2f12a4e2f5616427e0964caa273868cf5c620238041d2149b65186125ecc38e3cf768f4a09f9cee562802c8f5d9c650"
+    private val alphaNumHash = "66cb18a502eef80656c59d59eb1cc664e84d4dc7a7d66446530ebdf5e75ef887034bd4177250bb2efb77135e5b1b9add162535443c1d0997ada70de80b5c5d9ebd0e62ba647a221f8089850b1e44f7befd97c99366833b4c776e4827f871c11b85006eda41284e886b382a6d1df1337e53f8102e5b6c01e8cc84fbe41ef08fb0"
+    private val eightNumHash = "8649f0fee2f68cb856736d7bc72157965822457173be14741d11e7ba254b7bef82be69c618a4be216aa6f6b0d5c1464c4adac4b422e1466f50d51423c999ac6f48766911f9b1064ebf52054982820647efa70b91b7b748389b0780ca38d6cd7567b058d6efc990601b6c4a74530b4aa29d2d6b43161df951f050ae78d3ec854a"
 
 
     class Hash21024 : Hash<AbstractSponge21024>(object : AbstractSponge21024() {})
@@ -69,5 +71,19 @@ class AbstractSponge21024Test {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_NOPQ, Hash21024())
         println(hash)
         assertEquals(hash, nopqHash)
+    }
+
+    @Test
+    fun testAlphaNum() {
+        val hash = TestGen().runTest(TestGen.NamedTest.TEST_ALPHA_NUM, Hash21024())
+        println(hash)
+        assertEquals(hash, alphaNumHash)
+    }
+
+    @Test
+    fun testEightNum() {
+        val hash = TestGen().runTest(TestGen.NamedTest.TEST_EIGHT_NUM, Hash21024())
+        println(hash)
+        assertEquals(hash, eightNumHash)
     }
 }
