@@ -20,7 +20,7 @@ class TestGen {
         NamedTest.TEST_A -> singleATest(hash)
         NamedTest.TEST_ABC -> abcTest(hash)
         NamedTest.TEST_MD -> mdTest(hash)
-        NamedTest.TEST_A_TO_Z -> TODO()
+        NamedTest.TEST_A_TO_Z -> aToZTest(hash)
         NamedTest.TEST_ABC_OPQ -> TODO()
         NamedTest.TEST_ALPHA_NUM -> TODO()
         NamedTest.TEST_EIGHT_NUM -> TODO()
@@ -45,6 +45,17 @@ class TestGen {
     private fun<E: Sponge> mdTest(hash: Hash<E>): ByteArray {
         hash.update("message digest".encodeToByteArray())
         return hash.digest()
+    }
+
+    private fun<E: Sponge> aToZTest(hash: Hash<E>): ByteArray {
+        hash.update(aToZGenerator().encodeToByteArray())
+        return hash.digest()
+    }
+
+    private fun aToZGenerator(): String {
+        val sb = StringBuilder()
+        (97 .. 122).forEach { sb.append(it) }
+        return sb.toString()
     }
 }
 
