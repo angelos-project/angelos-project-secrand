@@ -9,7 +9,7 @@ class TestGen {
         TEST_ABC,
         TEST_MD,
         TEST_A_TO_Z,
-        TEST_ABC_OPQ,
+        TEST_NOPQ,
         TEST_ALPHA_NUM,
         TEST_EIGHT_NUM,
         TEST_MILLION_A
@@ -21,7 +21,7 @@ class TestGen {
         NamedTest.TEST_ABC -> abcTest(hash)
         NamedTest.TEST_MD -> mdTest(hash)
         NamedTest.TEST_A_TO_Z -> aToZTest(hash)
-        NamedTest.TEST_ABC_OPQ -> TODO()
+        NamedTest.TEST_NOPQ -> nopqTest(hash)
         NamedTest.TEST_ALPHA_NUM -> TODO()
         NamedTest.TEST_EIGHT_NUM -> TODO()
         NamedTest.TEST_MILLION_A -> TODO()
@@ -52,6 +52,11 @@ class TestGen {
         return hash.digest()
     }
 
+    private fun<E: Sponge> nopqTest(hash: Hash<E>): ByteArray {
+        hash.update(nopqGenerator().encodeToByteArray())
+        return hash.digest()
+    }
+
     public fun numGenerator(): String {
         val sb = StringBuilder()
         (48 .. 57).forEach { sb.append(it.toChar()) }
@@ -68,7 +73,6 @@ class TestGen {
         val sb = StringBuilder()
         val alphabet = aToZGenerator()
         (0 .. (110 - 97)).forEach {
-            println(it)
             sb.append(alphabet.substring(it, it + 4))
         }
         return sb.toString()
