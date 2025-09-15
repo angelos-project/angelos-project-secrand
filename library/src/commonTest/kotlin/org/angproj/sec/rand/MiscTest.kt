@@ -45,6 +45,11 @@ class MiscTest {
     }
 
     @Test
+    fun testNumGenerator() {
+        assertEquals(TestGen().numGenerator(), "0123456789")
+    }
+
+    @Test
     fun testAtoZ2Generator() {
         assertEquals(TestGen().aToZGenerator(), "abcdefghijklmnopqrstuvwxyz")
     }

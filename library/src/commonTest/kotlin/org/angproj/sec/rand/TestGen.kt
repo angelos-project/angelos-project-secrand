@@ -52,6 +52,12 @@ class TestGen {
         return hash.digest()
     }
 
+    public fun numGenerator(): String {
+        val sb = StringBuilder()
+        (48 .. 57).forEach { sb.append(it.toChar()) }
+        return sb.toString()
+    }
+
     public fun aToZGenerator(): String {
         val sb = StringBuilder()
         (97 .. 122).forEach { sb.append(it.toChar()) }
