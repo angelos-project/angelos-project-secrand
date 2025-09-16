@@ -31,66 +31,74 @@ abstract class SpongeHashTest<S: Sponge> {
 
     protected abstract fun getHashInstance(): Hash<S>
 
+    protected fun printDebug(output: String) {
+        if(debug) println(output)
+    }
+
     @Test
     fun testEmpty() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_EMPTY, getHashInstance())
-        println(hash)
+        printDebug(hash)
         assertEquals(hash, emptyHash)
     }
 
     @Test
     fun testSingleA() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_A, getHashInstance())
-        println(hash)
+        printDebug(hash)
         assertEquals(hash, singleAHash)
     }
 
     @Test
     fun testAbc() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_ABC, getHashInstance())
-        println(hash)
+        printDebug(hash)
         assertEquals(hash, abcHash)
     }
 
     @Test
     fun testMessage() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_MD, getHashInstance())
-        println(hash)
+        printDebug(hash)
         assertEquals(hash, mdHash)
     }
 
     @Test
     fun testAToZ() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_A_TO_Z, getHashInstance())
-        println(hash)
+        printDebug(hash)
         assertEquals(hash, aToZHash)
     }
 
     @Test
     fun testNopq() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_NOPQ, getHashInstance())
-        println(hash)
+        printDebug(hash)
         assertEquals(hash, nopqHash)
     }
 
     @Test
     fun testAlphaNum() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_ALPHA_NUM, getHashInstance())
-        println(hash)
+        printDebug(hash)
         assertEquals(hash, alphaNumHash)
     }
 
     @Test
     fun testEightNum() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_EIGHT_NUM, getHashInstance())
-        println(hash)
+        printDebug(hash)
         assertEquals(hash, eightNumHash)
     }
 
     @Test
     fun testMillionA() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_MILLION_A, getHashInstance())
-        println(hash)
+        printDebug(hash)
         assertEquals(hash, millionAHash)
+    }
+
+    companion object {
+        val debug: Boolean = false
     }
 }

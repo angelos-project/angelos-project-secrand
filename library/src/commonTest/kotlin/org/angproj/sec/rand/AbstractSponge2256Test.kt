@@ -26,7 +26,7 @@ class AbstractSponge2256Test : SpongeHashTest<AbstractSponge2256>() {
     override val eightNumHash = "fb95718edf6720aba7b36c3ed4322045c2dd7fa7228ce1435b05518dfd86ad6c"
     override val millionAHash = "59962e5d65b9f81168c82e20147d5f502e97f3984971ef06b4dabb2b6f5127e0"
 
-    class Hash2256 : Hash<AbstractSponge2256>(object : AbstractSponge2256() {})
+    class Hash2256 : Hash<AbstractSponge2256>(object : AbstractSponge2256() {}, debug)
 
     override fun getHashInstance(): Hash<AbstractSponge2256> {
         return Hash2256()
