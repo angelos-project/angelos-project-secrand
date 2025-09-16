@@ -5,8 +5,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertContentEquals
 
-
-@OptIn(ExperimentalStdlibApi::class)
 class MiscTest {
 
     val intData: Int = 0x11223344
@@ -14,33 +12,19 @@ class MiscTest {
 
     @Test
     fun testLittleEndianIntVsByteArray() {
-        assertEquals(intData.toString(16), byteData.toHexString(HexFormat.Default))
-    }
-
-    fun writeLeLong2BeBinary(src: Long, dst: ByteArray, index: Int, size: Int) {
-        repeat(size) {
-            dst[it + index] = ((src ushr ((size - 1) - it) * 8) and 0xff).toByte()
-        }
+        assertEquals(intData.toString(16), byteData.toHex())
     }
 
     @Test
     fun testLittleEndianIntToByteArray() {
         val toData = ByteArray(TypeSize.intSize)
-        writeLeLong2BeBinary(intData.toLong(), toData, 0, 4)
+        writeLeLong2BeBinary<Unit>(intData.toLong(), toData, 0, 4)
         assertContentEquals(toData, byteData)
-    }
-
-    fun readBeBinary2LeLong(src: ByteArray, index: Int, size: Int): Long {
-        var dst: Long = 0
-        repeat(size) {
-            dst = dst or (src[index + it].toLong() shl (8 * ((size - 1) - it)))
-        }
-        return dst
     }
 
     @Test
     fun testByteArrayToLittleEndianInt() {
-        val toData = readBeBinary2LeLong(byteData, 0, 4).toInt()
+        val toData = readBeBinary2LeLong<Unit>(byteData, 0, 4).toInt()
         assertEquals(toData, intData)
     }
 

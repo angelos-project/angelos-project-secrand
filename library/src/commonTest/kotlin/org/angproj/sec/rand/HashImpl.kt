@@ -32,6 +32,20 @@ inline fun<reified R: Any> readBeBinary2LeLong(src: ByteArray, index: Int, size:
     return dst
 }
 
+fun ByteArray.toHex(): String {
+    val sb = StringBuilder()
+    this.forEach {
+        sb.append(intToHexChar<Unit>((it.toInt() shr 4) and 0xf))
+        sb.append(intToHexChar<Unit>(it.toInt() and 0xf))
+    }
+    return sb.toString()
+}
+
+inline fun<reified R: Any> intToHexChar(n: Int): Char = when {
+    n < 10 -> n + 0x30
+    else -> n - 10 + 0x61
+}.toChar()
+
 
 abstract class Hash<E: Sponge>(private val sponge: E, public val debug: Boolean = false) {
 
