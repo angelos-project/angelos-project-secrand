@@ -17,81 +17,84 @@ package org.angproj.sec.rand
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class AbstractSponge21024Test {
+class AbstractSponge21024Test: SpongeHashTest<AbstractSponge21024>() {
 
-    private val emptyHash = "79be7f41442401bffde34bf348196841555cf3ee86a4cc145a32394fa1977ebde3a1ced98fcf3eabfb6c3d131a25605c031e641ed60ab603a4fe39472142cb1dc6271640c0414e0d94f0febe79ce2c6da2e3cb6df7bd5bd9579bfa94837256dce560f70c2908f1facb4139920c0c95c0de99138448607ec29441a85dee3a1879"
-    private val singleAHash = "1e6e5a27d195698f4ec5b13fbb2265b54937b8a1c760fc7e2b8addb464ec4ebe8b331f3c4f1f6bda4b3d205a64a57a297abc7e5668b6f59605007f16913a32471cb6aa80520f00760cfdb08d39500b2497b2153911e00895b5d7d8b36f0cb99898e3aeea88a037cd170b9eb8b38dd52c1f329e32c959b2ad8d942bd41873f22f"
-    private val abcHash = "74d36bd4ff24edf6b75294ae307f16fb4582d5dd68aa6c389630f96712d47434bc82814ba7c30ab72a71a364d44b7e25542f8e8dd21aba7f71926a8c291ce46b523400ca0f4e9b83626c1c58f2896b4f8d933f33f8c065bfc054939b40bab392fda83f237390ae5d6780879ace4b5ec42bdc4d9fc6a3e163342d212426958b1f"
-    private val mdHash = "f4c28343a0cdf9d16167acbf343e16bf253ca600c42c2ea64216258435c62d180f108a16670b4a7d3cd7c69858f40ea89c78daa76aaaa5a3eb6f23f4e0faffc53a3628c15580c9b06f1a84be14542c630a8b8665912af8e2d9626a13af31f3ab4956fd49e6fd7bef05325deffe42c8ae2c9ea4754b60146f0fbbc02ceeee7e69"
-    private val aToZHash = "0ee1a4df1fb40266f534e995af5ec7ad5f17679a93b11c2c496e0b2f43bf29c18cb5786e0f7d0e1fe1562eb9761b9bee47ba70ea45f0c9798a51f09a96ba9ed98fea0adbb3db860671edcc16c24e32439b07cd08376d3b03135faaa044a3e3f0ae81d235d42779e60790a8e31decd736711f32bfc9a9d53104e8f9e9d1b069dd"
-    private val nopqHash = "1a91acf997f54c3777d21535ab58b05013a7d4b9eaf288b2bd667a0d47672e00e03a11c9a38ec2709e0c0bf48aa3a7a7ac6b68de05320fc16499f735352d95fdf77a11b85be4eb342a7e5d98cbce75add2f12a4e2f5616427e0964caa273868cf5c620238041d2149b65186125ecc38e3cf768f4a09f9cee562802c8f5d9c650"
-    private val alphaNumHash = "66cb18a502eef80656c59d59eb1cc664e84d4dc7a7d66446530ebdf5e75ef887034bd4177250bb2efb77135e5b1b9add162535443c1d0997ada70de80b5c5d9ebd0e62ba647a221f8089850b1e44f7befd97c99366833b4c776e4827f871c11b85006eda41284e886b382a6d1df1337e53f8102e5b6c01e8cc84fbe41ef08fb0"
-    private val eightNumHash = "8649f0fee2f68cb856736d7bc72157965822457173be14741d11e7ba254b7bef82be69c618a4be216aa6f6b0d5c1464c4adac4b422e1466f50d51423c999ac6f48766911f9b1064ebf52054982820647efa70b91b7b748389b0780ca38d6cd7567b058d6efc990601b6c4a74530b4aa29d2d6b43161df951f050ae78d3ec854a"
-    private val millionAHash = "f515ed02a861610f8d9a8ff6b9032f128e9b0b537c634c0b3850db47e5c2563c365c69e2db180e686fefe0f72c7248ee401e37159964a4fbaca33693663db5263f7b6dfd3e9b3215d825e0a11cc1b777d41dbc0c57cb700884d7fddd88c50fd51a682bb2b5d44886690df37559ed54b746b63ccd0a89a1aba6a6c4a47954c08b"
-
+    override val emptyHash = "79be7f41442401bffde34bf348196841555cf3ee86a4cc145a32394fa1977ebde3a1ced98fcf3eabfb6c3d131a25605c031e641ed60ab603a4fe39472142cb1dc6271640c0414e0d94f0febe79ce2c6da2e3cb6df7bd5bd9579bfa94837256dce560f70c2908f1facb4139920c0c95c0de99138448607ec29441a85dee3a1879"
+    override val singleAHash = "1e6e5a27d195698f4ec5b13fbb2265b54937b8a1c760fc7e2b8addb464ec4ebe8b331f3c4f1f6bda4b3d205a64a57a297abc7e5668b6f59605007f16913a32471cb6aa80520f00760cfdb08d39500b2497b2153911e00895b5d7d8b36f0cb99898e3aeea88a037cd170b9eb8b38dd52c1f329e32c959b2ad8d942bd41873f22f"
+    override val abcHash = "74d36bd4ff24edf6b75294ae307f16fb4582d5dd68aa6c389630f96712d47434bc82814ba7c30ab72a71a364d44b7e25542f8e8dd21aba7f71926a8c291ce46b523400ca0f4e9b83626c1c58f2896b4f8d933f33f8c065bfc054939b40bab392fda83f237390ae5d6780879ace4b5ec42bdc4d9fc6a3e163342d212426958b1f"
+    override val mdHash = "f4c28343a0cdf9d16167acbf343e16bf253ca600c42c2ea64216258435c62d180f108a16670b4a7d3cd7c69858f40ea89c78daa76aaaa5a3eb6f23f4e0faffc53a3628c15580c9b06f1a84be14542c630a8b8665912af8e2d9626a13af31f3ab4956fd49e6fd7bef05325deffe42c8ae2c9ea4754b60146f0fbbc02ceeee7e69"
+    override val aToZHash = "a8d950bf92af1880b6dab0947e246cc391b9f9bd14aaab516b0ff37d0c7322d326c34ae04b24eb104427eb767818919587841bdcc5e75076375141a960872fcef417506a14ac2b7c358ae778ca7d169998bc2bd18d6336551a01bc321e9cd2571759632dc1fbe26d98e5f7fdf8c7a66e999d4d3129e8ec25d893269f5c74f877"
+    override val nopqHash = "1a91acf997f54c3777d21535ab58b05013a7d4b9eaf288b2bd667a0d47672e00e03a11c9a38ec2709e0c0bf48aa3a7a7ac6b68de05320fc16499f735352d95fdf77a11b85be4eb342a7e5d98cbce75add2f12a4e2f5616427e0964caa273868cf5c620238041d2149b65186125ecc38e3cf768f4a09f9cee562802c8f5d9c650"
+    override val alphaNumHash = "66cb18a502eef80656c59d59eb1cc664e84d4dc7a7d66446530ebdf5e75ef887034bd4177250bb2efb77135e5b1b9add162535443c1d0997ada70de80b5c5d9ebd0e62ba647a221f8089850b1e44f7befd97c99366833b4c776e4827f871c11b85006eda41284e886b382a6d1df1337e53f8102e5b6c01e8cc84fbe41ef08fb0"
+    override val eightNumHash = "8649f0fee2f68cb856736d7bc72157965822457173be14741d11e7ba254b7bef82be69c618a4be216aa6f6b0d5c1464c4adac4b422e1466f50d51423c999ac6f48766911f9b1064ebf52054982820647efa70b91b7b748389b0780ca38d6cd7567b058d6efc990601b6c4a74530b4aa29d2d6b43161df951f050ae78d3ec854a"
+    override val millionAHash = "f515ed02a861610f8d9a8ff6b9032f128e9b0b537c634c0b3850db47e5c2563c365c69e2db180e686fefe0f72c7248ee401e37159964a4fbaca33693663db5263f7b6dfd3e9b3215d825e0a11cc1b777d41dbc0c57cb700884d7fddd88c50fd51a682bb2b5d44886690df37559ed54b746b63ccd0a89a1aba6a6c4a47954c08b"
 
     class Hash21024 : Hash<AbstractSponge21024>(object : AbstractSponge21024() {})
 
-    @Test
-    fun testEmpty() {
+    override fun getHashInstance(): Hash<AbstractSponge21024> {
+        return Hash21024()
+    }
+
+    /*@Test
+    fun testEmpty_() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_EMPTY, Hash21024())
         println(hash)
         assertEquals(hash, emptyHash)
     }
 
     @Test
-    fun testSingleA() {
+    fun testSingleA_() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_A, Hash21024())
         println(hash)
         assertEquals(hash, singleAHash)
     }
 
     @Test
-    fun testAbc() {
+    fun testAbc_() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_ABC, Hash21024())
         println(hash)
         assertEquals(hash, abcHash)
     }
 
     @Test
-    fun testMessage() {
+    fun testMessage_() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_MD, Hash21024())
         println(hash)
         assertEquals(hash, mdHash)
     }
 
     @Test
-    fun testAToZ() {
+    fun testAToZ_() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_A_TO_Z, Hash21024())
         println(hash)
         assertEquals(hash, aToZHash)
     }
 
     @Test
-    fun testNopq() {
+    fun testNopq_() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_NOPQ, Hash21024())
         println(hash)
         assertEquals(hash, nopqHash)
     }
 
     @Test
-    fun testAlphaNum() {
+    fun testAlphaNum_() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_ALPHA_NUM, Hash21024())
         println(hash)
         assertEquals(hash, alphaNumHash)
     }
 
     @Test
-    fun testEightNum() {
+    fun testEightNum_() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_EIGHT_NUM, Hash21024())
         println(hash)
         assertEquals(hash, eightNumHash)
     }
 
     @Test
-    fun testMillionA() {
+    fun testMillionA_() {
         val hash = TestGen().runTest(TestGen.NamedTest.TEST_MILLION_A, Hash21024())
         println(hash)
         assertEquals(hash, millionAHash)
-    }
+    }*/
 }

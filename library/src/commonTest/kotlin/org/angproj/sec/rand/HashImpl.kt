@@ -33,7 +33,7 @@ inline fun<reified R: Any> readBeBinary2LeLong(src: ByteArray, index: Int, size:
 }
 
 
-abstract class Hash<E: Sponge>(private val sponge: E, public val debug: Boolean = true) {
+abstract class Hash<E: Sponge>(private val sponge: E, public val debug: Boolean = false) {
 
     var remainder = byteArrayOf()
     var offset = 0
