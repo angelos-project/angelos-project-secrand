@@ -14,29 +14,21 @@
  */
 package org.angproj.sec.rand
 
-import org.angproj.sec.rand.AbstractSponge21024Test.Hash21024
-import kotlin.test.Test
-import kotlin.test.assertContentEquals
-import kotlin.test.assertEquals
+class AbstractSponge1024Test : SpongeHashTest<AbstractSponge1024>() {
 
-class AbstractSponge1024Test {
-
-    private val emptyHash = "dbd87a113a4a1e7d01567ddec404d2ed914e844e72f078f69288bcdd13ffd3f424c9c7bd33bac9004b5937fccabe8498efd7c8df32d19d6126b6f7a44bcc47db3511f1b7ebccfb705c8d5c092bb4ae8728c3281e201f49615b0b38db8f5a93d0ee6f624ef0af92512061ebf569e95cb44720adedf8cd073bd02ba2d65fa34af3"
-    private val singleAHash = "3e45ca38b5daf449b5beb41440a6eb4075cc11f4d5c6d4670db184bfc5ec8870539b336ba7a065b74d2283cb803e084868108bffce8f7cfeaa297fb754cf4def5081066fa947ff5d6938f8cf213774261ff7819e3a51048b9813aaeaca607741245216cc961d65018ad27c7910064440ecd080290c55a647cac40b72e9ff366a"
+    override val emptyHash = "dbd87a113a4a1e7d01567ddec404d2ed914e844e72f078f69288bcdd13ffd3f424c9c7bd33bac9004b5937fccabe8498efd7c8df32d19d6126b6f7a44bcc47db3511f1b7ebccfb705c8d5c092bb4ae8728c3281e201f49615b0b38db8f5a93d0ee6f624ef0af92512061ebf569e95cb44720adedf8cd073bd02ba2d65fa34af3"
+    override val singleAHash = "3e45ca38b5daf449b5beb41440a6eb4075cc11f4d5c6d4670db184bfc5ec8870539b336ba7a065b74d2283cb803e084868108bffce8f7cfeaa297fb754cf4def5081066fa947ff5d6938f8cf213774261ff7819e3a51048b9813aaeaca607741245216cc961d65018ad27c7910064440ecd080290c55a647cac40b72e9ff366a"
+    override val abcHash = "0a72eafb57e606d2a58809b33d02e528f4a23238cffbc9c13ac072bc6f09775a8b11fac1b5151f0a26e684deab3cf39647001f63e28435612ddd16f9943b2d21806bcd66d338dda4130ef7412921913ef51e1a73ce985e9f2b198d6c77357692d14dc21fd497e3127fb55e124b356fcda43d2c240b3ebe52035d3751c08724de"
+    override val mdHash = "6b3e3a6c68becb5635456ee025dc2d3fb55d05f552fce16d8fa05df4680cae797f58e50a161f2931fe8e4819dd0d1f886b2210029ef4afedfe82abd8de2e25fc6478be4c9283a28df6e214cd1041866065511822323b4aa428431ae16ace52500a64c69a6c895dd4c70c4f9de55ff64b08dc8809d2c655d9ecc5290c6f062b3a"
+    override val aToZHash = "92d985479d267e6e1bb25ab6966da2172f27875b24767ba97b4921be27702ce9632315d6be5eabdfa362c2da99bc92bbc83092ece9e50fa37c47437071a30d2bd1eb890ee2ea975673cec7d47d3ea54bad3618dcba8992aef4de4575996eceaa4ebb6b84e4f78ed1b3e93801751cb1fbbfbdb510deccb2970212baa39813afd1"
+    override val nopqHash = "389e246f7774a7fca44bfae7d15c312cd6eacf290435fe4f6fddcc7d741d2b729c1660c7a4cf7cdd7aa2e0eea98901a370a5ff71da6a2cc7ef2fc3ca73b1b3489169470a43b68cc04bff6c05cfbcfd90f4a874da0e9e6f8e4e3a38d9d0428dae855a5dcd2141fc3de20202953af83d85b8d008b1c7994977dfdfa8b9087a520f"
+    override val alphaNumHash = "38756f4a6ffbc026e806fc7070172e4fa334454c3727e7b3bfae5071a8fc0e989f04d02e0f41401d8418ac7d5f92efe9c78b220fb59059179a188131032333da6d8907558c028276ed239a57c1a9a1f847e167196620cfc67618054aad365915614f3b4e8fb7de7b23a0b333cfa5ef213a7e7086e8d043c689803b6a1e9ca07b"
+    override val eightNumHash = "81c96122094d08a9e63e97b41b3a126c299887540fda29ada758691a2fa2894a8b89ba8a0d97f091812045881842259b89db70947a5ff5a6b267c5b367f3597e7893fb089cb355d8ee73d682a40823c2d13f5d8675b09f354b178b6bbfb90166a6dc02a79a78c64731345b784b5249f4e85041a9d05e5a528ff7c41249b31a2c"
+    override val millionAHash = "f0ddd428bff0f7bf90f7d0d95e5465bab87de382e6305055162bf41a3b81b515aa1fd555bef1a6889f7a9034924ad5697013ba4bdeba28c1be6a820eb788e8cac1c8b68457780d6c7615c787606636272e5ee5a430d233265094d98cb8ca4de80de777160d031016ffbf844634849874e40b3b1bb320ff8bcd915dd8ff924da9"
 
     class Hash1024 : Hash<AbstractSponge1024>(object : AbstractSponge1024() {})
 
-    @Test
-    fun testEmpty() {
-        val hash = TestGen().runTest(TestGen.NamedTest.TEST_EMPTY, Hash1024())
-        println(hash)
-        assertEquals(hash, emptyHash)
-    }
-
-    @Test
-    fun testSingleA() {
-        val hash = TestGen().runTest(TestGen.NamedTest.TEST_A, Hash1024())
-        println(hash)
-        assertEquals(hash, singleAHash)
+    override fun getHashInstance(): Hash<AbstractSponge1024> {
+        return Hash1024()
     }
 }
