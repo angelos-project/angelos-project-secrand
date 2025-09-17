@@ -49,4 +49,11 @@ class SecureFeedTest {
         // With high probability, two random arrays should not be equal
         assertNotEquals(buffer1.toList(), buffer2.toList())
     }
+
+    @Test
+    fun testPrintUuid() {
+        repeat(100) {
+            println(Uuid())
+        }
+    }
 }

@@ -16,7 +16,7 @@ package org.angproj.sec
 
 import org.angproj.sec.util.Octet
 
-public abstract class UUID(
+public class Uuid(
     private val upper: Long = 0,
     private val lower: Long = 0
 ): Octet {
@@ -29,8 +29,7 @@ public abstract class UUID(
     public override fun toString(): String {
         var counter = 0
         val sb = StringBuilder()
-        counter = printStr<Unit>(upper, sb, counter)
-        printStr<Unit>(lower, sb, counter)
+        printStr<Unit>(lower, sb, printStr<Unit>(upper, sb, counter))
         return sb.toString()
     }
 
@@ -47,7 +46,7 @@ public abstract class UUID(
         return cnt
     }
 
-    private companion object {
-        private val hyphens = listOf<Int>(1)
+    private companion object Companion {
+        private val hyphens = listOf(8,13,18,23)
     }
 }

@@ -41,4 +41,17 @@ public interface Octet {
             dst.writeOctet(it + index, ((src ushr ((size - 1) - it) * 8) and 0xff).toByte())
         }
     }
+
+    public companion object {
+        public fun<E> toHex(src: Byte, data: E, index: Int, writeOctet: E.(index: Int, value: Byte) -> Unit): Int {
+            data.writeOctet(index, toHexChar<Unit>((src.toInt() shr 4) and 0xf))
+            data.writeOctet(index+1, toHexChar<Unit>(src.toInt() and 0xf))
+            return index+2
+        }
+
+        private inline fun<reified R: Any> toHexChar(n: Int): Byte = when {
+            n < 10 -> n + 0x30
+            else -> n - 10 + 0x61
+        }.toByte()
+    }
 }
