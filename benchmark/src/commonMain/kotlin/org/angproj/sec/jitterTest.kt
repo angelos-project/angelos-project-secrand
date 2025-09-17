@@ -82,4 +82,8 @@ public fun main() {
     avalancheEffect.calculateData()
     println("Avalanche Effect")
     println(avalancheEffect)
+
+    repeat(100) {
+        println(Uuid())
+    }
 }

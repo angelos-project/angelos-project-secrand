@@ -16,7 +16,7 @@ package org.angproj.sec
 
 import org.angproj.sec.util.Octet
 
-public class Uuid(
+public data class Uuid(
     private val upper: Long = 0,
     private val lower: Long = 0
 ): Octet {
@@ -36,18 +36,18 @@ public class Uuid(
         var cnt = counter
         writeLeLong2BeBinary(src, sb, -1, 8) { _, value ->
             if(cnt in hyphens) {
-                cnt += 1
                 sb.append('-')
+                cnt += 1
             }
-            cnt += 1
             Octet.toHex(value, sb, -1) { _, v ->
-                sb.append(v.toChar())
+                sb.append(v.toInt().toChar())
+                cnt += 1
             }
         }
         return cnt
     }
 
     private companion object Companion {
-        private val hyphens = listOf(4,7,10,13)
+        private val hyphens = listOf(8,13,18,23)
     }
 }
