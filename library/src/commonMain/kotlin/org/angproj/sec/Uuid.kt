@@ -22,31 +22,32 @@ public class Uuid(
 ): Octet {
 
     public constructor() : this(
-        SecureFeed.getNextBits(32).toLong() shl 32 or SecureFeed.getNextBits(32).toLong(),
-        SecureFeed.getNextBits(32).toLong() shl 32 or SecureFeed.getNextBits(32).toLong()
+        (SecureFeed.getNextBits(32).toLong() shl 32) or SecureFeed.getNextBits(32).toLong(),
+        (SecureFeed.getNextBits(32).toLong() shl 32) or SecureFeed.getNextBits(32).toLong()
     )
 
     public override fun toString(): String {
-        var counter = 0
         val sb = StringBuilder()
-        printStr<Unit>(lower, sb, printStr<Unit>(upper, sb, counter))
+        printStr<Unit>(lower, sb, printStr<Unit>(upper, sb, 0))
         return sb.toString()
     }
 
     private inline fun<reified E: Any> printStr(src: Long, sb: StringBuilder, counter: Int): Int {
         var cnt = counter
-        writeLeLong2BeBinary(src, sb, 0, 8) { _, value ->
-            if(counter in hyphens) {
+        writeLeLong2BeBinary(src, sb, -1, 8) { _, value ->
+            if(cnt in hyphens) {
                 cnt += 1
                 sb.append('-')
             }
             cnt += 1
-            sb.append(value)
+            Octet.toHex(value, sb, -1) { _, v ->
+                sb.append(v.toChar())
+            }
         }
         return cnt
     }
 
     private companion object Companion {
-        private val hyphens = listOf(8,13,18,23)
+        private val hyphens = listOf(4,7,10,13)
     }
 }
