@@ -19,7 +19,7 @@ import org.angproj.sec.util.Octet
 public data class Uuid(
     private val upper: Long = 0,
     private val lower: Long = 0
-): Octet {
+) {
 
     public constructor() : this(
         (SecureFeed.getNextBits(32).toLong() shl 32) or SecureFeed.getNextBits(32).toLong(),
@@ -34,7 +34,7 @@ public data class Uuid(
 
     private inline fun<reified E: Any> printStr(src: Long, sb: StringBuilder, counter: Int): Int {
         var cnt = counter
-        writeLeLong2BeBinary(src, sb, -1, 8) { _, value ->
+        Octet.writeLE(src, sb, -1, 8) { _, value ->
             if(cnt in hyphens) {
                 sb.append('-')
                 cnt += 1

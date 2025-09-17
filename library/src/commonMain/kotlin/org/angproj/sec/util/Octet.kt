@@ -14,8 +14,8 @@
  */
 package org.angproj.sec.util
 
-public interface Octet {
-    public fun<E> readBeBinary2LeLong(
+public object Octet {
+    public fun<E> readLE(
         src: E,
         index: Int,
         size: Int,
@@ -29,7 +29,7 @@ public interface Octet {
         return dst
     }
 
-    public fun<E> writeLeLong2BeBinary(
+    public fun<E> writeLE(
         src: Long,
         dst: E,
         index: Int,
@@ -42,16 +42,15 @@ public interface Octet {
         }
     }
 
-    public companion object {
-        public fun<E> toHex(src: Byte, data: E, index: Int, writeOctet: E.(index: Int, value: Byte) -> Unit): Int {
-            data.writeOctet(index, toHexChar<Unit>((src.toInt() shr 4) and 0xf))
-            data.writeOctet(index+1, toHexChar<Unit>(src.toInt() and 0xf))
-            return index+2
-        }
 
-        private inline fun<reified R: Any> toHexChar(n: Int): Byte = when {
-            n < 10 -> n + 0x30
-            else -> n - 10 + 0x61
-        }.toByte()
+    public fun<E> toHex(src: Byte, data: E, index: Int, writeOctet: E.(index: Int, value: Byte) -> Unit): Int {
+        data.writeOctet(index, toHexChar<Unit>((src.toInt() shr 4) and 0xf))
+        data.writeOctet(index+1, toHexChar<Unit>(src.toInt() and 0xf))
+        return index+2
     }
+
+    private inline fun<reified R: Any> toHexChar(n: Int): Byte = when {
+        n < 10 -> n + 0x30
+        else -> n - 10 + 0x61
+    }.toByte()
 }
