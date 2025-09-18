@@ -14,10 +14,23 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertContentEquals
+
+
+public fun ByteArray.toHex(): String {
+    val sb = StringBuilder()
+    forEach {
+        Octet.toHex(it, this, -1) { _, value ->
+            sb.append(value.toInt().toChar())
+        }
+    }
+    return sb.toString()
+}
+
 
 class MiscTest {
 
@@ -32,13 +45,17 @@ class MiscTest {
     @Test
     fun testLittleEndianIntToByteArray() {
         val toData = ByteArray(TypeSize.intSize)
-        writeLeLong2BeBinary<Unit>(intData.toLong(), toData, 0, 4)
+        Octet.writeLE(intData.toLong(), toData, 0, 4) { index, value ->
+            toData[index] = value
+        }
         assertContentEquals(toData, byteData)
     }
 
     @Test
     fun testByteArrayToLittleEndianInt() {
-        val toData = readBeBinary2LeLong<Unit>(byteData, 0, 4).toInt()
+        val toData = Octet.readLE(byteData, 0, 4) { index ->
+            byteData[index]
+        }.toInt()
         assertEquals(toData, intData)
     }
 

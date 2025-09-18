@@ -14,37 +14,8 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
-
-
-inline fun<reified R: Any> writeLeLong2BeBinary(src: Long, dst: ByteArray, index: Int, size: Int) {
-    repeat(size) {
-        dst[it + index] = ((src ushr ((size - 1) - it) * 8) and 0xff).toByte()
-    }
-}
-
-
-inline fun<reified R: Any> readBeBinary2LeLong(src: ByteArray, index: Int, size: Int): Long {
-    var dst: Long = 0
-    repeat(size) {
-        dst = dst or (src[index + it].toLong() shl (8 * ((size - 1) - it)))
-    }
-    return dst
-}
-
-fun ByteArray.toHex(): String {
-    val sb = StringBuilder()
-    this.forEach {
-        sb.append(intToHexChar<Unit>((it.toInt() shr 4) and 0xf))
-        sb.append(intToHexChar<Unit>(it.toInt() and 0xf))
-    }
-    return sb.toString()
-}
-
-inline fun<reified R: Any> intToHexChar(n: Int): Char = when {
-    n < 10 -> n + 0x30
-    else -> n - 10 + 0x61
-}.toChar()
 
 
 abstract class Hash<E: Sponge>(private val sponge: E, public val debug: Boolean = false) {
@@ -70,10 +41,10 @@ abstract class Hash<E: Sponge>(private val sponge: E, public val debug: Boolean 
         val loops = (data.size - data.size.mod(TypeSize.longSize)).div(TypeSize.longSize)
         repeat(loops){
             printDebug("ABSORB - $offset")
-            sponge.absorb(
-                readBeBinary2LeLong<Unit>(data, it * TypeSize.longSize, TypeSize.longSize),
-                offset++ % sponge.visibleSize
-            )
+            val value = Octet.readLE(data, it * TypeSize.longSize, TypeSize.longSize) { index ->
+                data[index]
+            }
+            sponge.absorb(value, offset++ % sponge.visibleSize)
             if(offset == sponge.visibleSize) {
                 offset = 0
                 sponge.round()
@@ -99,12 +70,14 @@ abstract class Hash<E: Sponge>(private val sponge: E, public val debug: Boolean 
 
         val digestBytes = ByteArray(sponge.byteSize)
         repeat(sponge.visibleSize) {
-            writeLeLong2BeBinary<Unit>(
+            Octet.writeLE(
                 sponge.squeeze(it),
                 digestBytes,
                 it * TypeSize.longSize,
                 TypeSize.longSize
-            )
+            ) { index, value ->
+                digestBytes[index] = value
+            }
         }
         return digestBytes
     }

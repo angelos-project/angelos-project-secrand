@@ -14,6 +14,8 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.util.Octet
+
 class TestGen {
 
     enum class NamedTest {
