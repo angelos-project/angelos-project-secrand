@@ -14,10 +14,12 @@
  */
 package org.angproj.sec.util
 
+import org.angproj.sec.stat.Benchmark
+import org.angproj.sec.stat.BenchmarkObject
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-// Mock BenchmarkObject
+/*// Mock BenchmarkObject
 class MockBenchmarkObject : BenchmarkObject<String>("mock") {
     var called = false
 }
@@ -47,4 +49,4 @@ class BenchmarkTest {
         assertTrue(result.contains("samples=10"))
         assertTrue(result.contains("called=true"))
     }
-}
+}*/

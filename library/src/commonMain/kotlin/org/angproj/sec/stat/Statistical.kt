@@ -12,14 +12,14 @@
  * Contributors:
  *      Kristoffer Paulsson - initial implementation
  */
-package org.angproj.sec.util
+package org.angproj.sec.stat
 
-/**
- * Abstract base class representing an object to be benchmarked.
- *
- * @param B The type of the object being benchmarked.
- * @property obj The instance of the object to benchmark.
- *
- * Extend this class to wrap the object you want to measure performance for.
- */
-public abstract class BenchmarkObject<B>(public val obj: B)
+import kotlin.time.TimeMark
+
+public data class Statistical(
+    val sampleCount: Long,
+    val keyValue: Double,
+    val startTime: TimeMark,
+    val stopTime: TimeMark,
+    val report: String
+)

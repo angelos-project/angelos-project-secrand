@@ -12,7 +12,8 @@
  * Contributors:
  *      Kristoffer Paulsson - initial implementation
  */
-package org.angproj.sec.util
+package org.angproj.sec.stat
+
 
 /**
  * Abstract base class for running benchmarks on a given object.

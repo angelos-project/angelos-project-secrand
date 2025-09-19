@@ -14,8 +14,8 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.util.Benchmark
-import org.angproj.sec.util.BenchmarkObject
+import org.angproj.sec.stat.Benchmark
+import org.angproj.sec.stat.BenchmarkObject
 import kotlin.math.PI
 import kotlin.math.pow
 import kotlin.math.sqrt

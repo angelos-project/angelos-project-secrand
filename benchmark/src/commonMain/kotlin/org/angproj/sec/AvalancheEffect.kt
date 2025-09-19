@@ -14,8 +14,8 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.util.Benchmark
-import org.angproj.sec.util.BenchmarkObject
+import org.angproj.sec.stat.Benchmark
+import org.angproj.sec.stat.BenchmarkObject
 import kotlin.time.Duration
 import kotlin.time.TimeSource
 
@@ -27,11 +27,6 @@ public abstract class AvalancheObject<E>(obj: E) : BenchmarkObject<E>(obj) {
     public abstract fun digest(data: LongArray)
 }
 
-/**
- * MonteCarlo is a class that implements the Monte Carlo method to estimate the value of Pi.
- * It generates random points in a unit square and counts how many fall inside a unit circle.
- * The estimated value of Pi is calculated based on the ratio of points inside the circle to the total number of points.
- */
 public class AvalancheEffect<B>(
     samples: Int, config: () -> AvalancheObject<B>
 ) : Benchmark<B, AvalancheObject<B>>(samples, config) {
@@ -39,12 +34,6 @@ public class AvalancheEffect<B>(
     private val stats = IntArray(obj.digestSize * 8)
     private var duration: Duration = Duration.INFINITE
 
-    /**
-     * Estimates the value of Pi using the Monte Carlo method.
-     * The method generates random points in a unit square and counts how many fall inside a unit circle.
-     *
-     * @return the estimated value of Pi
-     */
     override fun calculateData() {
         val startTime = TimeSource.Monotonic.markNow()
 
@@ -64,11 +53,6 @@ public class AvalancheEffect<B>(
         duration = startTime.elapsedNow() // Duration in nanoseconds
     }
 
-    /**
-     * Returns a string representation of the AvalancheEffect object.
-     *
-     * @return a string containing the class name, estimated Pi, number of samples, and duration
-     */
     override fun toString(): String {
         val usage = stats.count { it == 0 }
         val sum = stats.sum()
