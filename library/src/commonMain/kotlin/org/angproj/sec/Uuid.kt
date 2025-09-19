@@ -17,8 +17,8 @@ package org.angproj.sec
 import org.angproj.sec.util.Octet
 
 public data class Uuid(
-    private val upper: Long = 0,
-    private val lower: Long = 0
+    public val upper: Long = 0,
+    public val lower: Long = 0
 ) {
 
     public constructor() : this(
