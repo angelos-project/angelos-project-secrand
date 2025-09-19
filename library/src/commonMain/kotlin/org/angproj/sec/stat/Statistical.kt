@@ -14,12 +14,11 @@
  */
 package org.angproj.sec.stat
 
-import kotlin.time.TimeMark
+import kotlin.time.Duration
 
 public data class Statistical(
     val sampleCount: Long,
     val keyValue: Double,
-    val startTime: TimeMark,
-    val stopTime: TimeMark,
+    val duration: Duration,
     val report: String
 )

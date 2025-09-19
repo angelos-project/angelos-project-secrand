@@ -14,6 +14,8 @@
  */
 package org.angproj.sec.stat
 
+import org.angproj.sec.util.Octet
+import org.angproj.sec.util.TypeSize
 
 /**
  * Abstract base class for running benchmarks on a given object.
@@ -47,10 +49,23 @@ public abstract class BenchmarkTester<B, E: BenchmarkObject<B>>(
         calculateSampleImpl(sample)
     }
 
-    public abstract fun collectStats(): Statistical
+    public abstract fun collectStatsImpl(): Statistical
+
+    public fun collectStats(): Statistical {
+        return collectStatsImpl()
+    }
 
     /**
      * Returns a string representation of the benchmark results.
      */
     public abstract override fun toString(): String
+
+
+    public fun ByteArray.readIntBE(offset: Int): Int = Octet.readLE(this, offset, TypeSize.intSize) { index ->
+            this[index]
+    }.toInt()
+
+    public fun ByteArray.readLongBE(offset: Int): Long = Octet.readLE(this, offset, TypeSize.longSize) { index ->
+        this[index]
+    }
 }

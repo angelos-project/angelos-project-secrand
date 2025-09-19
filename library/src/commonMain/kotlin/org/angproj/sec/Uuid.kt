@@ -26,10 +26,8 @@ public data class Uuid(
         (SecureFeed.getNextBits(32).toLong() shl 32) or SecureFeed.getNextBits(32).toLong()
     )
 
-    public override fun toString(): String {
-        val sb = StringBuilder()
-        printStr<Unit>(lower, sb, printStr<Unit>(upper, sb, 0))
-        return sb.toString()
+    public override fun toString(): String = buildString {
+        printStr<Unit>(lower, this, printStr<Unit>(upper, this, 0))
     }
 
     private inline fun<reified E: Any> printStr(src: Long, sb: StringBuilder, counter: Int): Int {

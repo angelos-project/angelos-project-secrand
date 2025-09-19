@@ -21,14 +21,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertContentEquals
 
 
-public fun ByteArray.toHex(): String {
-    val sb = StringBuilder()
-    forEach {
+public fun ByteArray.toHex(): String = buildString {
+    this@toHex.forEach {
         Octet.toHex(it, this, -1) { _, value ->
-            sb.append(value.toInt().toChar())
+            this.append(value.toInt().toChar())
         }
     }
-    return sb.toString()
 }
 
 
