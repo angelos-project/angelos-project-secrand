@@ -15,13 +15,15 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.*
-import kotlin.math.absoluteValue
+import org.angproj.sec.util.toUnitFraction
 
 
 public class SpongeMonteObject(obj: Sponge): MonteObject<Sponge>(obj) {
     public override fun readNextDouble(data: DoubleArray) {
         repeat(obj.visibleSize) {
-            data[it] = ((obj.squeeze(it) and 0x7fffffffffffffffL) / (1L shl 63).toDouble()).absoluteValue
+            //data[it] = ((obj.squeeze(it) and 0x7fffffffffffffffL) / (1L shl 63).toDouble()).absoluteValue
+            data[it] = obj.squeeze(it).toUnitFraction()
+
         }
         obj.round()
     }
@@ -37,7 +39,8 @@ public class EntropyMonteObject(obj: JitterEntropy): MonteObject<JitterEntropy>(
             arr[index] = value
         }
         repeat(bufferSize) {
-            data[it] = ((arr[it] and 0x7fffffffffffffffL) / (1L shl 63).toDouble()).absoluteValue
+            //data[it] = ((arr[it] and 0x7fffffffffffffffL) / (1L shl 63).toDouble()).absoluteValue
+            data[it] = arr[it].toUnitFraction()
         }
     }
 
@@ -52,7 +55,8 @@ public class SecureFeedMonteObject(obj: SecureFeed): MonteObject<SecureFeed>(obj
             arr[index] = value
         }
         repeat(bufferSize) {
-            data[it] = ((arr[it] and 0x7fffffffffffffffL) / (1L shl 63).toDouble()).absoluteValue
+            //data[it] = ((arr[it] and 0x7fffffffffffffffL) / (1L shl 63).toDouble()).absoluteValue
+            data[it] = arr[it].toUnitFraction()
         }
     }
 

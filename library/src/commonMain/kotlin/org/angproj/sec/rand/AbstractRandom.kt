@@ -16,6 +16,7 @@ package org.angproj.sec.rand
 
 import org.angproj.sec.util.ExportOctetByte
 import org.angproj.sec.util.TypeSize
+import org.angproj.sec.util.toUnitFraction
 import kotlin.math.absoluteValue
 
 public abstract class AbstractRandom : ExportOctetByte {
@@ -146,7 +147,7 @@ public abstract class AbstractRandom : ExportOctetByte {
      *
      * @return A single-precision floating-point number in the range [0.0, 1.0).
      */
-    public fun readFloat(): Float = ((readInt() and 0x7fffffff) / (1 shl 31).toFloat()).absoluteValue
+    public fun readFloat(): Float = readInt().toUnitFraction() //readInt() and 0x7fffffff) / (1 shl 31).toFloat()).absoluteValue
 
     /**
      * Reads a double-precision floating-point number from the random source.
@@ -154,7 +155,7 @@ public abstract class AbstractRandom : ExportOctetByte {
      *
      * @return A double-precision floating-point number in the range [0.0, 1.0).
      */
-    public fun readDouble(): Double = ((readLong() and 0x7fffffffffffffffL) / (1L shl 63).toDouble()).absoluteValue
+    public fun readDouble(): Double = readLong().toUnitFraction() //((readLong() and 0x7fffffffffffffffL) / (1L shl 63).toDouble()).absoluteValue
 
     /**
      * Reads bytes into a data structure from the secure random source.
