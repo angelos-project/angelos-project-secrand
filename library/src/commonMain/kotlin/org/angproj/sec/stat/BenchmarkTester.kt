@@ -16,6 +16,9 @@ package org.angproj.sec.stat
 
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
+import kotlin.time.Duration
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 /**
  * Abstract base class for running benchmarks on a given object.
@@ -34,10 +37,21 @@ public abstract class BenchmarkTester<B, E: BenchmarkObject<B>>(
     protected val obj: E
 ) {
 
+    protected lateinit var startTime: TimeMark
+    protected var duration: Duration = Duration.INFINITE
+
     /**
      * Mandatory name for what is being tested
      * */
     public abstract fun name(): String
+
+    public fun start() {
+        startTime = TimeSource.Monotonic.markNow()
+    }
+
+    public fun stop() {
+        duration = startTime.elapsedNow() // Duration in nanoseconds
+    }
 
     public abstract fun calculateSampleImpl(sample: ByteArray)
 

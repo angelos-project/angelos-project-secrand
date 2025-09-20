@@ -19,8 +19,6 @@ import org.angproj.sec.util.toUnitFraction
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.math.PI
-import kotlin.time.Duration
-import kotlin.time.TimeSource
 
 public class MonteCarloTester<B, E: BenchmarkObject<B>>(
     samples: Int, mode: Mode, obj: E
@@ -32,9 +30,6 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
 
     private var totalTakenSamples: Long = 0
     private var insideCircle: Long = 0
-
-    private val startTime = TimeSource.Monotonic.markNow()
-    private var duration: Duration = Duration.INFINITE
 
     override fun name(): String {
         return "MonteCarlo"
@@ -94,7 +89,7 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
         return Statistical(
             totalTakenSamples,
             evaluateSampleData(),
-            startTime.elapsedNow(),
+            duration,
             toString()
         )
     }

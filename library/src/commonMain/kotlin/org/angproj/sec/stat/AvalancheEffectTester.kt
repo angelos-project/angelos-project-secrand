@@ -15,8 +15,6 @@
 package org.angproj.sec.stat
 
 import org.angproj.sec.util.TypeSize
-import kotlin.time.Duration
-import kotlin.time.TimeSource
 
 public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
     samples: Int, obj: E
@@ -26,9 +24,6 @@ public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
     private val stats = IntArray(obj.sampleByteSize * TypeSize.byteBits)
     private var lastSample: ByteArray = byteArrayOf()
     private var currentSample: ByteArray = byteArrayOf()
-
-    private val startTime = TimeSource.Monotonic.markNow()
-    private var duration: Duration = Duration.INFINITE
 
     override fun name(): String {
         return "AvalancheEffect"
