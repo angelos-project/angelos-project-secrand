@@ -86,19 +86,21 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
         }
     }
 
-    override fun collectStatsImpl(): Statistical {
-        val piEstimate = 4.0 * insideCircle / totalTakenSamples
+    private fun evaluateSampleData(): Double {
+        return 4.0 * insideCircle / totalTakenSamples
+    }
 
+    override fun collectStatsImpl(): Statistical {
         return Statistical(
             totalTakenSamples,
-            piEstimate,
+            evaluateSampleData(),
             startTime.elapsedNow(),
             toString()
         )
     }
 
     override fun toString(): String = buildString {
-        val piEstimate = 4.0 * insideCircle / totalTakenSamples
+        val piEstimate = evaluateSampleData()
         append("Monte Carlo at ")
         append(totalTakenSamples)
         append(" samples, estimates PI at ")
