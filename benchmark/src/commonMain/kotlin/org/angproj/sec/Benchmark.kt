@@ -13,6 +13,8 @@ public class Benchmark {
 public fun main(args: Array<String>) {
     println("Hello, Benchmark!")
 
+    SecureFeed.securityHealthCheck()
+
     val samplesNeeded = 10_000_000L
 
     val benchmarkSponge = SpongeBenchmark(object : AbstractSponge256() {})

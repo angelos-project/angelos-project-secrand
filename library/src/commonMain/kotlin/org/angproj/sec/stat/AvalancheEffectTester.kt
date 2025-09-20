@@ -16,6 +16,7 @@ package org.angproj.sec.stat
 
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
+import kotlin.math.abs
 
 public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
     samples: Long, obj: E
@@ -84,7 +85,7 @@ public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
         append(" samples, averages at ")
         append(average)
         append(" with a deviation of ")
-        append(average - 0.5)
+        append(abs(average - 0.5))
         append(".")
     }
 }

@@ -20,6 +20,7 @@ import org.angproj.sec.util.toUnitFraction
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.math.PI
+import kotlin.math.abs
 
 public class MonteCarloTester<B, E: BenchmarkObject<B>>(
     samples: Long, mode: Mode, obj: E
@@ -111,10 +112,10 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
         val piEstimate = evaluateSampleData()
         append("Monte Carlo at ")
         append(totalTakenSamples)
-        append(" samples, estimates PI at ")
+        append(" samples, estimates PI to ")
         append(piEstimate)
         append(" with a deviation of ")
-        append(piEstimate - PI)
+        append(abs(piEstimate - PI))
         append(".")
     }
 }
