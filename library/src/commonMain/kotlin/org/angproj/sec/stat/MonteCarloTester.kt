@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.stat
 
+import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.toUnitFraction
 import kotlin.math.pow
@@ -58,18 +59,30 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
     private fun atomicMode32(sample: ByteArray) {
         repeat(sample.size / atomicSampleByteSize) {
             val index = it * atomicSampleByteSize
-            val x = sample.readIntBE(index).toUnitFraction()
-            val y = sample.readIntBE(index + TypeSize.intSize).toUnitFraction()
-            accumulateSample(x.toDouble(), y.toDouble())
+
+            val x = Octet.readLE(sample, index, TypeSize.intSize) { index ->
+                sample[index]
+            }.toInt()
+            val y = Octet.readLE(sample, index + TypeSize.longSize, TypeSize.intSize) { index ->
+                sample[index]
+            }.toInt()
+
+            accumulateSample(x.toUnitFraction().toDouble(), y.toUnitFraction().toDouble())
         }
     }
 
     private fun atomicMode64(sample: ByteArray) {
         repeat(sample.size / atomicSampleByteSize) {
             val index = it * atomicSampleByteSize
-            val x = sample.readLongBE(index).toUnitFraction()
-            val y = sample.readLongBE(index + TypeSize.longSize).toUnitFraction()
-            accumulateSample(x, y)
+
+            val x = Octet.readLE(sample, index, TypeSize.longSize) { index ->
+                sample[index]
+            }
+            val y = Octet.readLE(sample, index + TypeSize.longSize, TypeSize.longSize) { index ->
+                sample[index]
+            }
+
+            accumulateSample(x.toUnitFraction(), y.toUnitFraction())
         }
     }
 

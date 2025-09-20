@@ -73,13 +73,4 @@ public abstract class BenchmarkTester<B, E: BenchmarkObject<B>>(
      * Returns a string representation of the benchmark results.
      */
     public abstract override fun toString(): String
-
-
-    public fun ByteArray.readIntBE(offset: Int): Int = Octet.readLE(this, offset, TypeSize.intSize) { index ->
-            this[index]
-    }.toInt()
-
-    public fun ByteArray.readLongBE(offset: Int): Long = Octet.readLE(this, offset, TypeSize.longSize) { index ->
-        this[index]
-    }
 }

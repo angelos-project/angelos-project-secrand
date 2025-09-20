@@ -53,4 +53,12 @@ public object Octet {
         n < 10 -> n + 0x30
         else -> n - 10 + 0x61
     }.toByte()
+
+    public fun asHexSymbolString(data: ByteArray): String = buildString {
+        data.forEach {
+            toHex(it, data, -1) { _, value ->
+                append(value.toInt().toChar())
+            }
+        }
+    }
 }

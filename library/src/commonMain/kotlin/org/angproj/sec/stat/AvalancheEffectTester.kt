@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.stat
 
+import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 
 public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
@@ -33,7 +34,15 @@ public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
         var total = 0
         repeat(obj.sampleByteSize / TypeSize.longSize) { idx ->
             val offset = idx * TypeSize.longSize
-            total += (lastSample.readLongBE(offset) xor currentSample.readLongBE(offset)).countOneBits()
+
+            val last = Octet.readLE(lastSample, offset, TypeSize.longSize) { index ->
+                lastSample[index]
+            }
+            val current = Octet.readLE(currentSample, offset, TypeSize.longSize) { index ->
+                currentSample[index]
+            }
+
+            total += (last xor current).countOneBits()
         }
         stats[total]++
         totalTakenSamples++
