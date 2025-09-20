@@ -58,11 +58,13 @@ public class BenchmarkSession<B, E: BenchmarkObject<B>>(
     public fun startRun() {
         check(state == RunState.INITIALIZE)
         state = RunState.RUNNING
+        registry.forEach { it.value.start() }
     }
 
     public fun stopRun() {
         check(state == RunState.RUNNING)
         state = RunState.FINISHED
+        registry.forEach { it.value.stop() }
     }
 
     public fun finalizeCollecting(): Map<String, Statistical> {
