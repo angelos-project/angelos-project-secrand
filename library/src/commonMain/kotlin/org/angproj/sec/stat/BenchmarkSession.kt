@@ -38,7 +38,6 @@ public class BenchmarkSession<B, E: BenchmarkObject<B>>(
     }
 
     init {
-        require(registry.isNotEmpty()) { "Testers registry must not be empty" }
         require(obj.sampleByteSize % subSampleByteSize == 0) { "Sub sample size must be divisible with sample byte size" }
         require(sampleCount > 0) { "Samples taken must be set above one" }
     }
@@ -57,6 +56,7 @@ public class BenchmarkSession<B, E: BenchmarkObject<B>>(
 
     public fun startRun() {
         check(state == RunState.INITIALIZE)
+        check(registry.isNotEmpty()) { "Testers registry must not be empty" }
         state = RunState.RUNNING
         registry.forEach { it.value.start() }
     }

@@ -21,7 +21,7 @@ import kotlin.math.sqrt
 import kotlin.math.PI
 
 public class MonteCarloTester<B, E: BenchmarkObject<B>>(
-    samples: Int, mode: Mode, obj: E
+    samples: Long, mode: Mode, obj: E
 ) : BenchmarkTester<B, E>(samples, mode.size, obj) {
 
     public enum class Mode(public val size: Int) {

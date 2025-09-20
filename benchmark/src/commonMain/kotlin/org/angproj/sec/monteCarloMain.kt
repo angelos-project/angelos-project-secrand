@@ -18,7 +18,7 @@ import org.angproj.sec.rand.*
 import org.angproj.sec.util.toUnitFraction
 
 
-public class SpongeMonteObject(obj: Sponge): MonteObject<Sponge>(obj) {
+/*public class SpongeMonteObject(obj: Sponge): MonteObject<Sponge>(obj) {
     public override fun readNextDouble(data: DoubleArray) {
         repeat(obj.visibleSize) {
             //data[it] = ((obj.squeeze(it) and 0x7fffffffffffffffL) / (1L shl 63).toDouble()).absoluteValue
@@ -137,4 +137,4 @@ public fun main() {
     benchmark4.calculateData()
     println("Entropy")
     println(benchmark4)
-}
+}*/

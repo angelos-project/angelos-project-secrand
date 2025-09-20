@@ -19,7 +19,7 @@ import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 
 
-public class SpongeChiObject(obj: Sponge): ChiObject<Sponge>(obj) {
+/*public class SpongeChiObject(obj: Sponge): ChiObject<Sponge>(obj) {
 
     override val byteSize: Int
         get() = obj.byteSize
@@ -37,7 +37,7 @@ public class SpongeChiObject(obj: Sponge): ChiObject<Sponge>(obj) {
         }
         obj.round()
     }
-}
+}*/
 
 /*public class EntropyAvalancheObject(obj: JitterEntropy): AvalancheObject<JitterEntropy>(obj) {
     public override val bufferSize: Int
@@ -101,7 +101,7 @@ public class GarbageGarblerAvalancheObject(obj: GarbageGarbler): AvalancheObject
 
 
 public fun main() {
-    val samples = 1024 * 32
+/*    val samples = 1024 * 32
 
     val benchmark0a = ChiSquare(samples) {
         SpongeChiObject(object : AbstractSponge21024(){})
@@ -143,7 +143,7 @@ public fun main() {
     }
     benchmark2b.calculateData()
     println("AbstractSponge256")
-    println(benchmark2b)
+    println(benchmark2b)*/
 
     /*val benchmarkf = AvalancheEffect(samples) {
         SecureFeedAvalancheObject(SecureFeed)

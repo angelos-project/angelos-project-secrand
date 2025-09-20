@@ -17,7 +17,7 @@ package org.angproj.sec.stat
 import org.angproj.sec.util.TypeSize
 
 public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
-    samples: Int, obj: E
+    samples: Long, obj: E
 ) : BenchmarkTester<B, E>(samples, 16, obj) {
 
     private var totalTakenSamples: Long = 0

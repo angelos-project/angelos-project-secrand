@@ -20,7 +20,7 @@ import kotlin.math.pow
 import kotlin.time.Duration
 import kotlin.time.TimeSource
 
-public abstract class ChiObject<E>(obj: E) : BenchmarkObject<E>(obj) {
+/*public abstract class ChiObject<E>(obj: E) : BenchmarkObject<E>(obj) {
     public abstract val byteSize: Int
 
     public abstract fun digest(data: ByteArray)
@@ -61,4 +61,4 @@ public class ChiSquare<B>(
                 "Critical: 293.25" + "\n" +
                 "Duration: " + duration + "\n"
     }
-}
+}*/

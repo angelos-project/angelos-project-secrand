@@ -22,7 +22,7 @@ import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.TimeSource
 
-public abstract class MonteObject<E>(obj: E) : BenchmarkObject<E>(obj) {
+/*public abstract class MonteObject<E>(obj: E) : BenchmarkObject<E>(obj) {
     public abstract val bufferSize: Int
 
     public abstract fun readNextDouble(data: DoubleArray)
@@ -97,4 +97,4 @@ public class MonteCarlo<B>(
                 "Number of samples: " + samples + "\n" +
                 "Duration: " + duration.toString() + "\n"
     }
-}
+}*/

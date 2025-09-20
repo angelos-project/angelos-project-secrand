@@ -17,7 +17,7 @@ package org.angproj.sec
 import org.angproj.sec.rand.*
 
 
-public class SpongeAvalancheObject(obj: Sponge): AvalancheObject<Sponge>(obj) {
+/*public class SpongeAvalancheObject(obj: Sponge): AvalancheObject<Sponge>(obj) {
     public override val bufferSize: Int
         get() = this.obj.visibleSize
 
@@ -166,4 +166,4 @@ public fun main() {
     benchmark4.calculateData()
     println("Entropy")
     println(benchmark4)
-}
+}*/

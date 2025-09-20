@@ -20,7 +20,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.time.TimeSource
 
-public class JitterTest {
+/*public class JitterTest {
     private val start = TimeSource.Monotonic.markNow();
 
     public fun nextJitter(bits: Int): Int {
@@ -86,4 +86,4 @@ public fun main() {
     repeat(100) {
         println(Uuid())
     }
-}
+}*/

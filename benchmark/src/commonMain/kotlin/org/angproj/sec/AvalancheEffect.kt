@@ -19,7 +19,7 @@ import org.angproj.sec.stat.BenchmarkObject
 import kotlin.time.Duration
 import kotlin.time.TimeSource
 
-public abstract class AvalancheObject<E>(obj: E) : BenchmarkObject<E>(obj) {
+/*public abstract class AvalancheObject<E>(obj: E) : BenchmarkObject<E>(obj) {
     public abstract val bufferSize: Int
 
     public abstract val digestSize: Int
@@ -66,4 +66,4 @@ public class AvalancheEffect<B>(
                 "Spread: " + (1 - usage / (obj.digestSize * 8).toFloat()) + "\n" +
                 "Duration: " + duration + "\n"
     }
-}
+}*/
