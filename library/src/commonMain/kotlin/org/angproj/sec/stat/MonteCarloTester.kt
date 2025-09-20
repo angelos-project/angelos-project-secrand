@@ -58,12 +58,12 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
 
     private fun atomicMode32(sample: ByteArray) {
         repeat(sample.size / atomicSampleByteSize) {
-            val index = it * atomicSampleByteSize
+            val offset = it * atomicSampleByteSize
 
-            val x = Octet.readLE(sample, index, TypeSize.intSize) { index ->
+            val x = Octet.readLE(sample, offset, TypeSize.intSize) { index ->
                 sample[index]
             }.toInt()
-            val y = Octet.readLE(sample, index + TypeSize.longSize, TypeSize.intSize) { index ->
+            val y = Octet.readLE(sample, offset + TypeSize.longSize, TypeSize.intSize) { index ->
                 sample[index]
             }.toInt()
 
@@ -73,12 +73,12 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
 
     private fun atomicMode64(sample: ByteArray) {
         repeat(sample.size / atomicSampleByteSize) {
-            val index = it * atomicSampleByteSize
+            val offset = it * atomicSampleByteSize
 
-            val x = Octet.readLE(sample, index, TypeSize.longSize) { index ->
+            val x = Octet.readLE(sample, offset, TypeSize.longSize) { index ->
                 sample[index]
             }
-            val y = Octet.readLE(sample, index + TypeSize.longSize, TypeSize.longSize) { index ->
+            val y = Octet.readLE(sample, offset + TypeSize.longSize, TypeSize.longSize) { index ->
                 sample[index]
             }
 
