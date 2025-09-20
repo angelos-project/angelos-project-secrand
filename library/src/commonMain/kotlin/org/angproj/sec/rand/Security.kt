@@ -14,16 +14,53 @@
  */
 package org.angproj.sec.rand
 
-internal interface Security : Sponge, Randomizer {
-    public var position: Int
+import org.angproj.sec.stat.BenchmarkSession
+import org.angproj.sec.stat.MonteCarloTester
+import org.angproj.sec.stat.SpongeBenchmark
+import kotlin.math.PI
+import kotlin.math.abs
 
-    override fun getNextBits(bits: Int): Int {
-        val random = squeeze(position++)
+public abstract class Security {
 
+    protected abstract val sponge: Sponge
+
+    private var position: Int = 0
+
+    private var _totalBits: Long = 0
+    public val totalBits: Long
+        get() = _totalBits
+
+
+    protected fun Sponge.getNextBits(bits: Int): Int {
         if(position >= visibleSize) {
             round()
             position = 0
         }
-        return Randomizer.reduceBits<Unit>(bits, Randomizer.foldBits<Unit>(random))
+
+        _totalBits += bits
+        return Randomizer.reduceBits<Unit>(bits, Randomizer.foldBits<Unit>(squeeze(position++)))
+    }
+
+    protected fun healthCheck(sponge: Sponge): Boolean {
+        val samplesNeeded = MonteCarloTester.Mode.MODE_64_BIT.size * 10_000_000L / sponge.byteSize
+
+        val benchmarkSponge = SpongeBenchmark(sponge)
+        val benchmarkSession = BenchmarkSession(samplesNeeded, benchmarkSponge.sampleByteSize, benchmarkSponge)
+        val monteCarlo = benchmarkSession.registerTester { MonteCarloTester(samplesNeeded, MonteCarloTester.Mode.MODE_64_BIT, it) }
+        //val avalancheEffect = benchmarkSession.registerTester { AvalancheEffectTester(samplesNeeded, it) }
+
+        benchmarkSession.startRun()
+        repeat(samplesNeeded.toInt()) {
+            benchmarkSession.collectSample()
+        }
+        benchmarkSession.stopRun()
+        val results = benchmarkSession.finalizeCollecting()
+
+        if(abs(PI - results[monteCarlo]!!.keyValue) > 0.01) return false
+        return true
+    }
+
+    public fun securityHealthCheck() {
+        check(healthCheck(sponge)) { "Security health check failed!" }
     }
 }

@@ -17,6 +17,7 @@ package org.angproj.sec
 import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.JitterEntropy
 import org.angproj.sec.rand.Security
+import org.angproj.sec.rand.Sponge
 import org.angproj.sec.util.ExportOctetByte
 import org.angproj.sec.util.ExportOctetLong
 
@@ -25,11 +26,9 @@ import org.angproj.sec.util.ExportOctetLong
  * using a sponge construction with a size of 256 bits. It revitalizes the sponge
  * with real-time gated entropy and provides methods to read random bytes.
  */
-public object SecureEntropy : ExportOctetLong, ExportOctetByte {
+public object SecureEntropy : Security(), ExportOctetLong, ExportOctetByte {
 
-    private val sponge: Security = object : AbstractSponge256(), Security {
-        override var position: Int = 0
-    }
+    override val sponge: Sponge = object : AbstractSponge256() {}
 
     init {
         revitalize()

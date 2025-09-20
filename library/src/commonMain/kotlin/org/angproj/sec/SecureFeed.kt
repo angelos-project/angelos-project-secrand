@@ -17,6 +17,7 @@ package org.angproj.sec
 import org.angproj.sec.rand.AbstractSponge512
 import org.angproj.sec.rand.Randomizer
 import org.angproj.sec.rand.Security
+import org.angproj.sec.rand.Sponge
 import org.angproj.sec.util.ExportOctetByte
 import org.angproj.sec.util.ExportOctetLong
 import org.angproj.sec.util.ceilDiv
@@ -31,11 +32,9 @@ import org.angproj.sec.util.floorMod
  * The SecureFeed object is designed to be used in cryptographic applications where
  * high-quality randomness is required.
  */
-public object SecureFeed : ExportOctetLong, ExportOctetByte, Randomizer {
+public object SecureFeed : Security(), ExportOctetLong, ExportOctetByte, Randomizer {
 
-    private val sponge: Security = object : AbstractSponge512(), Security {
-        override var position: Int = 0
-    }
+    override val sponge: Sponge = object : AbstractSponge512() {}
 
     private var next: Int = 0
     private var counter: Int = 0

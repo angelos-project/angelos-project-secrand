@@ -30,11 +30,12 @@ public class BenchmarkSession<B, E: BenchmarkObject<B>>(
 
     private val registry: MutableMap<String, BenchmarkTester<B, E>> = mutableMapOf()
 
-    public fun registerTester(builder: (E) -> BenchmarkTester<B, E>): Boolean {
+    public fun registerTester(builder: (E) -> BenchmarkTester<B, E>): String {
         check(state == RunState.INITIALIZE) { "Can't register new state after INITIALIZE state." }
         val tester = builder(obj)
-        registry[tester.name()] = tester
-        return true
+        val token  = tester::class.qualifiedName.toString()
+        registry[token] = tester
+        return token
     }
 
     init {
@@ -70,7 +71,7 @@ public class BenchmarkSession<B, E: BenchmarkObject<B>>(
     public fun finalizeCollecting(): Map<String, Statistical> {
         return buildMap {
             registry.forEach {
-                put(it.value.name(), it.value.collectStats())
+                put(it.key, it.value.collectStats())
             }
         }.toMap()
     }
