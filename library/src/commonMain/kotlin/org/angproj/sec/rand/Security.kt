@@ -42,20 +42,21 @@ public abstract class Security {
     }
 
     protected fun healthCheck(sponge: Sponge): Boolean {
-        val samplesNeeded = MonteCarloTester.Mode.MODE_64_BIT.size * 10_000_000L / sponge.byteSize
+        val objectSponge = SpongeBenchmark(sponge)
+        val samplesNeeded = MonteCarloTester.Mode.MODE_64_BIT.size * 10_000_000L / objectSponge.sampleByteSize
 
-        val benchmarkSponge = SpongeBenchmark(sponge)
-        val benchmarkSession = BenchmarkSession(samplesNeeded, benchmarkSponge.sampleByteSize, benchmarkSponge)
-        val monteCarlo = benchmarkSession.registerTester { MonteCarloTester(samplesNeeded, MonteCarloTester.Mode.MODE_64_BIT, it) }
+        val session = BenchmarkSession(samplesNeeded, objectSponge.sampleByteSize, objectSponge)
+        val monteCarlo = session.registerTester { MonteCarloTester(10_000_000, MonteCarloTester.Mode.MODE_64_BIT, it) }
         //val avalancheEffect = benchmarkSession.registerTester { AvalancheEffectTester(samplesNeeded, it) }
 
-        benchmarkSession.startRun()
+        session.startRun()
         repeat(samplesNeeded.toInt()) {
-            benchmarkSession.collectSample()
+            session.collectSample()
         }
-        benchmarkSession.stopRun()
-        val results = benchmarkSession.finalizeCollecting()
+        session.stopRun()
+        val results = session.finalizeCollecting()
 
+        println(results[monteCarlo]!!.report)
         if(abs(PI - results[monteCarlo]!!.keyValue) > 0.01) return false
         return true
     }
