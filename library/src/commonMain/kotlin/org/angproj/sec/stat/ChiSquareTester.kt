@@ -14,7 +14,6 @@
  */
 package org.angproj.sec.stat
 
-import kotlin.collections.plusAssign
 import kotlin.math.*
 
 public class ChiSquareTester<B, E: BenchmarkObject<B>>(
@@ -54,14 +53,12 @@ public class ChiSquareTester<B, E: BenchmarkObject<B>>(
     }
 
     override fun toString(): String = buildString {
-        val piEstimate = evaluateSampleData()
-        append("Monte Carlo at ")
-        append(totalTakenSamples)
-        append(" samples, estimates PI to ")
-        append(piEstimate)
-        append(" with a deviation of ")
-        append(abs(piEstimate - PI))
-        append(".")
+        val chiSquare = evaluateSampleData()
+        val criticalValue = criticalValue()
+        val passed = chiSquare < criticalValue
+        append("Chi Square at $totalTakenSamples samples ")
+        append("scores $chiSquare with ")
+        append("critical value $criticalValue using α=$ALPHA.")
     }
 
     public companion object {
@@ -70,28 +67,113 @@ public class ChiSquareTester<B, E: BenchmarkObject<B>>(
         private val DEGREES_OF_FREEDOM = NUM_CATEGORIES - 1 // 256 - 1 = 255
 
         public fun criticalValue(): Double {
-            return wilsonHilfertyChiSquareCritical(1 - ALPHA, DEGREES_OF_FREEDOM.toDouble())
+            return inverseChiSquareCDF(1 - ALPHA, DEGREES_OF_FREEDOM.toDouble())
         }
 
         /**
-         * Approximates the chi-square critical value using Wilson-Hilferty approximation.
+         * Approximates the inverse CDF of the chi-square distribution.
+         * Uses Wilson-Hilferty approximation with Newton-Raphson refinement.
          * @param p Cumulative probability (1 - α)
          * @param df Degrees of freedom
          * @return Chi-square critical value
          */
-        public fun wilsonHilfertyChiSquareCritical(p: Double, df: Double): Double {
-            // Standard normal quantile for p
-            val z = normalInverseCDF(p)
-            // Wilson-Hilferty approximation: transforms chi-square to approximate normal
+        private fun inverseChiSquareCDF(p: Double, df: Double): Double {
+            // Wilson-Hilferty approximation for initial guess
+            val z = normalInverseCDF(p) // Standard normal quantile
             val dfHalf = df / 2.0
-            return df * (1 - 1.0 / (9 * df) + z * sqrt(1.0 / (9 * df))).pow(3.0)
+            val initialGuess = df * (1 - 1.0 / (9 * df) + z * sqrt(1.0 / (9 * df))).pow(3.0)
+
+            // Newton-Raphson refinement
+            var x = initialGuess
+            val tolerance = 1e-6
+            val maxIterations = 100
+            for (i in 0..<maxIterations) {
+                val cdf = chiSquareCDF(x, df)
+                val pdf = chiSquarePDF(x, df)
+                if (pdf == 0.0) break // Avoid division by zero
+
+                val delta = (cdf - p) / pdf
+                x -= delta
+                if (abs(delta) < tolerance) {
+                    break
+                }
+                if (x < 0) x = initialGuess / 2 // Reset if negative
+            }
+            return x
+        }
+
+        /**
+         * Approximates the chi-square CDF using the regularized incomplete gamma function.
+         */
+        private fun chiSquareCDF(x: Double, df: Double): Double {
+            if (x <= 0) return 0.0
+            val k = df / 2.0
+            val s = x / 2.0
+            return regularizedGammaP(k, s)
+        }
+
+        /**
+         * Approximates the chi-square PDF.
+         */
+        private fun chiSquarePDF(x: Double, df: Double): Double {
+            if (x <= 0) return 0.0
+            val k = df / 2.0
+            val term = x.pow(k - 1) * exp(-x / 2.0)
+            val denom = 2.0.pow(k) * gamma(k)
+            return term / denom
+        }
+
+        /**
+         * Approximates the regularized incomplete gamma function P(a, x).
+         */
+        private fun regularizedGammaP(a: Double, x: Double): Double {
+            if (x <= 0) return 0.0
+            var sum = 0.0
+            var term = 1.0 / a
+            var n = 0.0
+            val maxTerms = 1000.0
+            while (abs(term) > 1e-10 && n < maxTerms) {
+                sum += term
+                n++
+                term *= x / (a + n)
+            }
+            return exp(-x + a * ln(x) - logGamma(a)) * sum
+        }
+
+        /**
+         * Computes the gamma function using Lanczos approximation.
+         */
+        private fun gamma(z: Double): Double {
+            var z = z
+            val p = doubleArrayOf(
+                676.5203681218851, -1259.1392167224028, 771.32342877765313,
+                -176.61502916214059, 12.507343278686905, -0.13857109526572012,
+                9.9843695780195716e-6, 1.5056327351493116e-7
+            )
+            val g = 7.0
+            if (z < 0.5) {
+                return PI / (sin(PI * z) * gamma(1 - z))
+            }
+            z -= 1.0
+            var a = p[0]
+            val t = z + g + 0.5
+            for (i in 1..<p.size) {
+                a += p[i] / (z + i)
+            }
+            return sqrt(2 * PI) * t.pow(z + 0.5) * exp(-t) * a
+        }
+
+        /**
+         * Computes the log-gamma function for numerical stability.
+         */
+        private fun logGamma(z: Double): Double {
+            return ln(gamma(z))
         }
 
         /**
          * Approximates the inverse CDF of the standard normal distribution.
          */
         private fun normalInverseCDF(p: Double): Double {
-            // Abramowitz and Stegun approximation
             val c0 = 2.515517
             val c1 = 0.802853
             val c2 = 0.010328
