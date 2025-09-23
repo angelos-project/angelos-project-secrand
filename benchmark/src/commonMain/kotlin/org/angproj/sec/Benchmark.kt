@@ -11,7 +11,6 @@ import org.angproj.sec.stat.BenchmarkSession
 import org.angproj.sec.stat.ChiSquareTester
 import org.angproj.sec.stat.MonteCarloTester
 import org.angproj.sec.stat.SpongeBenchmark
-import kotlin.time.measureTime
 
 public class Benchmark {
 
@@ -34,19 +33,30 @@ public fun main(args: Array<String>) {
     println("SecureFeed:")
     SecureFeed.securityHealthCheck()*/
 
-    val benchmarkSponge = SpongeBenchmark(object : AbstractSponge1024() {})
-    val samplesNeeded = MonteCarloTester.Mode.MODE_64_BIT.size * 10_000_000L / benchmarkSponge.sampleByteSize
-    val benchmarkSession = BenchmarkSession(samplesNeeded, benchmarkSponge.sampleByteSize, benchmarkSponge)
-    val monteCarlo = benchmarkSession.registerTester { MonteCarloTester(samplesNeeded, MonteCarloTester.Mode.MODE_64_BIT, it) }
-    val avalancheEffect = benchmarkSession.registerTester { AvalancheEffectTester(samplesNeeded, it) }
-    val chiSquare = benchmarkSession.registerTester { ChiSquareTester(samplesNeeded, it) }
-    benchmarkSession.startRun()
-    repeat(samplesNeeded.toInt()) {
-        benchmarkSession.collectSample()
+    listOf(
+        object : AbstractSponge256() {},
+        object : AbstractSponge512() {},
+        object : AbstractSponge1024() {},
+        object : AbstractSponge2256() {},
+        object : AbstractSponge2512() {},
+        object : AbstractSponge21024() {}
+    ).forEach {
+        println(it.visibleSize)
+        val benchmarkSponge = SpongeBenchmark(it)
+        val samplesNeeded = MonteCarloTester.Mode.MODE_64_BIT.size * 10_000_000L / benchmarkSponge.sampleByteSize
+        val benchmarkSession = BenchmarkSession(samplesNeeded, benchmarkSponge.sampleByteSize, benchmarkSponge)
+        val monteCarlo = benchmarkSession.registerTester { MonteCarloTester(samplesNeeded, MonteCarloTester.Mode.MODE_64_BIT, it) }
+        val avalancheEffect = benchmarkSession.registerTester { AvalancheEffectTester(samplesNeeded, it) }
+        val chiSquare = benchmarkSession.registerTester { ChiSquareTester(samplesNeeded, it) }
+        benchmarkSession.startRun()
+        repeat(samplesNeeded.toInt()) {
+            benchmarkSession.collectSample()
+        }
+        benchmarkSession.stopRun()
+        val results = benchmarkSession.finalizeCollecting()
+        println(results[monteCarlo]!!.report)
+        println(results[avalancheEffect]!!.report)
+        println(results[chiSquare]!!.report)
+        println()
     }
-    benchmarkSession.stopRun()
-    val results = benchmarkSession.finalizeCollecting()
-    println(results[monteCarlo]!!.report)
-    println(results[avalancheEffect]!!.report)
-    println(results[chiSquare]!!.report)
 }

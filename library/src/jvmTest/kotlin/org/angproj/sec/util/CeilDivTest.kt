@@ -40,8 +40,8 @@ class CeilDivTest {
 
     @Test
     fun testFixAndTrix() {
-        val size = 4
         val width = 2
+        val size = width * width
         for (i in 0 until size) {
             // Map linear index to 4x4 matrix coordinates
             val row = i / width
