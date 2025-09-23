@@ -119,11 +119,25 @@ public interface Randomness {
         return r * cos(theta)
     }
 
+    /**
+     * Generates a random value from an exponential distribution
+     * with the specified rate parameter (lambda).
+     *
+     * @param lambda The rate parameter of the exponential distribution (λ > 0).
+     * @return A Double sampled from Exp(λ).
+     */
     public fun readExponential(lambda: Double): Double {
         val u = readDouble()
         return -ln(1 - u) / lambda
     }
 
+    /**
+     * Generates a random value from a Poisson distribution
+     * with the specified rate parameter (lambda).
+     *
+     * @param lambda The rate parameter of the Poisson distribution (λ > 0).
+     * @return An Int sampled from Poisson(λ).
+     */
     public fun readPoisson(lambda: Double): Int {
         val L = exp(-lambda)
         var k = 0
@@ -135,6 +149,14 @@ public interface Randomness {
         return k - 1
     }
 
+    /**
+     * Generates a random value from a Gamma distribution
+     * with the specified shape and scale parameters.
+     *
+     * @param shape The shape parameter of the Gamma distribution (k > 0).
+     * @param scale The scale parameter of the Gamma distribution (θ > 0).
+     * @return A Double sampled from Gamma(k, θ).
+     */
     public fun readGamma(shape: Double, scale: Double): Double {
         if (shape < 1) {
             val u = readDouble()
@@ -156,20 +178,51 @@ public interface Randomness {
         }
     }
 
+    /**
+     * Generates a random value from a Beta distribution
+     * with the specified shape parameters.
+     *
+     * @param a The first shape parameter of the Beta distribution (α > 0).
+     * @param b The second shape parameter of the Beta distribution (β > 0).
+     * @return A Double sampled from Beta(α, β).
+     */
     public fun readBeta(a: Double, b: Double): Double {
         val x = readGamma(a, 1.0)
         val y = readGamma(b, 1.0)
         return x / (x + y)
     }
 
+    /**
+     * Generates a random value from a uniform distribution
+     * within the specified range [a, b).
+     *
+     * @param a The lower bound of the uniform distribution.
+     * @param b The upper bound of the uniform distribution.
+     * @return A Double sampled from Uniform(a, b).
+     */
     public fun readUniform(a: Double, b: Double): Double {
         return a + (b - a) * readDouble()
     }
 
+    /**
+     * Generates a random boolean value based on a Bernoulli distribution
+     * with the specified probability of success (p).
+     *
+     * @param p The probability of success (0.0 <= p <= 1.0).
+     * @return A Boolean sampled from Bernoulli(p).
+     */
     public fun readBernoulli(p: Double): Boolean {
         return readDouble() < p
     }
 
+    /**
+     * Generates a random integer value from a Binomial distribution
+     * with the specified number of trials (n) and probability of success (p).
+     *
+     * @param n The number of trials (n >= 0).
+     * @param p The probability of success in each trial (0.0 <= p <= 1.0).
+     * @return An Int sampled from Binomial(n, p).
+     */
     public fun readBinomial(n: Int, p: Double): Int {
         var successes = 0
         repeat(n) {
@@ -177,5 +230,4 @@ public interface Randomness {
         }
         return successes
     }
-
 }
