@@ -16,6 +16,12 @@ package org.angproj.sec.stat
 
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.toUnitFraction
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.exp
+import kotlin.math.ln
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 public interface Randomness {
 
@@ -98,4 +104,78 @@ public interface Randomness {
      * @return A double-precision floating-point number in the range [0.0, 1.0).
      */
     public fun readDouble(): Double = readLong().toUnitFraction()
+
+    /**
+     * Generates a random value from a standard normal (Gaussian) distribution
+     * using the Box-Muller transform.
+     *
+     * @return A Double sampled from N(0, 1).
+     */
+    public fun readGaussian(): Double {
+        val u1 = readDouble()
+        val u2 = readDouble()
+        val r = sqrt(-2.0 * ln(u1))
+        val theta = 2.0 * PI * u2
+        return r * cos(theta)
+    }
+
+    public fun readExponential(lambda: Double): Double {
+        val u = readDouble()
+        return -ln(1 - u) / lambda
+    }
+
+    public fun readPoisson(lambda: Double): Int {
+        val L = exp(-lambda)
+        var k = 0
+        var p = 1.0
+        do {
+            k++
+            p *= readDouble()
+        } while (p > L)
+        return k - 1
+    }
+
+    public fun readGamma(shape: Double, scale: Double): Double {
+        if (shape < 1) {
+            val u = readDouble()
+            return readGamma(1.0 + shape, scale) * u.pow(1.0 / shape)
+        }
+        val d = shape - 1.0 / 3.0
+        val c = 1.0 / sqrt(9.0 * d)
+        while (true) {
+            var x: Double
+            var v: Double
+            do {
+                x = readGaussian()
+                v = 1.0 + c * x
+            } while (v <= 0)
+            v = v * v * v
+            val u = readDouble()
+            if (u < 1.0 - 0.0331 * x * x * x * x) return scale * d * v
+            if (ln(u) < 0.5 * x * x + d * (1.0 - v + ln(v))) return scale * d * v
+        }
+    }
+
+    public fun readBeta(a: Double, b: Double): Double {
+        val x = readGamma(a, 1.0)
+        val y = readGamma(b, 1.0)
+        return x / (x + y)
+    }
+
+    public fun readUniform(a: Double, b: Double): Double {
+        return a + (b - a) * readDouble()
+    }
+
+    public fun readBernoulli(p: Double): Boolean {
+        return readDouble() < p
+    }
+
+    public fun readBinomial(n: Int, p: Double): Int {
+        var successes = 0
+        repeat(n) {
+            if (readBernoulli(p)) successes++
+        }
+        return successes
+    }
+
 }
