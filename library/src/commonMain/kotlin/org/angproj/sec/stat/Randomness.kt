@@ -16,13 +16,16 @@ package org.angproj.sec.stat
 
 import org.angproj.sec.util.toUnitFraction
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.exp
 import kotlin.math.floor
 import kotlin.math.ln
 import kotlin.math.pow
+import kotlin.math.sign
 import kotlin.math.sqrt
+import kotlin.math.tan
 
 public interface Randomness {
 
@@ -333,6 +336,76 @@ public interface Randomness {
         val z = readGaussian()
         val y = readChiSquare(df)
         return z / sqrt(y / df)
+    }
+
+    /**
+     * Generates a random integer from a Bernoulli distribution.
+     *
+     * @param p The probability of success (returning 1).
+     * @return A random integer (0 or 1) from Bernoulli(p).
+     * @throws IllegalArgumentException if p is not in [0, 1].
+     */
+    public fun readBernoulli(p: Double): Int {
+        require(p in 0.0..1.0) { "Probability must be in [0, 1]" }
+        return if (readDouble() < p) 1 else 0
+    }
+
+    /**
+     * Generates a random double from a Laplace distribution.
+     *
+     * @param mean The mean (location parameter) of the distribution.
+     * @param scale The scale parameter (b) of the distribution.
+     * @return A random double from Laplace(mean, scale).
+     * @throws IllegalArgumentException if scale <= 0.
+     */
+    public fun readLaplace(mean: Double = 0.0, scale: Double = 1.0): Double {
+        require(scale > 0) { "Scale must be positive" }
+        val u = readDouble() - 0.5
+        return mean - scale * sign(u) * ln(1.0 - 2.0 * abs(u))
+    }
+
+    /**
+     * Generates a random double from a Logistic distribution.
+     *
+     * @param mean The mean (location parameter) of the distribution.
+     * @param scale The scale parameter (s) of the distribution.
+     * @return A random double from Logistic(mean, scale).
+     * @throws IllegalArgumentException if scale <= 0.
+     */
+    public fun readLogistic(mean: Double = 0.0, scale: Double = 1.0): Double {
+        require(scale > 0) { "Scale must be positive" }
+        val u = readDouble()
+        return mean + scale * ln(u / (1.0 - u))
+    }
+
+    /**
+     * Generates a random double from a Cauchy distribution.
+     *
+     * @param x0 The location parameter (median) of the distribution.
+     * @param gamma The scale parameter of the distribution.
+     * @return A random double from Cauchy(x0, gamma).
+     * @throws IllegalArgumentException if gamma <= 0.
+     */
+    public fun readCauchy(x0: Double = 0.0, gamma: Double = 1.0): Double {
+        require(gamma > 0) { "Gamma must be positive" }
+        val u = readDouble()
+        return x0 + gamma * tan(PI * (u - 0.5))
+    }
+
+    /**
+     * Generates a random double from an F-distribution.
+     *
+     * @param d1 The degrees of freedom for the numerator.
+     * @param d2 The degrees of freedom for the denominator.
+     * @return A random double from F(d1, d2).
+     * @throws IllegalArgumentException if d1 <= 0 or d2 <= 0.
+     */
+    public fun readFDist(d1: Int, d2: Int): Double {
+        require(d1 > 0) { "Numerator degrees of freedom must be positive" }
+        require(d2 > 0) { "Denominator degrees of freedom must be positive" }
+        val u = readChiSquare(d1) / d1
+        val v = readChiSquare(d2) / d2
+        return if (v == 0.0) Double.POSITIVE_INFINITY else u / v
     }
 
     /**
