@@ -27,6 +27,11 @@ import kotlin.math.sign
 import kotlin.math.sqrt
 import kotlin.math.tan
 
+/**
+ * Interface defining methods for generating random numbers and sampling from various statistical distributions.
+ * Implementations should provide a source of randomness and ensure that the generated values are uniformly
+ * distributed over their respective ranges.
+ */
 public interface Randomness {
 
     /**
