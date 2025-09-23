@@ -157,13 +157,20 @@ public interface Randomness {
      * @return A random double from N(mean, stdDev^2).
      * @throws IllegalArgumentException if stdDev <= 0.
      */
-    public fun readNormal(mean: Double = 0.0, stdDev: Double = 1.0): Double {
+    public fun readGaussian(mean: Double, stdDev: Double): Double {
         require(stdDev > 0) { "Standard deviation must be positive" }
         val u1 = readDouble()
         val u2 = readDouble()
         val z0 = sqrt(-2.0 * ln(u1)) * cos(2.0 * PI * u2)
         return mean + stdDev * z0
     }
+
+    /**
+     * Generates a random double from a standard normal (Gaussian) distribution N(0, 1).
+     *
+     * @return A random double from N(0, 1).
+     */
+    public fun readGaussian(): Double = readGaussian(0.0, 1.0)
 
     /**
      * Generates a random double from an exponential distribution.
@@ -272,7 +279,7 @@ public interface Randomness {
             val d = shape - 1.0 / 3.0
             val c = 1.0 / sqrt(9.0 * d)
             while (true) {
-                val x = readNormal()
+                val x = readGaussian()
                 val v = (1.0 + c * x).pow(3)
                 if (v > 0) {
                     val u = readDouble()
@@ -323,7 +330,7 @@ public interface Randomness {
     public fun readStudentT(df: Int): Double {
         require(df > 0) { "Degrees of freedom must be positive" }
         // t-distribution: Z / sqrt(Y / df) where Z ~ N(0,1), Y ~ ChiSquare(df)
-        val z = readNormal()
+        val z = readGaussian()
         val y = readChiSquare(df)
         return z / sqrt(y / df)
     }
