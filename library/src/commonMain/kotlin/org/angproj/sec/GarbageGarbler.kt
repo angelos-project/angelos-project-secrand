@@ -74,6 +74,7 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
         }
         sponge.scramble()
         entropyPos = 0
+        _count = 0
     }
 
     /**

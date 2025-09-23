@@ -40,25 +40,27 @@ class GarbageGarblerTest {
         assertNotEquals(buffer1.toList(), buffer2.toList())
     }
 
+
     @Test
-    fun testTriggerReseedAndCountReset() {
+    fun testTriggerReseedAndRemainingReset() {
         val garbler = GarbageGarbler()
 
+        val initialRemaining = garbler.remaining
         repeat(256) { garbler.readDouble() }
-        assertEquals(1024, garbler.count)
+        assertEquals(2048, initialRemaining-garbler.remaining)
 
         // Use the importBytes to fill entropy and trigger reseed
         val seed = ByteArray(128) { it.toByte() }
         garbler.importBytes(seed, 0, seed.size) { idx -> this[idx] }
-        assertEquals(0, garbler.count)
+        assertEquals(initialRemaining, garbler.remaining)
     }
 
     @Test
-    fun testCountIncreases() {
+    fun testRemainingDecreases() {
         val garbler = GarbageGarbler()
-        val initialCount = garbler.count
+        val initialRemaining = garbler.remaining
         repeat(10) { garbler.readByte() }
-        assertTrue(garbler.count > initialCount)
+        assertTrue(garbler.remaining < initialRemaining)
     }
 
     @Test
