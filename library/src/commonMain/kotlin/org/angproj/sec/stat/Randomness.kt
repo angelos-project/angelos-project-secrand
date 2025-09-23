@@ -358,11 +358,18 @@ public interface Randomness {
      * @return A random double from Laplace(mean, scale).
      * @throws IllegalArgumentException if scale <= 0.
      */
-    public fun readLaplace(mean: Double = 0.0, scale: Double = 1.0): Double {
+    public fun readLaplace(mean: Double, scale: Double): Double {
         require(scale > 0) { "Scale must be positive" }
         val u = readDouble() - 0.5
         return mean - scale * sign(u) * ln(1.0 - 2.0 * abs(u))
     }
+
+    /**
+     * Generates a random double from a standard Laplace distribution Laplace(0, 1).
+     *
+     * @return A random double from Laplace(0, 1).
+     */
+    public fun readLaplace(): Double = readLaplace(0.0, 1.0)
 
     /**
      * Generates a random double from a Logistic distribution.
@@ -372,11 +379,18 @@ public interface Randomness {
      * @return A random double from Logistic(mean, scale).
      * @throws IllegalArgumentException if scale <= 0.
      */
-    public fun readLogistic(mean: Double = 0.0, scale: Double = 1.0): Double {
+    public fun readLogistic(mean: Double, scale: Double): Double {
         require(scale > 0) { "Scale must be positive" }
         val u = readDouble()
         return mean + scale * ln(u / (1.0 - u))
     }
+
+    /**
+     * Generates a random double from a standard Logistic distribution Logistic(0, 1).
+     *
+     * @return A random double from Logistic(0, 1).
+     */
+    public fun readLogistic(): Double = readLogistic(0.0, 1.0)
 
     /**
      * Generates a random double from a Cauchy distribution.
@@ -386,11 +400,18 @@ public interface Randomness {
      * @return A random double from Cauchy(x0, gamma).
      * @throws IllegalArgumentException if gamma <= 0.
      */
-    public fun readCauchy(x0: Double = 0.0, gamma: Double = 1.0): Double {
+    public fun readCauchy(x0: Double, gamma: Double): Double {
         require(gamma > 0) { "Gamma must be positive" }
         val u = readDouble()
         return x0 + gamma * tan(PI * (u - 0.5))
     }
+
+    /**
+     * Generates a random double from a standard Cauchy distribution Cauchy(0, 1).
+     *
+     * @return A random double from Cauchy(0, 1).
+     */
+    public fun readCauchy(): Double = readCauchy(0.0, 1.0)
 
     /**
      * Generates a random double from an F-distribution.
