@@ -17,11 +17,13 @@ package org.angproj.sec.stat
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.toUnitFraction
 import kotlin.math.PI
+import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.exp
 import kotlin.math.ln
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.math.tan
 
 public interface Randomness {
 
@@ -229,5 +231,50 @@ public interface Randomness {
             if (readBernoulli(p)) successes++
         }
         return successes
+    }
+
+    /**
+     * Generates a random integer value from a Geometric distribution
+     * with the specified probability of success (p).
+     *
+     * @param p The probability of success in each trial (0.0 < p <= 1.0).
+     * @return An Int sampled from Geometric(p).
+     */
+    public fun readGeometric(p: Double): Int {
+        return ceil(ln(1 - readDouble()) / ln(1 - p)).toInt()
+    }
+
+    /**
+     * Generates a random integer value from a Negative Binomial distribution
+     * with the specified number of successes (r) and probability of success (p).
+     *
+     * @param r The number of successes (r > 0).
+     * @param p The probability of success in each trial (0.0 < p <= 1.0).
+     * @return An Int sampled from NegativeBinomial(r, p).
+     */
+    public fun readNegativeBinomial(r: Int, p: Double): Int {
+        var failures = 0
+        var successes = 0
+        while (successes < r) {
+            if (readBernoulli(p)) {
+                successes++
+            } else {
+                failures++
+            }
+        }
+        return failures
+    }
+
+    /**
+     * Generates a random value from a Cauchy distribution
+     * with the specified location and scale parameters.
+     *
+     * @param location The location parameter of the Cauchy distribution (x0).
+     * @param scale The scale parameter of the Cauchy distribution (γ > 0).
+     * @return A Double sampled from Cauchy(x0, γ).
+     */
+    public fun readCauchy(location: Double, scale: Double): Double {
+        val u = readDouble() - 0.5
+        return location + scale * tan(PI * u)
     }
 }
