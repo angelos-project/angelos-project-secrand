@@ -33,7 +33,7 @@ public interface Randomness {
      *
      * @return A byte in the range [-128, 127].
      */
-    public fun readByte(): Byte = readInt().toByte()
+    public fun readByte(): Byte
 
     /**
      * Reads an unsigned byte from the random source.
@@ -49,7 +49,7 @@ public interface Randomness {
      *
      * @return A short integer in the range [-32768, 32767].
      */
-    public fun readShort(): Short = readInt().toShort()
+    public fun readShort(): Short
 
     /**
      * Reads an unsigned short integer from the random source.
@@ -106,6 +106,23 @@ public interface Randomness {
      * @return A double-precision floating-point number in the range [0.0, 1.0).
      */
     public fun readDouble(): Double = readLong().toUnitFraction()
+
+    /**
+     * Reads bytes into a ByteArray from the random source,
+     * starting at the specified offset and ending at the specified size.
+     *
+     * @param data The ByteArray to fill with random bytes.
+     * @param offset The starting index in the ByteArray to write to.
+     * @param size The number of bytes to read. Defaults to the size of the ByteArray.
+     */
+    public fun readBytes(data: ByteArray, offset: Int = 0, size: Int = data.size)
+
+    /**
+     * Reads bytes into a ByteArray from the random source.
+     *
+     * @param data The ByteArray to fill with random bytes.
+     */
+    public fun readBytes(data: ByteArray): Unit = readBytes(data, 0, data.size)
 
     /**
      * Generates a random value from a standard normal (Gaussian) distribution

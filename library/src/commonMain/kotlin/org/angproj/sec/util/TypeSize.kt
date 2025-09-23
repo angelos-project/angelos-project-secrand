@@ -101,7 +101,7 @@ public object TypeSize {
     /**
      * Total number of bytes in a Long is 4, which derives from `Long.SIZE_BYTES`.
      */
-    public const val longSize: Int = ULong.SIZE_BYTES
+    public const val longSize: Int = Long.SIZE_BYTES
 
     // Unsigned integer types
 
@@ -113,17 +113,17 @@ public object TypeSize {
     /**
      * Total number of bytes in a UShort is 2, which derives from `UShort.SIZE_BYTES`.
      */
-    public const val uShortSize: Int = Short.SIZE_BYTES
+    public const val uShortSize: Int = UShort.SIZE_BYTES
 
     /**
      * Total number of bytes in a UInt is 4, which derives from `UInt.SIZE_BYTES`.
      */
-    public const val uIntSize: Int = Int.SIZE_BYTES
+    public const val uIntSize: Int = UInt.SIZE_BYTES
 
     /**
      * Total number of bytes in a ULong is 8, which derives from `ULong.SIZE_BYTES`.
      */
-    public const val uLongSize: Int = Long.SIZE_BYTES
+    public const val uLongSize: Int = ULong.SIZE_BYTES
 
     // Floating-point types
 

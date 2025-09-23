@@ -14,7 +14,8 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.rand.AbstractRandom
+import org.angproj.sec.stat.Randomness
+import org.angproj.sec.util.TypeSize
 
 /**
  * SecureRandom provides a high-quality source of random numbers
@@ -22,9 +23,9 @@ import org.angproj.sec.rand.AbstractRandom
  * and floating-point numbers from the secure random source.
  * The values are normalized to their respective ranges.
  */
-public object SecureRandom : AbstractRandom() {
+public object SecureRandom : Randomness /*AbstractRandom()*/ {
 
-    init {
+    /*init {
         refill()
     }
 
@@ -37,6 +38,25 @@ public object SecureRandom : AbstractRandom() {
     override fun refill() {
         SecureFeed.exportLongs(buffer, 0, buffer.size) { index, value ->
             buffer[index] = value
+        }
+    }*/
+
+    override fun readByte(): Byte = SecureFeed.getNextBits(TypeSize.byteBits).toByte()
+
+    override fun readShort(): Short = SecureFeed.getNextBits(TypeSize.shortBits).toShort()
+
+    override fun readInt(): Int = SecureFeed.getNextBits(TypeSize.intBits)
+
+    /**
+     * Reads bytes into a ByteArray from the secure random source.
+     *
+     * @param data The ByteArray to fill with random bytes.
+     * @param offset The starting index in the ByteArray to write to.
+     * @param size The number of bytes to read. Defaults to the size of the ByteArray.
+     */
+    public override fun readBytes(data: ByteArray, offset: Int, size: Int) {
+        SecureFeed.exportBytes(data, offset, size) { index, value ->
+            this[index] = value
         }
     }
 }
