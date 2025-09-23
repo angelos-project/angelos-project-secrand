@@ -21,25 +21,8 @@ import org.angproj.sec.util.TypeSize
  * SecureRandom provides a high-quality source of random numbers
  * using a secure entropy feed. It reads bytes, shorts, ints, longs,
  * and floating-point numbers from the secure random source.
- * The values are normalized to their respective ranges.
  */
-public object SecureRandom : Randomness /*AbstractRandom()*/ {
-
-    /*init {
-        refill()
-    }
-
-    /**
-     * Revitalizes the secure random source by reading from the secure feed.
-     * This method is called when the internal buffer is exhausted.
-     * It fills the buffer with new random data
-     * and resets the position to zero.
-     */
-    override fun refill() {
-        SecureFeed.exportLongs(buffer, 0, buffer.size) { index, value ->
-            buffer[index] = value
-        }
-    }*/
+public object SecureRandom : Randomness {
 
     override fun readByte(): Byte = SecureFeed.getNextBits(TypeSize.byteBits).toByte()
 
