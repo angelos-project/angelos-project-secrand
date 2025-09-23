@@ -14,16 +14,15 @@
  */
 package org.angproj.sec.stat
 
-import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.toUnitFraction
 import kotlin.math.PI
 import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.exp
+import kotlin.math.floor
 import kotlin.math.ln
 import kotlin.math.pow
 import kotlin.math.sqrt
-import kotlin.math.tan
 
 public interface Randomness {
 
@@ -81,7 +80,7 @@ public interface Randomness {
      *
      * @return A long integer in the range [-9223372036854775808, 9223372036854775807].
      */
-    public fun readLong(): Long = (readInt() shl TypeSize.intBits).toLong() or (readInt().toLong() and 0xFFFFFFFFL)
+    public fun readLong(): Long = (readInt() shl 32).toLong() or (readInt().toLong() and 0xFFFFFFFFL)
 
     /**
      * Reads an unsigned long integer from the random source.
@@ -125,39 +124,89 @@ public interface Randomness {
     public fun readBytes(data: ByteArray): Unit = readBytes(data, 0, data.size)
 
     /**
-     * Generates a random value from a standard normal (Gaussian) distribution
-     * using the Box-Muller transform.
+     * Generates a random double from a continuous uniform distribution over [min, max).
      *
-     * @return A Double sampled from N(0, 1).
+     * @param min The inclusive lower bound of the distribution.
+     * @param max The exclusive upper bound of the distribution.
+     * @return A random double in [min, max).
+     * @throws IllegalArgumentException if min >= max.
      */
-    public fun readGaussian(): Double {
+    public fun readUniform(min: Double, max: Double): Double {
+        require(min < max) { "min must be less than max" }
+        return min + (max - min) * readDouble()
+    }
+
+    /**
+     * Generates a random integer from a discrete uniform distribution over [min, max].
+     *
+     * @param min The inclusive lower bound of the distribution.
+     * @param max The inclusive upper bound of the distribution.
+     * @return A random integer in [min, max].
+     * @throws IllegalArgumentException if min > max.
+     */
+    public fun readDiscreteUniform(min: Int, max: Int): Int {
+        require(min <= max) { "min must be less than or equal to max" }
+        return min + (readDouble() * (max - min + 1)).toInt()
+    }
+
+    /**
+     * Generates a random double from a normal (Gaussian) distribution.
+     *
+     * @param mean The mean of the distribution.
+     * @param stdDev The standard deviation of the distribution.
+     * @return A random double from N(mean, stdDev^2).
+     * @throws IllegalArgumentException if stdDev <= 0.
+     */
+    public fun readNormal(mean: Double = 0.0, stdDev: Double = 1.0): Double {
+        require(stdDev > 0) { "Standard deviation must be positive" }
         val u1 = readDouble()
         val u2 = readDouble()
-        val r = sqrt(-2.0 * ln(u1))
-        val theta = 2.0 * PI * u2
-        return r * cos(theta)
+        val z0 = sqrt(-2.0 * ln(u1)) * cos(2.0 * PI * u2)
+        return mean + stdDev * z0
     }
 
     /**
-     * Generates a random value from an exponential distribution
-     * with the specified rate parameter (lambda).
+     * Generates a random double from an exponential distribution.
      *
-     * @param lambda The rate parameter of the exponential distribution (λ > 0).
-     * @return A Double sampled from Exp(λ).
+     * @param lambda The rate parameter (1/mean) of the distribution.
+     * @return A random double from Exp(lambda).
+     * @throws IllegalArgumentException if lambda <= 0.
      */
     public fun readExponential(lambda: Double): Double {
-        val u = readDouble()
-        return -ln(1 - u) / lambda
+        require(lambda > 0) { "Lambda must be positive" }
+        return -ln(1.0 - readDouble()) / lambda
     }
 
     /**
-     * Generates a random value from a Poisson distribution
-     * with the specified rate parameter (lambda).
+     * Generates a random integer from a binomial distribution.
      *
-     * @param lambda The rate parameter of the Poisson distribution (λ > 0).
-     * @return An Int sampled from Poisson(λ).
+     * @param n The number of trials.
+     * @param p The probability of success on each trial.
+     * @return A random integer representing the number of successes.
+     * @throws IllegalArgumentException if n < 0 or p is not in [0, 1].
+     */
+    public fun readBinomial(n: Int, p: Double): Int {
+        require(n >= 0) { "Number of trials must be non-negative" }
+        require(p in 0.0..1.0) { "Probability must be in [0, 1]" }
+        var successes = 0
+        for (i in 0 until n) {
+            if (readDouble() < p) {
+                successes++
+            }
+        }
+        return successes
+    }
+
+    /**
+     * Generates a random integer from a Poisson distribution.
+     *
+     * @param lambda The mean (and variance) of the distribution.
+     * @return A random integer from Poisson(lambda).
+     * @throws IllegalArgumentException if lambda <= 0.
      */
     public fun readPoisson(lambda: Double): Int {
+        require(lambda > 0) { "Lambda must be positive" }
+        // Knuth's algorithm for Poisson
         val L = exp(-lambda)
         var k = 0
         var p = 1.0
@@ -169,129 +218,118 @@ public interface Randomness {
     }
 
     /**
-     * Generates a random value from a Gamma distribution
-     * with the specified shape and scale parameters.
+     * Generates a random integer from a geometric distribution.
      *
-     * @param shape The shape parameter of the Gamma distribution (k > 0).
-     * @param scale The scale parameter of the Gamma distribution (θ > 0).
-     * @return A Double sampled from Gamma(k, θ).
-     */
-    public fun readGamma(shape: Double, scale: Double): Double {
-        if (shape < 1) {
-            val u = readDouble()
-            return readGamma(1.0 + shape, scale) * u.pow(1.0 / shape)
-        }
-        val d = shape - 1.0 / 3.0
-        val c = 1.0 / sqrt(9.0 * d)
-        while (true) {
-            var x: Double
-            var v: Double
-            do {
-                x = readGaussian()
-                v = 1.0 + c * x
-            } while (v <= 0)
-            v = v * v * v
-            val u = readDouble()
-            if (u < 1.0 - 0.0331 * x * x * x * x) return scale * d * v
-            if (ln(u) < 0.5 * x * x + d * (1.0 - v + ln(v))) return scale * d * v
-        }
-    }
-
-    /**
-     * Generates a random value from a Beta distribution
-     * with the specified shape parameters.
-     *
-     * @param a The first shape parameter of the Beta distribution (α > 0).
-     * @param b The second shape parameter of the Beta distribution (β > 0).
-     * @return A Double sampled from Beta(α, β).
-     */
-    public fun readBeta(a: Double, b: Double): Double {
-        val x = readGamma(a, 1.0)
-        val y = readGamma(b, 1.0)
-        return x / (x + y)
-    }
-
-    /**
-     * Generates a random value from a uniform distribution
-     * within the specified range [a, b).
-     *
-     * @param a The lower bound of the uniform distribution.
-     * @param b The upper bound of the uniform distribution.
-     * @return A Double sampled from Uniform(a, b).
-     */
-    public fun readUniform(a: Double, b: Double): Double {
-        return a + (b - a) * readDouble()
-    }
-
-    /**
-     * Generates a random boolean value based on a Bernoulli distribution
-     * with the specified probability of success (p).
-     *
-     * @param p The probability of success (0.0 <= p <= 1.0).
-     * @return A Boolean sampled from Bernoulli(p).
-     */
-    public fun readBernoulli(p: Double): Boolean {
-        return readDouble() < p
-    }
-
-    /**
-     * Generates a random integer value from a Binomial distribution
-     * with the specified number of trials (n) and probability of success (p).
-     *
-     * @param n The number of trials (n >= 0).
-     * @param p The probability of success in each trial (0.0 <= p <= 1.0).
-     * @return An Int sampled from Binomial(n, p).
-     */
-    public fun readBinomial(n: Int, p: Double): Int {
-        var successes = 0
-        repeat(n) {
-            if (readBernoulli(p)) successes++
-        }
-        return successes
-    }
-
-    /**
-     * Generates a random integer value from a Geometric distribution
-     * with the specified probability of success (p).
-     *
-     * @param p The probability of success in each trial (0.0 < p <= 1.0).
-     * @return An Int sampled from Geometric(p).
+     * @param p The probability of success on each trial.
+     * @return A random integer representing the number of trials until the first success.
+     * @throws IllegalArgumentException if p is not in (0, 1].
      */
     public fun readGeometric(p: Double): Int {
-        return ceil(ln(1 - readDouble()) / ln(1 - p)).toInt()
+        require(p in 0.0..1.0 && p > 0) { "Probability must be in (0, 1]" }
+        // Inverse CDF: ceil(ln(1 - U) / ln(1 - p))
+        return ceil(ln(1.0 - readDouble()) / ln(1.0 - p)).toInt()
     }
 
     /**
-     * Generates a random integer value from a Negative Binomial distribution
-     * with the specified number of successes (r) and probability of success (p).
+     * Generates a random integer from a negative binomial distribution.
      *
-     * @param r The number of successes (r > 0).
-     * @param p The probability of success in each trial (0.0 < p <= 1.0).
-     * @return An Int sampled from NegativeBinomial(r, p).
+     * @param r The number of successes until the experiment is stopped.
+     * @param p The probability of success on each trial.
+     * @return A random integer representing the number of failures until r successes.
+     * @throws IllegalArgumentException if r <= 0 or p is not in (0, 1].
      */
     public fun readNegativeBinomial(r: Int, p: Double): Int {
+        require(r > 0) { "Number of successes must be positive" }
+        require(p in 0.0..1.0 && p > 0) { "Probability must be in (0, 1]" }
+        // Sum of r geometric random variables
         var failures = 0
-        var successes = 0
-        while (successes < r) {
-            if (readBernoulli(p)) {
-                successes++
-            } else {
-                failures++
-            }
+        for (i in 0 until r) {
+            failures += readGeometric(p) - 1
         }
         return failures
     }
 
     /**
-     * Generates a random value from a Cauchy distribution
-     * with the specified location and scale parameters.
+     * Generates a random double from a gamma distribution.
      *
-     * @param location The location parameter of the Cauchy distribution (x0).
-     * @param scale The scale parameter of the Cauchy distribution (γ > 0).
-     * @return A Double sampled from Cauchy(x0, γ).
+     * @param shape The shape parameter (α) of the distribution.
+     * @param scale The scale parameter (θ) of the distribution.
+     * @return A random double from Gamma(shape, scale).
+     * @throws IllegalArgumentException if shape <= 0 or scale <= 0.
      */
-    public fun readCauchy(location: Double, scale: Double): Double {
-        val u = readDouble() - 0.5
-        return location + scale * tan(PI * u)
+    public fun readGamma(shape: Double, scale: Double): Double {
+        require(shape > 0) { "Shape must be positive" }
+        require(scale > 0) { "Scale must be positive" }
+        // For integer shape, sum exponential variates; for non-integer, use approximation
+        if (shape.isWhole()) {
+            var sum = 0.0
+            for (i in 0 until shape.toInt()) {
+                sum += readExponential(1.0 / scale)
+            }
+            return sum
+        } else {
+            // Marsaglia-Tsang approximation for non-integer shape
+            val d = shape - 1.0 / 3.0
+            val c = 1.0 / sqrt(9.0 * d)
+            while (true) {
+                val x = readNormal()
+                val v = (1.0 + c * x).pow(3)
+                if (v > 0) {
+                    val u = readDouble()
+                    if (u < 1.0 - 0.0331 * x * x * x * x) return d * v * scale
+                    if (ln(u) < 0.5 * x * x + d * (1.0 - v + ln(v))) return d * v * scale
+                }
+            }
+        }
     }
+
+    /**
+     * Generates a random double from a beta distribution.
+     *
+     * @param alpha The first shape parameter (α) of the distribution.
+     * @param beta The second shape parameter (β) of the distribution.
+     * @return A random double from Beta(alpha, beta) in [0, 1].
+     * @throws IllegalArgumentException if alpha <= 0 or beta <= 0.
+     */
+    public fun readBeta(alpha: Double, beta: Double): Double {
+        require(alpha > 0) { "Alpha must be positive" }
+        require(beta > 0) { "Beta must be positive" }
+        // Use gamma variates: X / (X + Y) where X ~ Gamma(alpha, 1), Y ~ Gamma(beta, 1)
+        val x = readGamma(alpha, 1.0)
+        val y = readGamma(beta, 1.0)
+        return x / (x + y)
+    }
+
+    /**
+     * Generates a random double from a chi-square distribution.
+     *
+     * @param df The degrees of freedom.
+     * @return A random double from ChiSquare(df).
+     * @throws IllegalArgumentException if df <= 0.
+     */
+    public fun readChiSquare(df: Int): Double {
+        require(df > 0) { "Degrees of freedom must be positive" }
+        // Chi-square with df is Gamma(df/2, 2)
+        return readGamma(df / 2.0, 2.0)
+    }
+
+    /**
+     * Generates a random double from a Student's t-distribution.
+     *
+     * @param df The degrees of freedom.
+     * @return A random double from t(df).
+     * @throws IllegalArgumentException if df <= 0.
+     */
+    public fun readStudentT(df: Int): Double {
+        require(df > 0) { "Degrees of freedom must be positive" }
+        // t-distribution: Z / sqrt(Y / df) where Z ~ N(0,1), Y ~ ChiSquare(df)
+        val z = readNormal()
+        val y = readChiSquare(df)
+        return z / sqrt(y / df)
+    }
+
+    /**
+     * Extension to check if a double is a whole number.
+     */
+    private fun Double.isWhole(): Boolean = this == floor(this)
 }
