@@ -148,6 +148,6 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
     }
 
     public companion object {
-        private const val THRESHOLD = Int.MAX_VALUE / 2 * TypeSize.byteBits
+        private const val THRESHOLD: Long = Int.MAX_VALUE.toLong() / 2L * TypeSize.byteBits
     }
 }

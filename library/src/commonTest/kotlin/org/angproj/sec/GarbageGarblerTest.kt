@@ -45,22 +45,23 @@ class GarbageGarblerTest {
     fun testTriggerReseedAndRemainingReset() {
         val garbler = GarbageGarbler()
 
-        val initialRemaining = garbler.remaining
+        val initialRemaining = garbler.remainingBytes
         repeat(256) { garbler.readDouble() }
-        assertEquals(2048, initialRemaining-garbler.remaining)
+        assertEquals(2048, initialRemaining-garbler.remainingBytes)
 
         // Use the importBytes to fill entropy and trigger reseed
         val seed = ByteArray(128) { it.toByte() }
         garbler.importBytes(seed, 0, seed.size) { idx -> this[idx] }
-        assertEquals(initialRemaining, garbler.remaining)
+        garbler.revitalize()
+        assertEquals(initialRemaining, garbler.remainingBytes)
     }
 
     @Test
     fun testRemainingDecreases() {
         val garbler = GarbageGarbler()
-        val initialRemaining = garbler.remaining
+        val initialRemaining = garbler.remainingBytes
         repeat(10) { garbler.readByte() }
-        assertTrue(garbler.remaining < initialRemaining)
+        assertTrue(garbler.remainingBytes < initialRemaining)
     }
 
     @Test
