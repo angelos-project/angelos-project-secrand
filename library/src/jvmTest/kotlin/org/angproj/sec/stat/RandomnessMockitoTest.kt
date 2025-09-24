@@ -95,7 +95,7 @@ class RandomnessMockitoTest {
         val result = randomMock.readFloat()
         assertEquals(0.75f, result, "readFloat should return mocked value")
         assertContains(0.0f..1.0f, result, "readFloat must be in [0.0, 1.0)")
-        assertTrue(result >= 0.0f && result < 1.0f, "readFloat must be in [0.0, 1.0)")
+        assertTrue(result in 0.0f..<1.0f, "readFloat must be in [0.0, 1.0)")
         Mockito.verify(randomMock, Mockito.times(1)).readFloat()
     }
 
@@ -105,7 +105,7 @@ class RandomnessMockitoTest {
         val result = randomMock.readDouble()
         assertEquals(0.42, result, "readDouble should return mocked value")
         assertContains(0.0..1.0, result, "readDouble must be in [0.0, 1.0)")
-        assertTrue(result >= 0.0 && result < 1.0, "readDouble must be in [0.0, 1.0)")
+        assertTrue(result in 0.0..<1.0, "readDouble must be in [0.0, 1.0)")
         Mockito.verify(randomMock, Mockito.times(1)).readDouble()
     }
 
