@@ -69,6 +69,7 @@ public object SecureFeed : Security(), ExportOctetLong, ExportOctetByte, Randomi
     }
 
     override fun checkExportConditions(length: Int): Boolean {
+        revitalize()
         return true
     }
 
