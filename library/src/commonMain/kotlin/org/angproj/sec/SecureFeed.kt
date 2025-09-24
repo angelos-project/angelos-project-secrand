@@ -20,7 +20,7 @@ import org.angproj.sec.rand.Security
 import org.angproj.sec.rand.Sponge
 import org.angproj.sec.util.ExportOctetByte
 import org.angproj.sec.util.ExportOctetLong
-import org.angproj.sec.util.ceilDiv
+import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.floorMod
 
 /**
@@ -36,18 +36,15 @@ public object SecureFeed : Security(), ExportOctetLong, ExportOctetByte, Randomi
 
     override val sponge: Sponge = object : AbstractSponge512() {}
 
-    private var next: Int = 0
-    private var counter: Int = 0
+    private var next: Long = 0
 
     init {
         revitalize()
     }
 
-    /**
-     * Revitalizes the secure random source by reading from the secure entropy.
-     * This method is called to fill the sponge with new entropy and reset the counter.
-     */
-    private fun revitalize() {
+    override fun checkReseedConditions(): Boolean = true
+
+    override fun reseedImpl() {
         SecureEntropy.exportLongs(sponge, 0, sponge.visibleSize) { index, value ->
             sponge.absorb(value, index)
         }
@@ -55,85 +52,39 @@ public object SecureFeed : Security(), ExportOctetLong, ExportOctetByte, Randomi
     }
 
     /**
-     * Checks if the current counter exceeds the next threshold.
-     * If it does, it resets the next threshold and revitalizes the sponge.
-     * This is used to ensure that the sponge is periodically refreshed with new entropy.
+     * Rounds the internal counter and checks if reseeding is necessary.
+     * If the counter exceeds the next threshold, it reseeds the sponge
+     * and resets the counter.
+     *
+     * This method should be called whenever bytes are read from the generator
+     * to ensure that the reseeding logic is applied correctly.
+     *
+     * @param count The number of bytes to add to the counter.
      */
-    private fun round(count: Int) {
-        if (counter >= next) {
-            next = (Int.MAX_VALUE / 4) + sponge.squeeze(0).toInt().floorMod(Int.MAX_VALUE / 8)
-            revitalize()
-            counter = 0
-        } else {
-            counter += count
+    private fun revitalize() {
+        if (lastReseedBits >= next) {
+            next = AVERAGE_THRESHOLD + sponge.squeeze(0).floorMod(AVERAGE_THRESHOLD) - DEVIATION_THRESHOLD
+            reseed()
         }
     }
 
-    private inline fun<reified R: Any> generateEntropy(entropy: Long, loops: Int): Long {
-        var data = entropy
-        repeat(loops) {
-            data = data shl 8 xor sponge.getNextBits(32).toLong()
-        }
-        return data
-    }
-
-    /**
-     * Reads random longs into a LongArray from the secure random source.
-     * This function fills the LongArray with random numbers starting from a specified offset.
-     * The data is read in chunks, and the sponge state is updated accordingly.
-     *
-     * @param data The LongArray to fill with random numbers.
-     */
-    override fun <E> exportLongs(data: E, offset: Int, length: Int, writeOctet: E.(Int, Long) -> Unit) {
-        if(length <= 0) return
-
-        round(length)
-        var entropy: Long = 0
-
-        // Warmup phase to stabilize the entropy pool
-        entropy = generateEntropy<Unit>(entropy, 16)
-
-        // Generate and write random Long values
-        repeat(length) { index ->
-            entropy = generateEntropy<Unit>(entropy, 8)
-            data.writeOctet(offset + index, entropy)
-        }
-    }
-
-    /**
-     * Reads bytes into a data structure from the secure random source.
-     * This function fills the data structure with random bytes
-     * starting from a specified offset and for a specified length.
-     *
-     * The data structure must provide a way to write bytes at specific indices
-     * and the function will write bytes in little-endian order.
-     * This is useful for filling buffers, arrays, or any other
-     * data structure that can hold bytes.
-     *
-     * @param data The data structure to fill with random bytes.
-     * @param offset The starting index in the data structure to write to.
-     * @param length The number of bytes to read. Defaults to 0, meaning the entire data structure.
-     * @param writeOctet A function that writes a byte at a specific index in the data structure.
-     */
-    override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
-        if(length <= 0) return
-
-        round(length)
-        var entropy: Long = 0
-
-        // Warmup phase to stabilize the entropy pool
-        entropy = generateEntropy<Unit>(entropy, 16)
-
-        // Generate and write random Byte values
-        repeat(length) { index ->
-            entropy = entropy shl 8 xor sponge.getNextBits(32).toLong()
-            data.writeOctet(offset + index, entropy.toByte())
-        }
+    override fun checkExportConditions(length: Int): Boolean {
+        return true
     }
 
     override fun getNextBits(bits: Int): Int {
         require(bits in 1..32) { "Bits must be between 1 and 32" }
-        round(bits.ceilDiv(8))
+        revitalize()
         return sponge.getNextBits(bits)
     }
+
+    /**
+     * Average threshold for reseeding the sponge, which is a half gigabyte.
+     */
+    public const val AVERAGE_THRESHOLD: Long = Int.MAX_VALUE / 4 * TypeSize.byteBits.toLong()
+
+    /**
+     * Deviation threshold for reseeding the sponge, which is a quarter gigabyte.
+     */
+    public const val DEVIATION_THRESHOLD: Long = AVERAGE_THRESHOLD / 2
 }

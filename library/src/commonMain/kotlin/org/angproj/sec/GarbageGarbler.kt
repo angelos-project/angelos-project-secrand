@@ -22,7 +22,7 @@ import org.angproj.sec.stat.Randomness
 import org.angproj.sec.util.ImportOctetByte
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
-import org.angproj.sec.util.ceilDiv
+import kotlin.math.min
 
 
 /**
@@ -47,14 +47,12 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
     public val missing: Int
         get() = entropy.size - entropyPos
 
-    private var _count: Int = 0
-
     /** Number of bytes readable from the garbler until depletion */
-    public val remaining: Int
-        get() = Int.MAX_VALUE / 2 - _count
+    public val remainingBits: Long
+        get() = THRESHOLD - lastReseedBits
 
-    public val depleted: Boolean
-        get() = _count >= Int.MAX_VALUE / 2
+    public val remainingBytes: Int
+        get() = (remainingBits / TypeSize.byteBits).toInt()
 
     init {
         // Seed the sponge
@@ -64,8 +62,11 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
         sponge.scramble()
     }
 
-    private fun reseed() {
-        // Absorb current entropy
+    override fun checkReseedConditions(): Boolean {
+        return missing <= 0
+    }
+
+    override fun reseedImpl() {
         repeat(sponge.visibleSize) {
             val data = Octet.readLE(entropy, it * TypeSize.longSize, TypeSize.longSize) { index ->
                 this[index]
@@ -74,7 +75,25 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
         }
         sponge.scramble()
         entropyPos = 0
-        _count = 0
+    }
+
+    override fun checkExportConditions(length: Int): Boolean {
+        if(length <= remainingBytes) {
+            return true
+        }
+        if(checkReseedConditions()) {
+            reseed()
+            return true
+        }
+        return false
+    }
+
+    public fun revitalize(): Boolean {
+        if(checkReseedConditions()) {
+            reseed()
+            return true
+        }
+        return false
     }
 
     /**
@@ -89,12 +108,8 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
     override fun <E> importBytes(data: E, offset: Int, length: Int, readOctet: E.(index: Int) -> Byte) {
         require(length > 0) { "Zero length data" }
 
-        repeat(length) { index ->
+        repeat(min(length, missing)) { index ->
             entropy[entropyPos++] = data.readOctet(index + offset)
-
-            if (entropyPos >= entropy.lastIndex) {
-                reseed()
-            }
         }
     }
 
@@ -108,8 +123,7 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
      */
     override fun getNextBits(bits: Int): Int {
         require(bits in 1..TypeSize.intBits) { "Bits must be between 1 and 32" }
-        if (depleted) throw IllegalStateException("GarbageGarbler is depleted")
-        _count += bits.ceilDiv(TypeSize.byteBits)
+        check(remainingBits >= bits) { "GarbageGarbler has depleted" }
         return sponge.getNextBits(bits)
     }
 
@@ -128,15 +142,12 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
      * @throws IllegalStateException if the GarbageGarbler is depleted.
      */
     override fun readBytes(data: ByteArray, offset: Int, size: Int) {
-        check(!depleted) { "GarbageGarbler is depleted" }
-        if (size <= 0) return
-
-        _count += size
-        repeat(size.ceilDiv(TypeSize.byteSize)) { index ->
-            val value = getNextBits(TypeSize.intBits).toLong()
-            Octet.writeLE(value, data, index * TypeSize.byteSize, TypeSize.byteSize) { idx, v ->
-                this[idx] = v
-            }
+        exportBytes(data, offset, size) { index, value ->
+            this[index] = value
         }
+    }
+
+    public companion object {
+        private const val THRESHOLD = Int.MAX_VALUE / 2 * TypeSize.byteBits
     }
 }
