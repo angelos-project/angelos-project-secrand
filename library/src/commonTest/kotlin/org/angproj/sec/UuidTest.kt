@@ -22,11 +22,21 @@ import kotlin.test.assertEquals
 class UuidTest {
 
     @Test
+    @Suppress("unused")
     fun showSubMilliSecEntropy() {
         val microPart: Double = PI / E / 1_200_000
-        repeat(100) {
+        repeat(20) {
             val count: Double = microPart * (it + 2)
-            //println(count.toBits().toString(16))
+            assertEquals(64-count.toRawBits().countLeadingZeroBits(), 62)
+        }
+    }
+
+    @Test
+    fun testUuid4() {
+        repeat(1) {
+            val uuid = Uuid.uuid4()
+            assertEquals(4, uuid.version)
+            assertEquals(2, uuid.variant)
         }
     }
 

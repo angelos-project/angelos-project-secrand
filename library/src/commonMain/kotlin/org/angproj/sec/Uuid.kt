@@ -16,6 +16,16 @@ package org.angproj.sec
 
 import org.angproj.sec.util.Octet
 
+/**
+ * Universally Unique Identifier (UUID).
+ *
+ * This class represents a UUID using two Long values: `upper` and `lower`.
+ * It provides functionality to generate random UUIDs, including version 4 UUIDs,
+ * and to retrieve the version and variant of the UUID.
+ *
+ * @property upper The upper 64 bits of the UUID.
+ * @property lower The lower 64 bits of the UUID.
+ */
 public data class Uuid(
     public val upper: Long = 0,
     public val lower: Long = 0
@@ -25,6 +35,12 @@ public data class Uuid(
         (SecureFeed.getNextBits(32).toLong() shl 32) or SecureFeed.getNextBits(32).toLong(),
         (SecureFeed.getNextBits(32).toLong() shl 32) or SecureFeed.getNextBits(32).toLong()
     )
+
+    public val version: Int
+        get() = ((upper ushr 12) and 0xf).toInt()
+
+    public val variant: Int
+        get() = ((lower ushr 62) and 0x3).toInt()
 
     public override fun toString(): String = buildString {
         printStr<Unit>(lower, this, printStr<Unit>(upper, this, 0))
@@ -48,7 +64,25 @@ public data class Uuid(
     public companion object Companion {
         private val hyphens = listOf(8,13,18,23)
 
-        public val nil: Uuid = Uuid(0,0)
-        public val omni: Uuid = Uuid(ULong.MAX_VALUE.toLong(), ULong.MAX_VALUE.toLong())
+        /**
+         * Generates a random UUID.
+         *
+         * @return A randomly generated UUID.
+         */
+        public fun uuid(): Uuid = Uuid()
+
+        /**
+         * Generates a random version 4 UUID.
+         *
+         * @return A randomly generated version 4 UUID.
+         */
+        public fun uuid4(): Uuid = Uuid(
+            (SecureFeed.getNextBits(32).toLong() shl 32) or (((SecureFeed.getNextBits(32) and 0xffff0fff.toInt()) or 0x4000).toLong()),
+            (((SecureFeed.getNextBits(32) and 0x3fffffff) or -0x80000000).toLong() shl 32) or SecureFeed.getNextBits(32).toLong()
+        )
+
+        public val nil: Uuid by lazy { Uuid(0,0) }
+
+        public val omni: Uuid by lazy { Uuid(ULong.MAX_VALUE.toLong(), ULong.MAX_VALUE.toLong()) }
     }
 }
