@@ -45,7 +45,10 @@ public data class Uuid(
         return cnt
     }
 
-    private companion object Companion {
+    public companion object Companion {
         private val hyphens = listOf(8,13,18,23)
+
+        public val nil: Uuid = Uuid(0,0)
+        public val omni: Uuid = Uuid(ULong.MAX_VALUE.toLong(), ULong.MAX_VALUE.toLong())
     }
 }
