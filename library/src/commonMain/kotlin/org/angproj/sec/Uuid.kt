@@ -83,6 +83,6 @@ public data class Uuid(
 
         public val nil: Uuid by lazy { Uuid(0,0) }
 
-        public val omni: Uuid by lazy { Uuid(ULong.MAX_VALUE.toLong(), ULong.MAX_VALUE.toLong()) }
+        public val max: Uuid by lazy { Uuid(ULong.MAX_VALUE.toLong(), ULong.MAX_VALUE.toLong()) }
     }
 }

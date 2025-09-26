@@ -48,9 +48,9 @@ class UuidTest {
     }
 
     @Test
-    fun testUuidOmni() {
-        assertEquals(Uuid.omni.upper, ULong.MAX_VALUE.toLong())
-        assertEquals(Uuid.omni.lower, ULong.MAX_VALUE.toLong())
-        assertEquals(Uuid.omni.toString(), "ffffffff-ffff-ffff-ffff-ffffffffffff")
+    fun testUuidMax() {
+        assertEquals(Uuid.max.upper, ULong.MAX_VALUE.toLong())
+        assertEquals(Uuid.max.lower, ULong.MAX_VALUE.toLong())
+        assertEquals(Uuid.max.toString(), "ffffffff-ffff-ffff-ffff-ffffffffffff")
     }
 }
