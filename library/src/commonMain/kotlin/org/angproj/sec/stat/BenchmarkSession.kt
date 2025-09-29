@@ -33,7 +33,7 @@ public class BenchmarkSession<B, E: BenchmarkObject<B>>(
     public fun registerTester(builder: (E) -> BenchmarkTester<B, E>): String {
         check(state == RunState.INITIALIZE) { "Can't register new state after INITIALIZE state." }
         val tester = builder(obj)
-        val token  = tester::class.qualifiedName.toString()
+        val token  = tester::class.toString()
         registry[token] = tester
         return token
     }

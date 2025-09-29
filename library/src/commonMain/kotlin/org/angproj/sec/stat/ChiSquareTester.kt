@@ -143,8 +143,8 @@ public class ChiSquareTester<B, E: BenchmarkObject<B>>(
         /**
          * Computes the gamma function using Lanczos approximation.
          */
-        private fun gamma(z: Double): Double {
-            var z = z
+        private fun gamma(z_: Double): Double {
+            var z = z_
             val p = doubleArrayOf(
                 676.5203681218851, -1259.1392167224028, 771.32342877765313,
                 -176.61502916214059, 12.507343278686905, -0.13857109526572012,
