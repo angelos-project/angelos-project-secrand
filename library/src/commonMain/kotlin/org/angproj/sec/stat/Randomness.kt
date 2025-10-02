@@ -31,6 +31,20 @@ import kotlin.math.tan
  * Interface defining methods for generating random numbers and sampling from various statistical distributions.
  * Implementations should provide a source of randomness and ensure that the generated values are uniformly
  * distributed over their respective ranges.
+ *
+ * The methods for reading primitive types (Byte, Short, Int, Long, Float, Double) are designed to return values
+ * normalized to their full range. For example, readByte() returns a Byte in the range [-128, 127], and readFloat()
+ * returns a Float in the range [0.0, 1.0).
+ *
+ * The interface also includes methods for sampling from common statistical distributions such as uniform,
+ * normal (Gaussian), exponential, binomial, Poisson, geometric, negative binomial, gamma, beta, chi-square,
+ * Student's t-distribution, Bernoulli, Laplace, Logistic, Cauchy, and F-distribution.
+ *
+ * Each distribution method includes parameters to define the characteristics of the distribution (e.g., mean,
+ * standard deviation for normal distribution) and returns a random value sampled from that distribution.
+ *
+ * Implementations should ensure that the random values generated are statistically sound and suitable for
+ * applications requiring randomness, such as simulations, cryptography, and statistical sampling.
  */
 public interface Randomness {
 

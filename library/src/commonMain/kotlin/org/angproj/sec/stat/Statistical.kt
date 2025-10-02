@@ -16,6 +16,14 @@ package org.angproj.sec.stat
 
 import kotlin.time.Duration
 
+/**
+ * Data class representing the results of a statistical test.
+ *
+ * @property sampleCount The number of samples taken during the test.
+ * @property keyValue The calculated key value from the test (e.g., estimated value of Pi).
+ * @property duration The duration taken to complete the test.
+ * @property report A textual report summarizing the results of the test.
+ */
 public data class Statistical(
     val sampleCount: Long,
     val keyValue: Double,

@@ -16,6 +16,22 @@ package org.angproj.sec.stat
 
 import kotlin.math.*
 
+/**
+ * Tester for the Chi-Square statistical test of a cryptographic function.
+ *
+ * The Chi-Square test is used to determine whether there is a significant difference
+ * between the expected and observed frequencies in one or more categories. In the context
+ * of cryptographic functions, it helps assess the uniformity of the output distribution.
+ *
+ * This tester collects samples of outputs from the cryptographic function and analyzes
+ * the frequency of each byte value (0-255). It calculates the Chi-Square statistic to evaluate
+ * how closely the observed frequencies match the expected uniform distribution.
+ *
+ * @param B The type of the benchmark result.
+ * @param E The type of the benchmark object, which must extend BenchmarkObject<B>.
+ * @property samples The number of samples to collect for the test.
+ * @property obj The benchmark object that provides the cryptographic function to be tested.
+ */
 public class ChiSquareTester<B, E: BenchmarkObject<B>>(
     samples: Long, obj: E
 ) : BenchmarkTester<B, E>(samples, 16, obj) {

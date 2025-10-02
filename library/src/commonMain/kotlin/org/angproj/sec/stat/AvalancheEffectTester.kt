@@ -18,6 +18,22 @@ import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 import kotlin.math.abs
 
+/**
+ * Tester for the Avalanche Effect of a cryptographic function.
+ *
+ * The Avalanche Effect is a desirable property of cryptographic algorithms,
+ * where a small change in input (e.g., flipping a single bit) results in a significant
+ * change in output (e.g., approximately half of the output bits change).
+ *
+ * This tester collects samples of outputs from the cryptographic function and analyzes
+ * how many bits differ between successive samples. It maintains statistics on the number
+ * of differing bits and calculates an average to evaluate the strength of the Avalanche Effect.
+ *
+ * @param B The type of the benchmark result.
+ * @param E The type of the benchmark object, which must extend BenchmarkObject<B>.
+ * @property samples The number of samples to collect for the test.
+ * @property obj The benchmark object that provides the cryptographic function to be tested.
+ */
 public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
     samples: Long, obj: E
 ) : BenchmarkTester<B, E>(samples, 16, obj) {

@@ -22,6 +22,19 @@ import kotlin.math.sqrt
 import kotlin.math.PI
 import kotlin.math.abs
 
+/**
+ * Tester for estimating the value of Pi using the Monte Carlo method.
+ *
+ * The Monte Carlo method is a statistical technique that uses random sampling to estimate numerical values.
+ * In this tester, random points are generated within a unit square, and the proportion of points that fall
+ * within a quarter circle inscribed within that square is used to estimate the value of Pi.
+ *
+ * @param B The type of the benchmark result.
+ * @param E The type of the benchmark object, which must extend BenchmarkObject<B>.
+ * @property samples The number of samples to collect for the test.
+ * @property mode The mode of operation, determining the size of each sample (32-bit or 64-bit).
+ * @property obj The benchmark object that provides the random data for the test.
+ */
 public class MonteCarloTester<B, E: BenchmarkObject<B>>(
     samples: Long, mode: Mode, obj: E
 ) : BenchmarkTester<B, E>(samples, mode.size, obj) {

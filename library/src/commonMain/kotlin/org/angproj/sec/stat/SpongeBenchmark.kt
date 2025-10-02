@@ -18,6 +18,15 @@ import org.angproj.sec.rand.Sponge
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 
+/**
+ * Benchmark object for the Sponge cryptographic primitive.
+ *
+ * This class extends the BenchmarkObject class and provides functionality
+ * to benchmark a Sponge instance. It initializes the Sponge by scrambling it
+ * and provides methods to retrieve sample byte size and generate the next sample.
+ *
+ * @param obj The Sponge instance to be benchmarked.
+ */
 public class SpongeBenchmark(obj: Sponge): BenchmarkObject<Sponge>(obj) {
 
     init {
