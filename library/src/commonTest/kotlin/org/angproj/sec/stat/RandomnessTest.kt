@@ -12,9 +12,9 @@
  * Contributors:
  *      Kristoffer Paulsson - initial implementation
  */
-package org.angproj.sec
+package org.angproj.sec.stat
 
-import org.angproj.sec.stat.Randomness
+import org.angproj.sec.util.toUnitFraction
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.random.Random
@@ -26,6 +26,11 @@ class RandomMock : Randomness {
     override fun readInt(): Int = Random.nextInt()
     override fun readBytes(data: ByteArray, offset: Int, size: Int) {
         Random.nextBytes(data, offset, offset + size)
+    }
+
+    override fun readDouble(): Double {
+        // Mocking the generation of a uniform random double in [0.0, 1.0)
+        return Random.nextBits(32).toUnitFraction().toDouble()
     }
 }
 
