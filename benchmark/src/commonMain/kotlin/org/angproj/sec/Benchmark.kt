@@ -8,7 +8,6 @@ import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.AbstractSponge512
 import org.angproj.sec.stat.AvalancheEffectTester
 import org.angproj.sec.stat.BenchmarkSession
-import org.angproj.sec.stat.ChiSquareTester
 import org.angproj.sec.stat.MonteCarloTester
 import org.angproj.sec.stat.SpongeBenchmark
 
@@ -47,7 +46,6 @@ public fun main(args: Array<String>) {
         val benchmarkSession = BenchmarkSession(samplesNeeded, benchmarkSponge.sampleByteSize, benchmarkSponge)
         val monteCarlo = benchmarkSession.registerTester { MonteCarloTester(samplesNeeded, MonteCarloTester.Mode.MODE_64_BIT, it) }
         val avalancheEffect = benchmarkSession.registerTester { AvalancheEffectTester(samplesNeeded, it) }
-        val chiSquare = benchmarkSession.registerTester { ChiSquareTester(samplesNeeded, it) }
         benchmarkSession.startRun()
         repeat(samplesNeeded.toInt()) {
             benchmarkSession.collectSample()
@@ -56,7 +54,6 @@ public fun main(args: Array<String>) {
         val results = benchmarkSession.finalizeCollecting()
         println(results[monteCarlo]!!.report)
         println(results[avalancheEffect]!!.report)
-        println(results[chiSquare]!!.report)
         println()
     }
 }
