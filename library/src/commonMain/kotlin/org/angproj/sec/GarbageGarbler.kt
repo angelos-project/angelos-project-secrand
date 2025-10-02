@@ -47,10 +47,11 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
     public val missing: Int
         get() = entropy.size - entropyPos
 
-    /** Number of bytes readable from the garbler until depletion */
+    /** Number of bits readable from the garbler until depletion */
     public val remainingBits: Long
         get() = THRESHOLD - lastReseedBits
 
+    /** Number of bytes readable from the garbler until depletion */
     public val remainingBytes: Int
         get() = (remainingBits / TypeSize.byteBits).toInt()
 
@@ -88,6 +89,11 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
         return false
     }
 
+    /**
+     * Attempts to reseed the internal entropy pool if the conditions are met.
+     *
+     * @return `true` if reseeding was performed, `false` otherwise.
+     */
     public fun revitalize(): Boolean {
         if(checkReseedConditions()) {
             reseed()
