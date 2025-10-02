@@ -21,9 +21,20 @@ import kotlin.time.TimeSource
 
 
 /**
- * A singleton object for generating true random numbers based on timing jitter in a Kotlin Multiplatform (KMP) environment.
- * It implements [ExportOctetLong] and [ExportOctetByte] to export random data as [Long] or [Byte] values.
- * The entropy is derived from system monotonic clock measurements, processed through trigonometric and bitwise operations.
+ * JitterEntropy provides true random number generation based on timing jitter.
+ *
+ * This implementation leverages the inherent unpredictability of timing variations in system operations
+ * to generate entropy. It uses a monotonic clock to measure elapsed time and derives randomness from
+ * the nanosecond and microsecond components of these measurements. The entropy is further processed using
+ * trigonometric functions and bitwise operations to enhance randomness.
+ *
+ * Usage:
+ * - Call [exportLongs] to fill a data structure with random [Long] values.
+ * - Call [exportBytes] to fill a data structure with random [Byte] values.
+ *
+ * Limitations:
+ * - The maximum length for [exportLongs] is 128 (1KB) to prevent excessive computation time.
+ * - The maximum length for [exportBytes] is 1024 (1KB) for the same reason.
  */
 public object JitterEntropy : ExportOctetLong, ExportOctetByte {
 
