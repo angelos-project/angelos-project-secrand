@@ -121,6 +121,12 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
         )
     }
 
+    /**
+     * Provides a string representation of the Monte Carlo tester, including the number of samples taken,
+     * the estimated value of Pi, and the deviation from the actual value of Pi.
+     *
+     * @return A string summarizing the results of the Monte Carlo test.
+     */
     override fun toString(): String = buildString {
         val piEstimate = evaluateSampleData()
         append("Monte Carlo at ")

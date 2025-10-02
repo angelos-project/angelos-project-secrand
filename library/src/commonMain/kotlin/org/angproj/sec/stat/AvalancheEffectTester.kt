@@ -94,6 +94,14 @@ public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
         )
     }
 
+    /**
+     * Provides a string representation of the Avalanche Effect Tester results.
+     *
+     * The string includes the total number of samples taken, the average avalanche effect,
+     * and the deviation from the ideal value of 0.5.
+     *
+     * @return A string summarizing the results of the Avalanche Effect test.
+     */
     override fun toString(): String = buildString {
         val average = evaluateSampleData()
         append("Avalanche Effect at ")
