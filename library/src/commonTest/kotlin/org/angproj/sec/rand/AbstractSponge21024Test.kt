@@ -14,6 +14,8 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.util.Hash
+
 class AbstractSponge21024Test: SpongeHashTest<AbstractSponge21024>() {
 
     override val emptyHash = "79be7f41442401bffde34bf348196841555cf3ee86a4cc145a32394fa1977ebde3a1ced98fcf3eabfb6c3d131a25605c031e641ed60ab603a4fe39472142cb1dc6271640c0414e0d94f0febe79ce2c6da2e3cb6df7bd5bd9579bfa94837256dce560f70c2908f1facb4139920c0c95c0de99138448607ec29441a85dee3a1879"
@@ -26,7 +28,7 @@ class AbstractSponge21024Test: SpongeHashTest<AbstractSponge21024>() {
     override val eightNumHash = "8649f0fee2f68cb856736d7bc72157965822457173be14741d11e7ba254b7bef82be69c618a4be216aa6f6b0d5c1464c4adac4b422e1466f50d51423c999ac6f48766911f9b1064ebf52054982820647efa70b91b7b748389b0780ca38d6cd7567b058d6efc990601b6c4a74530b4aa29d2d6b43161df951f050ae78d3ec854a"
     override val millionAHash = "f515ed02a861610f8d9a8ff6b9032f128e9b0b537c634c0b3850db47e5c2563c365c69e2db180e686fefe0f72c7248ee401e37159964a4fbaca33693663db5263f7b6dfd3e9b3215d825e0a11cc1b777d41dbc0c57cb700884d7fddd88c50fd51a682bb2b5d44886690df37559ed54b746b63ccd0a89a1aba6a6c4a47954c08b"
 
-    class Hash21024 : Hash<AbstractSponge21024>(object : AbstractSponge21024() {}, debug)
+    class Hash21024 : Hash<AbstractSponge21024>(object : AbstractSponge21024() {})
 
     override fun getHashInstance(): Hash<AbstractSponge21024> {
         return Hash21024()

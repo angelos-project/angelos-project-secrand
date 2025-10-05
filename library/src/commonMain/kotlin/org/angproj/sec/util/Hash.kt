@@ -12,35 +12,48 @@
  * Contributors:
  *      Kristoffer Paulsson - initial implementation
  */
-package org.angproj.sec.rand
+package org.angproj.sec.util
 
-import org.angproj.sec.util.Octet
-import org.angproj.sec.util.TypeSize
+import org.angproj.sec.rand.Sponge
 
+/**
+ * Abstract base class for hash functions using a sponge construction.
+ *
+ * This class provides the common functionality for hashing data using a sponge-based
+ * approach. It manages the absorption of input data, handling of remainders, and
+ * finalization of the hash output. Subclasses must provide a specific sponge implementation.
+ *
+ * Used for testing purposes.
+ *
+ * @param E The type of sponge used in the hash function, must implement the Sponge interface.
+ * @property sponge The sponge instance used for hashing.
+ * @property debug Flag to enable or disable debug output.
+ */
+public abstract class Hash<E: Sponge>(sponge: E) {
 
-abstract class Hash<E: Sponge>(private val sponge: E, public val debug: Boolean = false) {
+    private var state = RunState.INITIALIZE
+    private val sponge: E = sponge
+    private var remainder: ByteArray = byteArrayOf()
+    private var offset = 0
 
-    var remainder = byteArrayOf()
-    var offset = 0
-
-    init {
-        printDebug("HASH - " + sponge::class.toString())
-    }
-
-    protected fun printDebug(output: String) {
-        if(debug) println(output)
+    public fun init() {
+        check(state == RunState.INITIALIZE)
+        state = RunState.RUNNING
     }
 
     /**
      * Absorbs the input ByteArray into the sponge state, treating the input as big endian.
      * On a little endian system, bytes are reversed before conversion to Long.
      */
-    fun update(input: ByteArray) {
-        printDebug("UPDATE - " + input.size)
+    public fun update(input: ByteArray) {
+        check(state == RunState.RUNNING)
+        runUpdate(input)
+    }
+
+    private fun runUpdate(input: ByteArray) {
         val data = remainder + input
         val loops = (data.size - data.size.mod(TypeSize.longSize)).div(TypeSize.longSize)
         repeat(loops){
-            printDebug("ABSORB - $offset")
             val value = Octet.readLE(data, it * TypeSize.longSize, TypeSize.longSize) { index ->
                 data[index]
             }
@@ -53,20 +66,28 @@ abstract class Hash<E: Sponge>(private val sponge: E, public val debug: Boolean 
         remainder = data.copyOfRange(data.size - (data.size.mod(TypeSize.longSize)), data.size)
     }
 
-    /**
-     * Returns the digest as a ByteArray in big endian order.
-     * Converts each internal little endian Long to big endian bytes.
-     */
-    fun digest(): ByteArray {
-        printDebug("DIGEST")
+    private fun runFinalize() {
         if(remainder.isNotEmpty()) {
-            update(ByteArray(TypeSize.longSize - remainder.size.mod(TypeSize.longSize)))
+            runUpdate(ByteArray(TypeSize.longSize - remainder.size.mod(TypeSize.longSize)))
             check(remainder.isEmpty()) { "Remainder must be empty, still " + remainder.size + " bytes left" }
         }
         if(offset != 0) {
             sponge.round()
         }
         sponge.scramble()
+    }
+
+    /**
+     * Returns the digest as a ByteArray in big endian order.
+     * Converts each internal little endian Long to big endian bytes.
+     */
+    public fun final(): ByteArray {
+        check(state != RunState.INITIALIZE)
+
+        if (state == RunState.RUNNING) {
+            state = RunState.FINISHED
+            runFinalize()
+        }
 
         val digestBytes = ByteArray(sponge.byteSize)
         repeat(sponge.visibleSize) {

@@ -14,6 +14,8 @@
  */
 package org.angproj.sec.stat
 
+import org.angproj.sec.util.RunState
+
 /**
  * Manages a benchmarking session for a given benchmark object and its testers.
  *
@@ -32,13 +34,9 @@ public class BenchmarkSession<B, E: BenchmarkObject<B>>(
     private val obj: E
 ) {
 
-    private enum class RunState {
-        INITIALIZE, RUNNING, FINISHED
-    }
-
     private val numSubSamples: Int = obj.sampleByteSize / subSampleByteSize
 
-    private var state: RunState = RunState.INITIALIZE
+    private var state = RunState.INITIALIZE
 
     private val registry: MutableMap<String, BenchmarkTester<B, E>> = mutableMapOf()
 

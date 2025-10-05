@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.util.Hash
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

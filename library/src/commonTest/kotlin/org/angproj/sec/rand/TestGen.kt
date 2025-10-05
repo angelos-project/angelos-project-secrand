@@ -14,7 +14,7 @@
  */
 package org.angproj.sec.rand
 
-import org.angproj.sec.util.Octet
+import org.angproj.sec.util.Hash
 
 class TestGen {
 
@@ -43,54 +43,63 @@ class TestGen {
     }.toHex()
 
     private fun<E: Sponge> emptyTest(hash: Hash<E>): ByteArray {
+        hash.init()
         hash.update(byteArrayOf())
-        return hash.digest()
+        return hash.final()
     }
 
     private fun<E: Sponge> singleATest(hash: Hash<E>): ByteArray {
+        hash.init()
         hash.update("a".encodeToByteArray())
-        return hash.digest()
+        return hash.final()
     }
 
     private fun<E: Sponge> abcTest(hash: Hash<E>): ByteArray {
+        hash.init()
         hash.update("abc".encodeToByteArray())
-        return hash.digest()
+        return hash.final()
     }
 
     private fun<E: Sponge> mdTest(hash: Hash<E>): ByteArray {
+        hash.init()
         hash.update("message digest".encodeToByteArray())
-        return hash.digest()
+        return hash.final()
     }
 
     private fun<E: Sponge> aToZTest(hash: Hash<E>): ByteArray {
+        hash.init()
         hash.update(aToZGenerator().encodeToByteArray())
-        return hash.digest()
+        return hash.final()
     }
 
     private fun<E: Sponge> nopqTest(hash: Hash<E>): ByteArray {
+        hash.init()
         hash.update(nopqGenerator().encodeToByteArray())
-        return hash.digest()
+        return hash.final()
     }
 
     private fun<E: Sponge> alphaNumTest(hash: Hash<E>): ByteArray {
+        hash.init()
         hash.update((aToZGenerator().uppercase() + aToZGenerator() + numGenerator()).encodeToByteArray())
-        return hash.digest()
+        return hash.final()
     }
 
     private fun<E: Sponge> eightNumTest(hash: Hash<E>): ByteArray {
+        hash.init()
         val num = numGenerator().encodeToByteArray()
         repeat(8) {
             hash.update(num)
         }
-        return hash.digest()
+        return hash.final()
     }
 
     private fun<E: Sponge> millionATest(hash: Hash<E>): ByteArray {
+        hash.init()
         val num = "a".repeat(100).encodeToByteArray()
         repeat(10_000) {
             hash.update(num)
         }
-        return hash.digest()
+        return hash.final()
     }
 
     public fun numGenerator(): String {
