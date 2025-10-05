@@ -23,7 +23,7 @@ import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.AbstractSponge512
 import org.angproj.sec.rand.Sponge
 
-public fun<R: Sponge> hashDigestOf(sponge: Hash<R>, block: Hash<R>.() -> ByteArray): ByteArray {
+public fun<R: Sponge> hashDigestOf(sponge: Hash<R>, block: Hash<R>.() -> Unit): ByteArray {
     sponge.init()
     sponge.block()
     return sponge.final()
