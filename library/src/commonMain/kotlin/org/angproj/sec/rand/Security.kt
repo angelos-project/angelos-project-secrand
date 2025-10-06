@@ -80,7 +80,7 @@ public abstract class Security {
 
         _totalBits = _totalBits.incrementWithWrap(bits)
         _lastReseedBits += bits
-        return RandomBits.compactBitEntropy(bits, squeeze(absorbPosition++)) //Randomizer.reduceBits<Unit>(bits, Randomizer.foldBits<Unit>(squeeze(absorbPosition++)))
+        return RandomBits.compactBitEntropy(bits, squeeze(absorbPosition++))
     }
 
     protected abstract fun checkReseedConditions(): Boolean

@@ -33,7 +33,7 @@ class UuidTest {
 
     @Test
     fun testUuid4() {
-        repeat(1) {
+        repeat(100) {
             val uuid = Uuid.uuid4()
             assertEquals(4, uuid.version)
             assertEquals(2, uuid.variant)

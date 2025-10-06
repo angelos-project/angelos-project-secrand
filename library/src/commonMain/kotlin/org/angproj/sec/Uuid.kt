@@ -31,11 +31,12 @@ public data class Uuid(
     public val upper: Long = 0,
     public val lower: Long = 0
 ) {
-
-    public constructor() : this(
-        RandomBits.nextBitsToLong { SecureFeed.nextBits(it) },
-        RandomBits.nextBitsToLong { SecureFeed.nextBits(it) }
+    public constructor(randomBits: RandomBits) : this(
+        RandomBits.nextBitsToLong(randomBits),
+        RandomBits.nextBitsToLong(randomBits)
     )
+
+    public constructor() : this(SecureFeed)
 
     public val version: Int
         get() = ((upper ushr 12) and 0xf).toInt()
@@ -72,14 +73,15 @@ public data class Uuid(
          */
         public fun uuid(): Uuid = Uuid()
 
+        private const val uuid4Variant: Long = (-0x80000000L shl 32)
         /**
          * Generates a random version 4 UUID.
          *
          * @return A randomly generated version 4 UUID.
          */
         public fun uuid4(): Uuid = Uuid(
-            (SecureFeed.nextBits(32).toLong() shl 32) or (((SecureFeed.nextBits(32) and 0xffff0fff.toInt()) or 0x4000).toLong()),
-            (((SecureFeed.nextBits(32) and 0x3fffffff) or -0x80000000).toLong() shl 32) or SecureFeed.nextBits(32).toLong()
+            (RandomBits.nextBitsToLong(SecureFeed) and 0xffff0fff) or 0x4000,
+            (RandomBits.nextBitsToLong(SecureFeed) and 0x3fffffff_ffffffff) or uuid4Variant
         )
 
         public val nil: Uuid by lazy { Uuid(0,0) }
