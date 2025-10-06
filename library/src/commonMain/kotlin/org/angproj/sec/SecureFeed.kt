@@ -18,8 +18,6 @@ import org.angproj.sec.rand.AbstractSponge512
 import org.angproj.sec.rand.Randomizer
 import org.angproj.sec.rand.Security
 import org.angproj.sec.rand.Sponge
-import org.angproj.sec.util.ExportOctetByte
-import org.angproj.sec.util.ExportOctetLong
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.floorMod
 
@@ -32,7 +30,7 @@ import org.angproj.sec.util.floorMod
  * The SecureFeed object is designed to be used in cryptographic applications where
  * high-quality randomness is required.
  */
-public object SecureFeed : Security(), ExportOctetLong, ExportOctetByte, Randomizer {
+public object SecureFeed : Security(), Randomizer {
 
     override val sponge: Sponge = object : AbstractSponge512() {}
 
@@ -45,7 +43,7 @@ public object SecureFeed : Security(), ExportOctetLong, ExportOctetByte, Randomi
     override fun checkReseedConditions(): Boolean = true
 
     override fun reseedImpl() {
-        SecureEntropy.exportLongs(sponge, 0, sponge.visibleSize) { index, value ->
+        SecureEntropy.readLongs(sponge, 0, sponge.visibleSize) { index, value ->
             sponge.absorb(value, index)
         }
         sponge.scramble()

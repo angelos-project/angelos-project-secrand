@@ -35,7 +35,7 @@ public object SecureEntropy : Security() {
     override fun checkReseedConditions(): Boolean = true
 
     override fun reseedImpl() {
-        JitterEntropy.exportLongs(sponge, 0, sponge.visibleSize) { index, value ->
+        JitterEntropy.readLongs(sponge, 0, sponge.visibleSize) { index, value ->
             sponge.absorb(value, index)
         }
         sponge.scramble()

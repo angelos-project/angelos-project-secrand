@@ -26,7 +26,7 @@ import kotlin.math.min
  */
 public fun ByteArray.securelyRandomize() {
     var pos = 0
-    SecureFeed.exportLongs(this, 0, size.ceilDiv(8)) { _, value ->
+    SecureFeed.readLongs(this, 0, size.ceilDiv(8)) { _, value ->
         var data = value
         repeat(min(8, size - pos)) {
             this@securelyRandomize[pos++] = (data and 0xFF).toByte()
@@ -43,7 +43,7 @@ public fun ByteArray.securelyRandomize() {
  */
 public fun ShortArray.securelyRandomize() {
     var pos = 0
-    SecureFeed.exportLongs(this, 0, size.ceilDiv(4)) { _, value ->
+    SecureFeed.readLongs(this, 0, size.ceilDiv(4)) { _, value ->
         var data = value
         repeat(min(8, size - pos)) {
             this@securelyRandomize[pos++] = (data and 0xFFFF).toShort()
@@ -60,7 +60,7 @@ public fun ShortArray.securelyRandomize() {
  */
 public fun IntArray.securelyRandomize() {
     var pos = 0
-    SecureFeed.exportLongs(this, 0, size.ceilDiv(2)) { _, value ->
+    SecureFeed.readLongs(this, 0, size.ceilDiv(2)) { _, value ->
         var data = value
         repeat(min(8, size - pos)) {
             this@securelyRandomize[pos++] = (data and 0xFFFFFFFF).toInt()
@@ -76,7 +76,7 @@ public fun IntArray.securelyRandomize() {
  * The entire array is overwritten with new random values.
  */
 public fun LongArray.securelyRandomize() {
-    SecureFeed.exportLongs(this, 0, size) { index, value ->
+    SecureFeed.readLongs(this, 0, size) { index, value ->
         this@securelyRandomize[index] = value
     }
 }

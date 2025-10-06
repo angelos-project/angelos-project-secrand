@@ -26,8 +26,8 @@ class SecureEntropyTest {
         val buffer1 = ByteArray(size)
         val buffer2 = ByteArray(size)
 
-        SecureEntropy.exportBytes(buffer1, 0, size) { idx, value -> this[idx] = value }
-        SecureEntropy.exportBytes(buffer2, 0, size) { idx, value -> this[idx] = value }
+        SecureEntropy.readBytes(buffer1, 0, size) { idx, value -> this[idx] = value }
+        SecureEntropy.readBytes(buffer2, 0, size) { idx, value -> this[idx] = value }
 
         assertEquals(size, buffer1.size)
         assertEquals(size, buffer2.size)
@@ -41,8 +41,8 @@ class SecureEntropyTest {
         val buffer1 = LongArray(size)
         val buffer2 = LongArray(size)
 
-        SecureEntropy.exportLongs(buffer1, 0, size) { idx, value -> this[idx] = value }
-        SecureEntropy.exportLongs(buffer2, 0, size) { idx, value -> this[idx] = value }
+        SecureEntropy.readLongs(buffer1, 0, size) { idx, value -> this[idx] = value }
+        SecureEntropy.readLongs(buffer2, 0, size) { idx, value -> this[idx] = value }
 
         assertEquals(size, buffer1.size)
         assertEquals(size, buffer2.size)

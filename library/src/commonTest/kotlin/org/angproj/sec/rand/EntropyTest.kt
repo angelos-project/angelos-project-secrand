@@ -26,8 +26,8 @@ class EntropyTest {
         val buffer1 = ByteArray(size)
         val buffer2 = ByteArray(size)
 
-        JitterEntropy.exportBytes(buffer1, 0, size) { idx, value -> this[idx] = value }
-        JitterEntropy.exportBytes(buffer2, 0, size) { idx, value -> this[idx] = value }
+        JitterEntropy.readBytes(buffer1, 0, size) { idx, value -> this[idx] = value }
+        JitterEntropy.readBytes(buffer2, 0, size) { idx, value -> this[idx] = value }
 
         assertEquals(size, buffer1.size)
         assertEquals(size, buffer2.size)
@@ -41,8 +41,8 @@ class EntropyTest {
         val buffer1 = LongArray(size)
         val buffer2 = LongArray(size)
 
-        JitterEntropy.exportLongs(buffer1, 0, size) { idx, value -> this[idx] = value }
-        JitterEntropy.exportLongs(buffer2, 0, size) { idx, value -> this[idx] = value }
+        JitterEntropy.readLongs(buffer1, 0, size) { idx, value -> this[idx] = value }
+        JitterEntropy.readLongs(buffer2, 0, size) { idx, value -> this[idx] = value }
 
         assertEquals(size, buffer1.size)
         assertEquals(size, buffer2.size)

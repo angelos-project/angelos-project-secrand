@@ -19,8 +19,8 @@ import org.angproj.sec.rand.JitterEntropy
 import org.angproj.sec.rand.Randomizer
 import org.angproj.sec.rand.Security
 import org.angproj.sec.stat.Randomness
-import org.angproj.sec.util.ImportOctetByte
 import org.angproj.sec.util.Octet
+import org.angproj.sec.util.ReadOctet
 import org.angproj.sec.util.TypeSize
 import kotlin.math.min
 
@@ -36,7 +36,7 @@ import kotlin.math.min
  *
  * @constructor Creates a new instance of GarbageGarbler with an initialized sponge and entropy pool.
  */
-public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte {
+public class GarbageGarbler: Security(), Randomizer, Randomness {
 
     override val sponge: AbstractSponge1024 = object : AbstractSponge1024() {}
 
@@ -57,7 +57,7 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
 
     init {
         // Seed the sponge
-        JitterEntropy.exportLongs(sponge, 0, sponge.visibleSize) { index, value ->
+        JitterEntropy.readLongs(sponge, 0, sponge.visibleSize) { index, value ->
             sponge.absorb(value, index)
         }
         sponge.scramble()
@@ -103,7 +103,7 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
     }
 
     /**
-     * Imports bytes into the internal entropy pool.
+     * Seeds bytes into the internal entropy pool.
      *
      * @param data The data source containing bytes to import.
      * @param offset The starting index in the data source.
@@ -111,7 +111,7 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
      * @param readOctet A lambda function to read a byte from the data source at a given index.
      * @throws IllegalArgumentException if length is less than or equal to zero.
      */
-    override fun <E> importBytes(data: E, offset: Int, length: Int, readOctet: E.(index: Int) -> Byte) {
+    public fun <E> seedEntropy(data: E, offset: Int, length: Int, readOctet: ReadOctet<E, Byte>) {
         require(length > 0) { "Zero length data" }
 
         repeat(min(length, missing)) { index ->
@@ -148,7 +148,7 @@ public class GarbageGarbler: Security(), Randomizer, Randomness, ImportOctetByte
      * @throws IllegalStateException if the GarbageGarbler is depleted.
      */
     override fun readBytes(data: ByteArray, offset: Int, size: Int) {
-        exportBytes(data, offset, size) { index, value ->
+        readBytes(data, offset, size) { index, value ->
             this[index] = value
         }
     }

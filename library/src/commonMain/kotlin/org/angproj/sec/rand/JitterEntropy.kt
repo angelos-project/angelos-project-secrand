@@ -14,8 +14,7 @@
  */
 package org.angproj.sec.rand
 
-import org.angproj.sec.util.ExportOctetByte
-import org.angproj.sec.util.ExportOctetLong
+import org.angproj.sec.util.WriteOctet
 import kotlin.math.*
 import kotlin.time.TimeSource
 
@@ -29,14 +28,14 @@ import kotlin.time.TimeSource
  * trigonometric functions and bitwise operations to enhance randomness.
  *
  * Usage:
- * - Call [exportLongs] to fill a data structure with random [Long] values.
- * - Call [exportBytes] to fill a data structure with random [Byte] values.
+ * - Call [readLongs] to fill a data structure with random [Long] values.
+ * - Call [readBytes] to fill a data structure with random [Byte] values.
  *
  * Limitations:
- * - The maximum length for [exportLongs] is 128 (1KB) to prevent excessive computation time.
- * - The maximum length for [exportBytes] is 1024 (1KB) for the same reason.
+ * - The maximum length for [readLongs] is 128 (1KB) to prevent excessive computation time.
+ * - The maximum length for [readBytes] is 1024 (1KB) for the same reason.
  */
-public object JitterEntropy : ExportOctetLong, ExportOctetByte {
+public object JitterEntropy {
 
     /**
      * Internal state for tracking timing measurements and generating jitter-based entropy.
@@ -99,7 +98,7 @@ public object JitterEntropy : ExportOctetLong, ExportOctetByte {
      * @param writeOctet The function to write a [Long] value at a specific index.
      * @throws IllegalArgumentException If [length] exceeds 128.
      */
-    override fun <E> exportLongs(data: E, offset: Int, length: Int, writeOctet: E.(Int, Long) -> Unit) {
+    public fun <E> readLongs(data: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Long>) {
         require(length <= 128) { "Too large for time-gated entropy! Max 1Kb." }
         var entropy: Long = 0
 
@@ -123,7 +122,7 @@ public object JitterEntropy : ExportOctetLong, ExportOctetByte {
      * @param writeOctet The function to write a [Byte] value at a specific index.
      * @throws IllegalArgumentException If [length] exceeds 1024.
      */
-    override fun <E> exportBytes(data: E, offset: Int, length: Int, writeOctet: E.(index: Int, value: Byte) -> Unit) {
+    public fun <E> readBytes(data: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Byte>) {
         require(length <= 1024) { "Too large for time-gated entropy! Max 1Kb." }
         var entropy: Long = 0
 

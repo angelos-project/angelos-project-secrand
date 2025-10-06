@@ -51,7 +51,7 @@ class GarbageGarblerTest {
 
         // Use the importBytes to fill entropy and trigger reseed
         val seed = ByteArray(128) { it.toByte() }
-        garbler.importBytes(seed, 0, seed.size) { idx -> this[idx] }
+        garbler.seedEntropy(seed, 0, seed.size) { idx -> this[idx] }
         garbler.revitalize()
         assertEquals(initialRemaining, garbler.remainingBytes)
     }
@@ -69,7 +69,7 @@ class GarbageGarblerTest {
         val garbler = GarbageGarbler()
         val data = ByteArray(10)
         try {
-            garbler.importBytes(data, 0, 0) { idx -> this[idx] }
+            garbler.seedEntropy(data, 0, 0) { idx -> this[idx] }
             assertTrue(false)
         } catch (_: IllegalArgumentException) {
             assertTrue(true)
