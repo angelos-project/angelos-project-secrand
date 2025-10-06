@@ -15,6 +15,7 @@
 package org.angproj.sec
 
 import org.angproj.sec.util.Octet
+import org.angproj.sec.util.RandomBits
 
 /**
  * Universally Unique Identifier (UUID).
@@ -32,8 +33,8 @@ public data class Uuid(
 ) {
 
     public constructor() : this(
-        (SecureFeed.getNextBits(32).toLong() shl 32) or SecureFeed.getNextBits(32).toLong(),
-        (SecureFeed.getNextBits(32).toLong() shl 32) or SecureFeed.getNextBits(32).toLong()
+        RandomBits.nextBitsToLong { SecureFeed.getNextBits(it) },
+        RandomBits.nextBitsToLong { SecureFeed.getNextBits(it) }
     )
 
     public val version: Int

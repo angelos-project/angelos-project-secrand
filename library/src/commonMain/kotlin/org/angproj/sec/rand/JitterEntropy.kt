@@ -14,7 +14,10 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.util.RandomBits
+import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.WriteOctet
+import org.angproj.sec.util.ceilDiv
 import kotlin.math.*
 import kotlin.time.TimeSource
 
@@ -80,14 +83,6 @@ public object JitterEntropy {
     // Single instance of the entropy state
     private val state = JitterEntropyState()
 
-    private inline fun<reified R: Any> generateEntropy(entropy: Long, loops: Int): Long {
-        var data = entropy
-        repeat(loops) {
-            data = data shl 8 xor state.getNextBits(32).toLong()
-        }
-        return data
-    }
-
     /**
      * Exports true random [Long] values to the provided data structure.
      * Generates up to 128 [Long] values (1024 bytes) to prevent excessive computation.
@@ -100,15 +95,9 @@ public object JitterEntropy {
      */
     public fun <E> readLongs(data: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Long>) {
         require(length <= 128) { "Too large for time-gated entropy! Max 1Kb." }
-        var entropy: Long = 0
 
-        // Warmup phase to stabilize the entropy pool
-        entropy = generateEntropy<Unit>(entropy, 16)
-
-        // Generate and write random Long values
         repeat(length) { index ->
-            entropy = generateEntropy<Unit>(entropy, 8)
-            data.writeOctet(offset + index, entropy)
+            data.writeOctet(offset + index, RandomBits.nextBitsToLong { state.getNextBits(it) })
         }
     }
 
@@ -124,15 +113,15 @@ public object JitterEntropy {
      */
     public fun <E> readBytes(data: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Byte>) {
         require(length <= 1024) { "Too large for time-gated entropy! Max 1Kb." }
-        var entropy: Long = 0
 
-        // Warmup phase to stabilize the entropy pool
-        entropy = generateEntropy<Unit>(entropy, 16)
-
-        // Generate and write random Byte values
-        repeat(length) { index ->
-            entropy = entropy shl 8 xor state.getNextBits(32).toLong()
-            data.writeOctet(offset + index, entropy.toByte())
+        var pos = 0
+        repeat(length.ceilDiv(TypeSize.intSize)) { index ->
+            val bytes = min(TypeSize.intSize, length - pos)
+            var entropy = state.getNextBits(bytes * TypeSize.byteBits)
+            repeat(bytes) {
+                data.writeOctet(offset + pos++, entropy.toByte())
+                entropy = entropy ushr TypeSize.byteBits
+            }
         }
     }
 }

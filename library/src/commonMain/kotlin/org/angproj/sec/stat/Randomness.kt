@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.stat
 
+import org.angproj.sec.util.RandomBits
 import org.angproj.sec.util.toUnitFraction
 import kotlin.math.PI
 import kotlin.math.abs
@@ -102,7 +103,7 @@ public interface Randomness {
      *
      * @return A long integer in the range [-9223372036854775808, 9223372036854775807].
      */
-    public fun readLong(): Long = (readInt() shl 32).toLong() or (readInt().toLong() and 0xFFFFFFFFL)
+    public fun readLong(): Long = RandomBits.nextBitsToLong { readInt() }
 
     /**
      * Reads an unsigned long integer from the random source.

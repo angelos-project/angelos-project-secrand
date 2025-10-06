@@ -17,10 +17,14 @@ package org.angproj.sec.rand
 import org.angproj.sec.stat.BenchmarkSession
 import org.angproj.sec.stat.MonteCarloTester
 import org.angproj.sec.stat.SpongeBenchmark
+import org.angproj.sec.util.RandomBits
+import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.WriteOctet
+import org.angproj.sec.util.ceilDiv
 import org.angproj.sec.util.incrementWithWrap
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.min
 
 /**
  * Abstract base class for secure random number generators using a sponge construction.
@@ -92,14 +96,6 @@ public abstract class Security {
 
     protected abstract fun checkExportConditions(length: Int): Boolean
 
-    private inline fun<reified R: Any> generateEntropy(entropy: Long, loops: Int): Long {
-        var data = entropy
-        repeat(loops) {
-            data = data shl 8 xor sponge.getNextBits(32).toLong()
-        }
-        return data
-    }
-
     /**
      * Reads random longs into a LongArray from the secure random source.
      * This function fills the LongArray with random numbers starting from a specified offset.
@@ -111,15 +107,8 @@ public abstract class Security {
         if(length <= 0) return
 
         check(checkExportConditions(length)) { "Export conditions not met" }
-        var entropy: Long = 0
-
-        // Warmup phase to stabilize the entropy pool
-        entropy = generateEntropy<Unit>(entropy, 16)
-
-        // Generate and write random Long values
         repeat(length) { index ->
-            entropy = generateEntropy<Unit>(entropy, 8)
-            data.writeOctet(offset + index, entropy)
+            data.writeOctet(offset + index, RandomBits.nextBitsToLong { sponge.getNextBits(it) })
         }
     }
 
@@ -142,15 +131,14 @@ public abstract class Security {
         if(length <= 0) return
 
         check(checkExportConditions(length)) { "Export conditions not met" }
-        var entropy: Long = 0
-
-        // Warmup phase to stabilize the entropy pool
-        entropy = generateEntropy<Unit>(entropy, 16)
-
-        // Generate and write random Byte values
-        repeat(length) { index ->
-            entropy = entropy shl 8 xor sponge.getNextBits(32).toLong()
-            data.writeOctet(offset + index, entropy.toByte())
+        var pos = 0
+        repeat(length.ceilDiv(TypeSize.intSize)) {
+            val bytes = min(TypeSize.intSize, length - pos)
+            var entropy = sponge.getNextBits(bytes * TypeSize.byteBits)
+            repeat(bytes) {
+                data.writeOctet(offset + pos++, entropy.toByte())
+                entropy = entropy ushr TypeSize.byteBits
+            }
         }
     }
 
