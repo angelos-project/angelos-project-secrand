@@ -20,26 +20,39 @@ public typealias WriteOctet<E, T> = E.(index: Int, value: T) -> Unit
 public typealias ReadOctet<E, T> = E.(index: Int) -> T
 
 
+/**
+ * The `Octet` object provides utility functions and type aliases for working with octet (byte) data,
+ * supporting both reading and writing operations in a generic and type-safe manner.
+ *
+ * It defines functional interfaces and type aliases to abstract the process of importing and exporting
+ * bytes and long integers to and from various data structures. These abstractions allow for flexible
+ * manipulation of binary data, such as serialization, deserialization, and conversion between different
+ * representations.
+ *
+ * Key features include:
+ * - Type aliases for read and write operations on octet data.
+ * - Functional interfaces for exporting and importing bytes and long values.
+ * - Utility functions for reading and writing little-endian values.
+ * - Methods for converting byte data to hexadecimal string representations.
+ * - Extension functions for integrating with `ByteArray` operations.
+ *
+ * The design enables interoperability and reusability across different platforms and data sources,
+ * making it suitable for cryptographic, serialization, and low-level data manipulation tasks.
+ */
 public object Octet {
 
     /**
-     * Interface for exporting a sequence of bytes from some data object.
-     *
-     * Implementations define how to extract bytes from a given data structure and write them
-     * using a provided lambda function. This is useful for serializing objects or transferring
-     * byte data in a customizable way.
-     *
-     * @param E The type of the data object to export bytes from.
+     * @param E The type of the destination to write bytes to.
      */
     public fun interface ExportBytes<E> {
 
         /**
-         * Exports a range of bytes from the given data object.
+         * Exports a range of bytes to the given destination [E].
          *
-         * @param data The data object to export bytes from.
-         * @param offset The starting index in the data object.
-         * @param length The number of bytes to export.
-         * @param writeOctet Lambda function to write each byte, given its index and value.
+         * @param dst The destination object to write to.
+         * @param offset The starting index at the destination.
+         * @param length The number of bytes to write to the destination.
+         * @param writeOctet Lambda function which writes the byte at the destination.
          */
         public fun export(
             dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Byte>
@@ -47,23 +60,17 @@ public object Octet {
     }
 
     /**
-     * Interface for exporting a sequence of long values from some data object.
-     *
-     * Implementations define how to extract long values from a given data structure and write them
-     * using a provided lambda function. This is useful for serializing objects or transferring
-     * long data in a customizable way.
-     *
-     * @param E The type of the data object to export longs from.
+     * @param E The type of the destination to write long integers to.
      */
     public fun interface ExportLongs<E> {
 
         /**
-         * Exports a range of long values from the given data object.
+         * Exports a range of bytes to the given destination [E].
          *
-         * @param data The data object to export longs from.
-         * @param offset The starting index in the data object.
-         * @param length The number of long values to export.
-         * @param writeOctet Lambda function to write each long value, given its index and value.
+         * @param dst The destination object to write to.
+         * @param offset The starting index at the destination.
+         * @param length The number of long integers to write to the destination.
+         * @param writeOctet Lambda function which writes the long integer at the destination.
          */
         public fun export(
             dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Long>
@@ -71,22 +78,17 @@ public object Octet {
     }
 
     /**
-     * Interface for importing a sequence of bytes into some data object.
-     *
-     * Implementations define how to read bytes from a given data structure using a provided lambda function.
-     * This is useful for deserializing objects or reading byte data in a customizable way.
-     *
-     * @param E The type of the data object to import bytes into.
+     * @param E The type of the source to read bytes from.
      */
     public interface ImportBytes<E> {
 
         /**
-         * Imports a range of bytes into the given data object.
+         * Imports a range of bytes from the given source.
          *
-         * @param data The data object to import bytes into.
-         * @param offset The starting index in the data object.
-         * @param length The number of bytes to import.
-         * @param readOctet Lambda function to read each byte, given its index.
+         * @param src The source object to read from.
+         * @param offset The starting index at the source.
+         * @param length The number of bytes to read from the source.
+         * @param readOctet Lambda function which reads the bytes from the source.
          */
         public fun import(
             src: E, offset: Int, length: Int, readOctet: ReadOctet<E, Byte>
@@ -94,28 +96,26 @@ public object Octet {
     }
 
     /**
-     * Interface for importing a sequence of long values into some data object.
-     *
-     * Implementations define how to read long values from a given data structure using a provided lambda function.
-     * This is useful for deserializing objects or reading long data in a customizable way.
-     *
-     * @param E The type of the data object to import longs into.
+     * @param E The type of the source to read long integers from.
      */
     public interface ImportLongs<E> {
 
         /**
-         * Imports a range of long values into the given data object.
+         * Imports a range of long integers from the given source.
          *
-         * @param data The data object to import longs into.
-         * @param offset The starting index in the data object.
-         * @param length The number of long values to import.
-         * @param readOctet Lambda function to read each long value, given its index.
+         * @param src The source object to read from.
+         * @param offset The starting index at the source.
+         * @param length The number of long integers to read from the source.
+         * @param readOctet Lambda function which reads the long integers from the source.
          */
         public fun import(
             src: E, offset: Int, length: Int, readOctet: ReadOctet<E, Long>
         )
     }
 
+    /**
+     * Reading a long integer from a Big Endian stream [src] into a Little Endian architecture.
+     * */
     public fun<E> readLE(
         src: E,
         index: Int,
@@ -130,6 +130,9 @@ public object Octet {
         return dst
     }
 
+    /**
+     * Writing a long integer [src] as bytes from a Little Endian architecture to a Big Endian stream [dst].
+     * */
     public fun<E> writeLE(
         src: Long,
         dst: E,
