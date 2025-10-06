@@ -1,44 +1,62 @@
 package org.angproj.sec.util
 
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertContentEquals
 
 class OctetTest {
 
     @Test
-    fun testReverseOrder() {
+    fun testReverseOrderReadWrite() {
         val testData = 0x1122334455667788L
-        val array = ByteArray(8) { (0x11 * (it+1)).toByte() }
-        println(Octet.asHexSymbolString(array))
-        println(testData.toString(16))
 
-        val bigEndian = ByteArray(8)
-        Octet.writeBE(testData, bigEndian, 0, bigEndian.size) { index, value ->
-            bigEndian[index] = value
+        val buffer = ByteArray(8)
+        Octet.writeBE(testData, buffer, 0, buffer.size) { index, value ->
+            buffer[index] = value
         }
-        println(Octet.asHexSymbolString(bigEndian))
 
-        val bigLong = Octet.readBE(bigEndian, 0, bigEndian.size) { index ->
-            bigEndian[index]
+        val readLong = Octet.readBE(buffer, 0, buffer.size) { index ->
+            buffer[index]
         }
-        println(bigLong.toString(16))
+
+        assertEquals(testData, readLong)
+        println(readLong.toString(16))
+        println(Octet.asHexSymbolString(buffer))
     }
 
     @Test
-    fun testLittleEndianOrder() {
+    fun testLitterEndianOrderReadWrite() {
         val testData = 0x1122334455667788L
-        val array = ByteArray(8) { (0x11 * (it+1)).toByte() }
-        println(Octet.asHexSymbolString(array))
-        println(testData.toString(16))
 
-        val littleEndian = ByteArray(8)
-        Octet.writeLE(testData, littleEndian, 0, littleEndian.size) { index, value ->
-            littleEndian[index] = value
+        val buffer = ByteArray(8)
+        Octet.writeLE(testData, buffer, 0, buffer.size) { index, value ->
+            buffer[index] = value
         }
-        println(Octet.asHexSymbolString(littleEndian))
 
-        val littleLong = Octet.readLE(array, 0, array.size) { index ->
-            array[index]
+        val readLong = Octet.readLE(buffer, 0, buffer.size) { index ->
+            buffer[index]
         }
-        println(littleLong.toString(16))
+
+        assertEquals(testData, readLong)
+        println(readLong.toString(16))
+        println(Octet.asHexSymbolString(buffer))
+    }
+
+    @Test
+    fun testWriteOpposite() {
+        val testData = 0x1122334455667788L
+
+        val leBuffer = ByteArray(8)
+        Octet.writeLE(testData, leBuffer, 0, leBuffer.size) { index, value ->
+            leBuffer[index] = value
+        }
+
+        val beBuffer = ByteArray(8)
+        Octet.writeBE(testData, beBuffer, 0, beBuffer.size) { index, value ->
+            beBuffer[index] = value
+        }
+
+        beBuffer.reverse()
+        assertContentEquals(leBuffer, beBuffer)
     }
 }

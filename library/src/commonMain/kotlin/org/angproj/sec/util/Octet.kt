@@ -14,8 +14,6 @@
  */
 package org.angproj.sec.util
 
-import kotlin.text.toLong
-
 
 public typealias WriteOctet<E, T> = E.(index: Int, value: T) -> Unit
 
@@ -113,6 +111,24 @@ public object Octet {
         public fun import(
             src: E, offset: Int, length: Int, readOctet: ReadOctet<E, Long>
         )
+    }
+
+    public val isLittleEndian: Boolean
+    public val isBigEndian: Boolean
+
+    init {
+        val valueData = 0x1122334455667788L
+        val streamData = ByteArray(8) { (0x11 * (it+1)).toByte() }
+
+        isLittleEndian = readLE(streamData, 0, streamData.size) { index ->
+            streamData[index]
+        } == valueData
+
+        isBigEndian = readBE(streamData, 0, streamData.size) { index ->
+            streamData[index]
+        } == valueData
+
+        check(isLittleEndian != isBigEndian)
     }
 
     /**
