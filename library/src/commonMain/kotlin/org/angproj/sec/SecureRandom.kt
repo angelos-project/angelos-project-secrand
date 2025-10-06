@@ -24,11 +24,11 @@ import org.angproj.sec.util.TypeSize
  */
 public object SecureRandom : Randomness {
 
-    override fun readByte(): Byte = SecureFeed.getNextBits(TypeSize.byteBits).toByte()
+    override fun readByte(): Byte = SecureFeed.nextBits(TypeSize.byteBits).toByte()
 
-    override fun readShort(): Short = SecureFeed.getNextBits(TypeSize.shortBits).toShort()
+    override fun readShort(): Short = SecureFeed.nextBits(TypeSize.shortBits).toShort()
 
-    override fun readInt(): Int = SecureFeed.getNextBits(TypeSize.intBits)
+    override fun readInt(): Int = SecureFeed.nextBits(TypeSize.intBits)
 
     /**
      * Reads bytes into a ByteArray from the secure random source.

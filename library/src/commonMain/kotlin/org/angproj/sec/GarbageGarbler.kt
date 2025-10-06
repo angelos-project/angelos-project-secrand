@@ -20,6 +20,7 @@ import org.angproj.sec.rand.Randomizer
 import org.angproj.sec.rand.Security
 import org.angproj.sec.stat.Randomness
 import org.angproj.sec.util.Octet
+import org.angproj.sec.util.RandomBits
 import org.angproj.sec.util.ReadOctet
 import org.angproj.sec.util.TypeSize
 import kotlin.math.min
@@ -36,7 +37,7 @@ import kotlin.math.min
  *
  * @constructor Creates a new instance of GarbageGarbler with an initialized sponge and entropy pool.
  */
-public class GarbageGarbler: Security(), Randomizer, Randomness {
+public class GarbageGarbler: Security(), RandomBits, Randomness {
 
     override val sponge: AbstractSponge1024 = object : AbstractSponge1024() {}
 
@@ -127,17 +128,17 @@ public class GarbageGarbler: Security(), Randomizer, Randomness {
      * @throws IllegalArgumentException if bits is not in the range 1 to 32.
      * @throws IllegalStateException if the GarbageGarbler is depleted.
      */
-    override fun getNextBits(bits: Int): Int {
+    override fun nextBits(bits: Int): Int {
         require(bits in 1..TypeSize.intBits) { "Bits must be between 1 and 32" }
         check(remainingBits >= bits) { "GarbageGarbler has depleted" }
         return sponge.getNextBits(bits)
     }
 
-    override fun readByte(): Byte = getNextBits(TypeSize.byteBits).toByte()
+    override fun readByte(): Byte = nextBits(TypeSize.byteBits).toByte()
 
-    override fun readShort(): Short = getNextBits(TypeSize.shortBits).toShort()
+    override fun readShort(): Short = nextBits(TypeSize.shortBits).toShort()
 
-    override fun readInt(): Int = getNextBits(TypeSize.intBits)
+    override fun readInt(): Int = nextBits(TypeSize.intBits)
 
     /**
      * Reads random bytes into a ByteArray from the GarbageGarbler.

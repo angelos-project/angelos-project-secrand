@@ -14,6 +14,9 @@
  */
 package org.angproj.sec
 
+import org.angproj.sec.util.Octet
+import org.angproj.sec.util.Octet.importBytes
+import org.angproj.sec.util.WriteOctet
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -55,5 +58,16 @@ class SecureFeedTest {
         repeat(100) {
             println(Uuid())
         }
+
+        val array = ByteArray(1024)
+        SecureFeed.readBytes(array, 0, array.size) { index, value ->
+            array[index] = value
+        }
+        println(Octet.asHexSymbolString(array))
+
+        SecureEntropy.readBytes(array, 0, array.size) { index, value ->
+            array[index] = value
+        }
+        println(Octet.asHexSymbolString(array))
     }
 }

@@ -15,9 +15,9 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge512
-import org.angproj.sec.rand.Randomizer
 import org.angproj.sec.rand.Security
 import org.angproj.sec.rand.Sponge
+import org.angproj.sec.util.RandomBits
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.floorMod
 
@@ -30,7 +30,7 @@ import org.angproj.sec.util.floorMod
  * The SecureFeed object is designed to be used in cryptographic applications where
  * high-quality randomness is required.
  */
-public object SecureFeed : Security(), Randomizer {
+public object SecureFeed : Security(), RandomBits {
 
     override val sponge: Sponge = object : AbstractSponge512() {}
 
@@ -71,7 +71,7 @@ public object SecureFeed : Security(), Randomizer {
         return true
     }
 
-    override fun getNextBits(bits: Int): Int {
+    public override fun nextBits(bits: Int): Int {
         require(bits in 1..32) { "Bits must be between 1 and 32" }
         revitalize()
         return sponge.getNextBits(bits)
