@@ -1,3 +1,7 @@
+package org.angproj.sec.rand
+
+import org.angproj.sec.util.TypeSize
+
 /**
  * Copyright (c) 2025 by Kristoffer Paulsson <kristoffer.paulsson@talenten.se>.
  *
@@ -12,9 +16,14 @@
  * Contributors:
  *      Kristoffer Paulsson - initial implementation
  */
-package org.angproj.sec.util
-
 public fun interface RandomBits {
+
+    /**
+     * Returns an `Int` containing the specified number of random bits.
+     *
+     * @param bits Number of bits to retrieve (up to 32).
+     * @return Random bits as an `Int`.
+     */
     public fun nextBits(bits: Int): Int
 
     public companion object {
@@ -22,6 +31,9 @@ public fun interface RandomBits {
             return (randomBits.nextBits(TypeSize.intBits) shl TypeSize.intBits).toLong() or (randomBits.nextBits(
                 TypeSize.intBits).toLong() and 0xFFFFFFFFL)
         }
+
+        public fun compactBitEntropy(bits: Int, entropy: Long): Int {
+            return ((entropy ushr 32).toInt() xor (entropy and 0xffffffff).toInt()) ushr (TypeSize.intBits - bits)
+        }
     }
 }
-

@@ -17,7 +17,7 @@ package org.angproj.sec
 import org.angproj.sec.rand.AbstractSponge512
 import org.angproj.sec.rand.Security
 import org.angproj.sec.rand.Sponge
-import org.angproj.sec.util.RandomBits
+import org.angproj.sec.rand.RandomBits
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.floorMod
 

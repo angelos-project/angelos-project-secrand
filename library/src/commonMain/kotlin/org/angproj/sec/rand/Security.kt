@@ -17,7 +17,6 @@ package org.angproj.sec.rand
 import org.angproj.sec.stat.BenchmarkSession
 import org.angproj.sec.stat.MonteCarloTester
 import org.angproj.sec.stat.SpongeBenchmark
-import org.angproj.sec.util.RandomBits
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.WriteOctet
 import org.angproj.sec.util.ceilDiv
@@ -81,7 +80,7 @@ public abstract class Security {
 
         _totalBits = _totalBits.incrementWithWrap(bits)
         _lastReseedBits += bits
-        return Randomizer.reduceBits<Unit>(bits, Randomizer.foldBits<Unit>(squeeze(absorbPosition++)))
+        return RandomBits.compactBitEntropy(bits, squeeze(absorbPosition++)) //Randomizer.reduceBits<Unit>(bits, Randomizer.foldBits<Unit>(squeeze(absorbPosition++)))
     }
 
     protected abstract fun checkReseedConditions(): Boolean

@@ -69,5 +69,8 @@ class SecureFeedTest {
             array[index] = value
         }
         println(Octet.asHexSymbolString(array))
+
+        SecureRandom.readBytes(array)
+        println(Octet.asHexSymbolString(array))
     }
 }

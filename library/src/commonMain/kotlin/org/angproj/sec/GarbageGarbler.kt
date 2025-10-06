@@ -16,11 +16,10 @@ package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge1024
 import org.angproj.sec.rand.JitterEntropy
-import org.angproj.sec.rand.Randomizer
 import org.angproj.sec.rand.Security
 import org.angproj.sec.stat.Randomness
 import org.angproj.sec.util.Octet
-import org.angproj.sec.util.RandomBits
+import org.angproj.sec.rand.RandomBits
 import org.angproj.sec.util.ReadOctet
 import org.angproj.sec.util.TypeSize
 import kotlin.math.min

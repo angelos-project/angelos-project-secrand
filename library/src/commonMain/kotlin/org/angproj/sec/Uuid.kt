@@ -15,7 +15,7 @@
 package org.angproj.sec
 
 import org.angproj.sec.util.Octet
-import org.angproj.sec.util.RandomBits
+import org.angproj.sec.rand.RandomBits
 
 /**
  * Universally Unique Identifier (UUID).

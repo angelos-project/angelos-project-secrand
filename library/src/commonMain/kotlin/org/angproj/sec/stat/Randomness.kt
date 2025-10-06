@@ -14,7 +14,7 @@
  */
 package org.angproj.sec.stat
 
-import org.angproj.sec.util.RandomBits
+import org.angproj.sec.rand.RandomBits
 import org.angproj.sec.util.toUnitFraction
 import kotlin.math.PI
 import kotlin.math.abs
