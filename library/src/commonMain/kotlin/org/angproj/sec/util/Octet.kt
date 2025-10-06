@@ -14,6 +14,8 @@
  */
 package org.angproj.sec.util
 
+import kotlin.text.toLong
+
 
 public typealias WriteOctet<E, T> = E.(index: Int, value: T) -> Unit
 
@@ -125,7 +127,7 @@ public object Octet {
         require(size in TypeSize.shortSize..TypeSize.longSize)
         var dst: Long = 0
         repeat(size) {
-            dst = dst or (src.readOctet(index + it).toLong() shl (8 * ((size - 1) - it)))
+            dst = dst or ((src.readOctet(index + it).toLong() shl (8 * (size - 1 - it))) and (0xffL shl (8 * (size - 1 - it))))
         }
         return dst
     }
@@ -146,6 +148,38 @@ public object Octet {
         }
     }
 
+    /**
+     * Reading a long integer from a Big Endian stream [src] into a Big Endian architecture.
+     * */
+    public fun<E> readBE(
+        src: E,
+        index: Int,
+        size: Int,
+        readOctet: ReadOctet<E, Byte>
+    ): Long {
+        require(size in TypeSize.shortSize..TypeSize.longSize)
+        var dst: Long = 0
+        repeat(size) {
+            dst = dst or ((src.readOctet(index + it).toLong() shl (8 * it)) and (0xffL shl (8 * it)))
+        }
+        return dst
+    }
+
+    /**
+     * Writing a long integer [src] as bytes from a Big Endian architecture to a Big Endian stream [dst].
+     * */
+    public fun<E> writeBE(
+        src: Long,
+        dst: E,
+        index: Int,
+        size: Int,
+        writeOctet: WriteOctet<E, Byte>
+    ) {
+        require(size in TypeSize.shortSize..TypeSize.longSize)
+        repeat(size) {
+            dst.writeOctet(it + index, ((src ushr it * 8) and 0xff).toByte())
+        }
+    }
 
     public fun<E> toHex(src: Byte, data: E, index: Int, writeOctet: E.(index: Int, value: Byte) -> Unit): Int {
         data.writeOctet(index, toHexChar<Unit>((src.toInt() shr 4) and 0xf))
