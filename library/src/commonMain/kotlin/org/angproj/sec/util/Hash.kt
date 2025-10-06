@@ -15,6 +15,7 @@
 package org.angproj.sec.util
 
 import org.angproj.sec.rand.Sponge
+import org.angproj.sec.util.Octet.importBytes
 
 /**
  * Abstract base class for hash functions using a sponge construction.
@@ -27,7 +28,6 @@ import org.angproj.sec.rand.Sponge
  *
  * @param E The type of sponge used in the hash function, must implement the Sponge interface.
  * @property sponge The sponge instance used for hashing.
- * @property debug Flag to enable or disable debug output.
  */
 public abstract class Hash<E: Sponge>(sponge: E) {
 
@@ -47,6 +47,12 @@ public abstract class Hash<E: Sponge>(sponge: E) {
      */
     public fun update(input: ByteArray) {
         check(state == RunState.RUNNING)
+        runUpdate(input)
+    }
+
+    public fun<E> update(src: E, offset: Int, size: Int, readOctet: ReadOctet<E, Byte>) {
+        check(state == RunState.RUNNING)
+        val input = ByteArray(size) { src.readOctet(offset + it) }
         runUpdate(input)
     }
 
@@ -81,25 +87,25 @@ public abstract class Hash<E: Sponge>(sponge: E) {
      * Returns the digest as a ByteArray in big endian order.
      * Converts each internal little endian Long to big endian bytes.
      */
-    public fun final(): ByteArray {
+    public fun final(): ByteArray = ByteArray(sponge.byteSize).also { it.importBytes(::final) }
+
+    public fun<E> final(dst: E, offset: Int, size: Int, writeOctet: WriteOctet<E, Byte>) {
         check(state != RunState.INITIALIZE)
+        check(size == sponge.byteSize)
 
         if (state == RunState.RUNNING) {
             state = RunState.FINISHED
             runFinalize()
         }
 
-        val digestBytes = ByteArray(sponge.byteSize)
         repeat(sponge.visibleSize) {
             Octet.writeLE(
                 sponge.squeeze(it),
-                digestBytes,
-                it * TypeSize.longSize,
-                TypeSize.longSize
-            ) { index, value ->
-                digestBytes[index] = value
-            }
+                dst,
+                offset + it * TypeSize.longSize,
+                TypeSize.longSize,
+                writeOctet
+            )
         }
-        return digestBytes
     }
 }

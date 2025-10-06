@@ -14,12 +14,43 @@
  */
 package org.angproj.sec.util
 
+
+public typealias WriteOctet<E, T> = E.(index: Int, value: T) -> Unit
+
+public typealias ReadOctet<E, T> = E.(index: Int) -> T
+
+
 public object Octet {
+
+    public fun interface ExportBytes<E> {
+        public fun export(
+            dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Byte>
+        )
+    }
+
+    public fun interface ExportLongs<E> {
+        public fun export(
+            dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Long>
+        )
+    }
+
+    public interface ImportBytes<E> {
+        public fun import(
+            src: E, offset: Int, length: Int, readOctet: ReadOctet<E, Byte>
+        )
+    }
+
+    public interface ImportLongs<E> {
+        public fun import(
+            src: E, offset: Int, length: Int, readOctet: ReadOctet<E, Long>
+        )
+    }
+
     public fun<E> readLE(
         src: E,
         index: Int,
         size: Int,
-        readOctet: E.(index: Int) -> Byte
+        readOctet: ReadOctet<E, Byte>
     ): Long {
         require(size in TypeSize.shortSize..TypeSize.longSize)
         var dst: Long = 0
@@ -34,7 +65,7 @@ public object Octet {
         dst: E,
         index: Int,
         size: Int,
-        writeOctet: E.(index: Int, value: Byte) -> Unit
+        writeOctet: WriteOctet<E, Byte>
     ) {
         require(size in TypeSize.shortSize..TypeSize.longSize)
         repeat(size) {
@@ -60,5 +91,15 @@ public object Octet {
                 append(value.toInt().toChar())
             }
         }
+    }
+
+    public fun ByteArray.importBytes(exporter: ExportBytes<ByteArray>) {
+        exporter.export(this, 0, this.size) { index, value ->
+            this[index] = value
+        }
+    }
+
+    public fun ByteArray.exportBytes(importer: ImportBytes<ByteArray>, readOctet: ReadOctet<ByteArray, Byte>) {
+        importer.import(this, 0, this.size, readOctet)
     }
 }

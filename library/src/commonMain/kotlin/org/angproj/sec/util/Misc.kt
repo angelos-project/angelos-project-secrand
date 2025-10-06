@@ -23,10 +23,14 @@ import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.AbstractSponge512
 import org.angproj.sec.rand.Sponge
 
-public fun<R: Sponge> hashDigestOf(sponge: Hash<R>, block: Hash<R>.() -> Unit): ByteArray {
-    sponge.init()
-    sponge.block()
-    return sponge.final()
+public fun interface HashFactory<E: Sponge> {
+    public fun create(): Hash<E>
+}
+
+public fun<R: Sponge> hashDigestOf(hash: Hash<R>, block: Hash<R>.() -> Unit): ByteArray {
+    hash.init()
+    hash.block()
+    return hash.final()
 }
 
 public fun hash256(): Hash<AbstractSponge256> = object : Hash<AbstractSponge256>(object : AbstractSponge256() {}) {}
@@ -40,3 +44,14 @@ public fun hash2256(): Hash<AbstractSponge2256> = object : Hash<AbstractSponge22
 public fun hash2512(): Hash<AbstractSponge2512> = object : Hash<AbstractSponge2512>(object : AbstractSponge2512() {}) {}
 
 public fun hash21024(): Hash<AbstractSponge21024> = object : Hash<AbstractSponge21024>(object : AbstractSponge21024() {}) {}
+
+public fun<R: Sponge> macDigestOf(hashFactory: HashFactory<R>, passPhrase: ByteArray, block: Hash<R>.() -> Unit): ByteArray {
+    val alpha = hashFactory.create()
+    alpha.init()
+    alpha.update(passPhrase)
+    val beta = hashFactory.create()
+    beta.init()
+    beta.block()
+    alpha.update(beta.final())
+    return alpha.final()
+}
