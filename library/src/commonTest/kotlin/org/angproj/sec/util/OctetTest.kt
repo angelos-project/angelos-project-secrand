@@ -8,38 +8,38 @@ class OctetTest {
 
     @Test
     fun testReverseOrderReadWrite() {
-        val testData = 0x1122334455667788L
+        (2 .. 8).forEach { size ->
+            val testData = 0x1122334455667788L ushr (64 - (size * 8))
 
-        val buffer = ByteArray(8)
-        Octet.writeBE(testData, buffer, 0, buffer.size) { index, value ->
-            buffer[index] = value
+            val buffer = ByteArray(8)
+            Octet.writeBE(testData, buffer, 0, size) { index, value ->
+                buffer[index] = value
+            }
+
+            val readLong = Octet.readBE(buffer, 0, size) { index ->
+                buffer[index]
+            }
+
+            assertEquals(testData, readLong)
         }
-
-        val readLong = Octet.readBE(buffer, 0, buffer.size) { index ->
-            buffer[index]
-        }
-
-        assertEquals(testData, readLong)
-        println(readLong.toString(16))
-        println(Octet.asHexSymbolString(buffer))
     }
 
     @Test
     fun testLitterEndianOrderReadWrite() {
-        val testData = 0x1122334455667788L
+        (2 .. 8).forEach { size ->
+            val testData = 0x1122334455667788L ushr (64 - (size * 8))
 
-        val buffer = ByteArray(8)
-        Octet.writeLE(testData, buffer, 0, buffer.size) { index, value ->
-            buffer[index] = value
+            val buffer = ByteArray(8)
+            Octet.writeLE(testData, buffer, 0, size) { index, value ->
+                buffer[index] = value
+            }
+
+            val readLong = Octet.readLE(buffer, 0, size) { index ->
+                buffer[index]
+            }
+
+            assertEquals(testData, readLong)
         }
-
-        val readLong = Octet.readLE(buffer, 0, buffer.size) { index ->
-            buffer[index]
-        }
-
-        assertEquals(testData, readLong)
-        println(readLong.toString(16))
-        println(Octet.asHexSymbolString(buffer))
     }
 
     @Test
