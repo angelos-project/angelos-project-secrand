@@ -16,6 +16,7 @@ package org.angproj.sec
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
@@ -163,6 +164,15 @@ class GarbageGarblerTest {
         repeat(1000) {
             val value = garbler.readDouble()
             assertTrue(value in 0.0..1.0)
+        }
+    }
+
+    @Test
+    fun testHealthCheck() {
+        try {
+            GarbageGarbler().securityHealthCheck()
+        } catch (_: IllegalStateException) {
+            assertFalse(true)
         }
     }
 }

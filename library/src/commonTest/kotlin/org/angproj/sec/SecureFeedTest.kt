@@ -15,11 +15,11 @@
 package org.angproj.sec
 
 import org.angproj.sec.util.Octet
-import org.angproj.sec.util.Octet.importBytes
-import org.angproj.sec.util.WriteOctet
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertFalse
+
 
 class SecureFeedTest {
 
@@ -72,5 +72,14 @@ class SecureFeedTest {
 
         SecureRandom.readBytes(array)
         println(Octet.asHexSymbolString(array))
+    }
+
+    @Test
+    fun testHealthCheck() {
+        try {
+            SecureFeed.securityHealthCheck()
+        } catch (_: IllegalStateException) {
+            assertFalse(true)
+        }
     }
 }

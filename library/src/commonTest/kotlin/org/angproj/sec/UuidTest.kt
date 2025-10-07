@@ -14,6 +14,8 @@
  */
 package org.angproj.sec
 
+import org.angproj.sec.rand.AbstractSponge1024
+import org.angproj.sec.rand.RandomBits
 import kotlin.math.E
 import kotlin.math.PI
 import kotlin.test.Test
@@ -52,5 +54,12 @@ class UuidTest {
         assertEquals(Uuid.max.upper, ULong.MAX_VALUE.toLong())
         assertEquals(Uuid.max.lower, ULong.MAX_VALUE.toLong())
         assertEquals(Uuid.max.toString(), "ffffffff-ffff-ffff-ffff-ffffffffffff")
+    }
+
+    @Test
+    fun testUuidAccuracy() {
+        val error = RandomBits { 0x11223344 }
+
+        assertEquals("11223344-1122-3344-1122-334411223344",Uuid(error).toString())
     }
 }

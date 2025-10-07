@@ -16,6 +16,7 @@ package org.angproj.sec
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 
 class SecureEntropyTest {
@@ -48,5 +49,14 @@ class SecureEntropyTest {
         assertEquals(size, buffer2.size)
         // With high probability, two random arrays should not be equal
         assertNotEquals(buffer1.toList(), buffer2.toList())
+    }
+
+    @Test
+    fun testHealthCheck() {
+        try {
+            SecureEntropy.securityHealthCheck()
+        } catch (_: IllegalStateException) {
+            assertFalse(true)
+        }
     }
 }
