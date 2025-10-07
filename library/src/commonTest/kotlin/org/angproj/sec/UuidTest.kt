@@ -56,9 +56,16 @@ class UuidTest {
     }
 
     @Test
-    fun testUuidAccuracy() {
+    fun testRandomBits() {
         val error = RandomBits { 0x11223344 }
 
         assertEquals("11223344-1122-3344-1122-334411223344",Uuid(error).toString())
+    }
+
+    @Test
+    fun testDoubleLong() {
+        val error = 0x1122334455667788
+
+        assertEquals("11223344-5566-7788-1122-334455667788",Uuid(error, error).toString())
     }
 }
