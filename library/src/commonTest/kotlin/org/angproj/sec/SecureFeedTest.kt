@@ -53,7 +53,7 @@ class SecureFeedTest {
         assertNotEquals(buffer1.toList(), buffer2.toList())
     }
 
-    @Test
+    /*@Test
     fun testPrintUuid() {
         repeat(100) {
             println(Uuid())
@@ -72,7 +72,7 @@ class SecureFeedTest {
 
         SecureRandom.readBytes(array)
         println(Octet.asHexSymbolString(array))
-    }
+    }*/
 
     @Test
     fun testHealthCheck() {

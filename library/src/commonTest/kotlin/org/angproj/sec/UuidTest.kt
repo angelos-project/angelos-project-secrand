@@ -14,7 +14,6 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.rand.AbstractSponge1024
 import org.angproj.sec.rand.RandomBits
 import kotlin.math.E
 import kotlin.math.PI
