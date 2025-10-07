@@ -77,7 +77,7 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
             val x = Octet.readLE(sample, offset, TypeSize.intSize) { index ->
                 sample[index]
             }.toInt()
-            val y = Octet.readLE(sample, offset + TypeSize.longSize, TypeSize.intSize) { index ->
+            val y = Octet.readLE(sample, offset + TypeSize.intSize, TypeSize.intSize) { index ->
                 sample[index]
             }.toInt()
 

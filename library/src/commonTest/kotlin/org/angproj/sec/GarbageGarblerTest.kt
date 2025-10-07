@@ -14,6 +14,7 @@
  */
 package org.angproj.sec
 
+import org.angproj.sec.rand.RandomBits
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -170,7 +171,9 @@ class GarbageGarblerTest {
     @Test
     fun testHealthCheck() {
         try {
-            GarbageGarbler().securityHealthCheck()
+            val garbler = GarbageGarbler()
+            garbler.securityHealthCheck()
+            RandomBits.securityHealthCheck(garbler)
         } catch (_: IllegalStateException) {
             assertFalse(true)
         }

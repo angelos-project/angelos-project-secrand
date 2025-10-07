@@ -35,7 +35,7 @@ public class RandomBitsBenchmark(obj: RandomBits): BenchmarkObject<RandomBits>(o
         val sample = allocSampleArray()
         repeat(sampleByteSize / TypeSize.intSize) {
             Octet.writeLE(
-                obj.nextBits(TypeSize.intSize).toLong(),
+                obj.nextBits(TypeSize.intBits).toLong(),
                 sample,
                 it * TypeSize.intSize,
                 TypeSize.intSize

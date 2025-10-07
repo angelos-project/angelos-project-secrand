@@ -14,7 +14,7 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.util.Octet
+import org.angproj.sec.rand.RandomBits
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -78,6 +78,7 @@ class SecureFeedTest {
     fun testHealthCheck() {
         try {
             SecureFeed.securityHealthCheck()
+            RandomBits.securityHealthCheck(SecureFeed)
         } catch (_: IllegalStateException) {
             assertFalse(true)
         }
