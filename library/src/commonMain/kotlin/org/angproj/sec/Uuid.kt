@@ -50,7 +50,7 @@ public data class Uuid(
 
     private inline fun<reified E: Any> printStr(src: Long, sb: StringBuilder, counter: Int): Int {
         var cnt = counter
-        Octet.writeLE(src, sb, -1, 8) { _, value ->
+        Octet.writeNet(src, sb, -1, 8) { _, value ->
             if(cnt in hyphens) {
                 sb.append('-')
                 cnt += 1

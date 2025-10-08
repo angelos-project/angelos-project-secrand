@@ -52,10 +52,10 @@ public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
         repeat(obj.sampleByteSize / TypeSize.longSize) { idx ->
             val offset = idx * TypeSize.longSize
 
-            val last = Octet.readLE(lastSample, offset, TypeSize.longSize) { index ->
+            val last = Octet.readNet(lastSample, offset, TypeSize.longSize) { index ->
                 lastSample[index]
             }
-            val current = Octet.readLE(currentSample, offset, TypeSize.longSize) { index ->
+            val current = Octet.readNet(currentSample, offset, TypeSize.longSize) { index ->
                 currentSample[index]
             }
 

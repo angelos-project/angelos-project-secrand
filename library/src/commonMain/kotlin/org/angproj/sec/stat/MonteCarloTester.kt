@@ -74,10 +74,10 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
         repeat(sample.size / atomicSampleByteSize) {
             val offset = it * atomicSampleByteSize
 
-            val x = Octet.readLE(sample, offset, TypeSize.intSize) { index ->
+            val x = Octet.readNet(sample, offset, TypeSize.intSize) { index ->
                 sample[index]
             }.toInt()
-            val y = Octet.readLE(sample, offset + TypeSize.intSize, TypeSize.intSize) { index ->
+            val y = Octet.readNet(sample, offset + TypeSize.intSize, TypeSize.intSize) { index ->
                 sample[index]
             }.toInt()
 
@@ -89,10 +89,10 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
         repeat(sample.size / atomicSampleByteSize) {
             val offset = it * atomicSampleByteSize
 
-            val x = Octet.readLE(sample, offset, TypeSize.longSize) { index ->
+            val x = Octet.readNet(sample, offset, TypeSize.longSize) { index ->
                 sample[index]
             }
-            val y = Octet.readLE(sample, offset + TypeSize.longSize, TypeSize.longSize) { index ->
+            val y = Octet.readNet(sample, offset + TypeSize.longSize, TypeSize.longSize) { index ->
                 sample[index]
             }
 

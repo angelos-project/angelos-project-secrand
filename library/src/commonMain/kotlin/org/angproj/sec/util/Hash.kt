@@ -60,7 +60,7 @@ public abstract class Hash<E: Sponge>(sponge: E) {
         val data = remainder + input
         val loops = (data.size - data.size.mod(TypeSize.longSize)).div(TypeSize.longSize)
         repeat(loops){
-            val value = Octet.readLE(data, it * TypeSize.longSize, TypeSize.longSize) { index ->
+            val value = Octet.readNet(data, it * TypeSize.longSize, TypeSize.longSize) { index ->
                 data[index]
             }
             sponge.absorb(value, offset++ % sponge.visibleSize)
@@ -99,7 +99,7 @@ public abstract class Hash<E: Sponge>(sponge: E) {
         }
 
         repeat(sponge.visibleSize) {
-            Octet.writeLE(
+            Octet.writeNet(
                 sponge.squeeze(it),
                 dst,
                 offset + it * TypeSize.longSize,

@@ -197,6 +197,28 @@ public object Octet {
         }
     }
 
+    /**
+     * Reading a long integer from a Big Endian stream [src] into whichever endian architecture.
+     * */
+    public fun<E> readNet(
+        src: E, index: Int, size: Int, readOctet: ReadOctet<E, Byte>
+    ): Long = when {
+        isLittleEndian -> readLE(src, index, size, readOctet)
+        isBigEndian -> readBE(src, index, size, readOctet)
+        else -> error("Impossible endian")
+    }
+
+    /**
+     * Writing a long integer [src] as bytes from whichever endian architecture to a Big Endian stream [dst].
+     * */
+    public fun<E> writeNet(
+        src: Long, dst: E, index: Int, size: Int, writeOctet: WriteOctet<E, Byte>
+    ): Unit = when {
+        isLittleEndian -> writeLE(src, dst, index, size, writeOctet)
+        isBigEndian -> writeBE(src, dst, index, size, writeOctet)
+        else -> error("Impossible endian")
+    }
+
     public fun<E> toHex(src: Byte, data: E, index: Int, writeOctet: E.(index: Int, value: Byte) -> Unit): Int {
         data.writeOctet(index, toHexChar<Unit>((src.toInt() shr 4) and 0xf))
         data.writeOctet(index+1, toHexChar<Unit>(src.toInt() and 0xf))
