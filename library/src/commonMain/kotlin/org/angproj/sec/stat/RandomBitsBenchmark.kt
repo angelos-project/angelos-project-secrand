@@ -29,7 +29,7 @@ import org.angproj.sec.util.TypeSize
 public class RandomBitsBenchmark(obj: RandomBits): BenchmarkObject<RandomBits>(obj) {
 
     override val sampleByteSize: Int
-        get() = 8
+        get() = 16
 
     override fun nextSample(): ByteArray {
         val sample = allocSampleArray()
