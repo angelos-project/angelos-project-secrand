@@ -22,7 +22,7 @@ class securelyRandomizeTest {
 
     @Test
     fun testSecurelyRandomizeByteArray() {
-        val size = 128
+        val size = 53
         val buffer1 = ByteArray(size)
         val buffer2 = ByteArray(size)
 
@@ -37,7 +37,7 @@ class securelyRandomizeTest {
 
     @Test
     fun testSecurelyRandomizeShortArray() {
-        val size = 64
+        val size = 36
         val buffer1 = ShortArray(size)
         val buffer2 = ShortArray(size)
 
@@ -52,7 +52,7 @@ class securelyRandomizeTest {
 
     @Test
     fun testSecurelyRandomizeIntArray() {
-        val size = 32
+        val size = 25
         val buffer1 = IntArray(size)
         val buffer2 = IntArray(size)
 
@@ -67,7 +67,7 @@ class securelyRandomizeTest {
 
     @Test
     fun testSecurelyRandomizeLongArray() {
-        val size = 16
+        val size = 17
         val buffer1 = LongArray(size)
         val buffer2 = LongArray(size)
 
