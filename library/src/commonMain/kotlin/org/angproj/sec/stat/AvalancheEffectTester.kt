@@ -43,10 +43,6 @@ public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
     private var lastSample: ByteArray = byteArrayOf()
     private var currentSample: ByteArray = byteArrayOf()
 
-    override fun name(): String {
-        return "AvalancheEffect"
-    }
-
     private fun accumulateSample() {
         var total = 0
         repeat(obj.sampleByteSize / TypeSize.longSize) { idx ->

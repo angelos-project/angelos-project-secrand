@@ -44,14 +44,3 @@ public fun hash2256(): Hash<AbstractSponge2256> = object : Hash<AbstractSponge22
 public fun hash2512(): Hash<AbstractSponge2512> = object : Hash<AbstractSponge2512>(object : AbstractSponge2512() {}) {}
 
 public fun hash21024(): Hash<AbstractSponge21024> = object : Hash<AbstractSponge21024>(object : AbstractSponge21024() {}) {}
-
-public fun<R: Sponge> macDigestOf(hashFactory: HashFactory<R>, passPhrase: ByteArray, block: Hash<R>.() -> Unit): ByteArray {
-    val alpha = hashFactory.create()
-    alpha.init()
-    alpha.update(passPhrase)
-    val beta = hashFactory.create()
-    beta.init()
-    beta.block()
-    alpha.update(beta.final())
-    return alpha.final()
-}

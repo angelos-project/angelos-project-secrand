@@ -46,10 +46,6 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
     private var totalTakenSamples: Long = 0
     private var insideCircle: Long = 0
 
-    override fun name(): String {
-        return "MonteCarlo"
-    }
-
     /**
      * Calculates the distance between two points in a 2D space.
      *

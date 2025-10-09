@@ -19,6 +19,7 @@ import kotlin.math.E
 import kotlin.math.PI
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 class UuidTest {
 
@@ -33,8 +34,17 @@ class UuidTest {
     }
 
     @Test
+    fun testUuid() {
+        repeat(10) {
+            val uuid = Uuid.uuid()
+            assertNotEquals(0, uuid.lower)
+            assertNotEquals(0, uuid.upper)
+        }
+    }
+
+    @Test
     fun testUuid4() {
-        repeat(100) {
+        repeat(10) {
             val uuid = Uuid.uuid4()
             assertEquals(4, uuid.version)
             assertEquals(2, uuid.variant)

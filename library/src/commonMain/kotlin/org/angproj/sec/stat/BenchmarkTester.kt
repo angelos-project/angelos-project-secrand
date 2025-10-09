@@ -39,11 +39,6 @@ public abstract class BenchmarkTester<B, E: BenchmarkObject<B>>(
     protected var duration: Duration = Duration.INFINITE
 
     /**
-     * Mandatory name for what is being tested
-     * */
-    public abstract fun name(): String
-
-    /**
      * Starts the benchmark timer.
      */
     public fun start() {

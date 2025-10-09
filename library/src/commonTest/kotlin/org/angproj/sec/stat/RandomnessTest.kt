@@ -382,13 +382,13 @@ class RandomnessTest {
     @Test
     fun testReadLaplace() {
         val mean = 0.0
-        val scale = 1.0
+        //val scale = 1.0
         repeat(100) {
-            val double = randomness.readLaplace(mean, scale)
+            val double = randomness.readLaplace()
             assertTrue(double.isFinite(), "Laplace must be finite")
         }
         // Estimate mean (should be mean)
-        val samples = (0 until 1000).map { randomness.readLaplace(mean, scale) }
+        val samples = (0 until 1000).map { randomness.readLaplace() }
         val sampleMean = samples.average()
         assertTrue(abs(sampleMean - mean) < 0.1, "Sample mean $sampleMean too far from $mean")
         // Test invalid input
@@ -398,13 +398,13 @@ class RandomnessTest {
     @Test
     fun testReadLogistic() {
         val mean = 0.0
-        val scale = 1.0
+        //val scale = 1.0
         repeat(100) {
-            val double = randomness.readLogistic(mean, scale)
+            val double = randomness.readLogistic()
             assertTrue(double.isFinite(), "Logistic must be finite")
         }
         // Estimate mean (should be mean)
-        val samples = (0 until 1000).map { randomness.readLogistic(mean, scale) }
+        val samples = (0 until 1000).map { randomness.readLogistic() }
         val sampleMean = samples.average()
         assertTrue(abs(sampleMean - mean) < 0.1, "Sample mean $sampleMean too far from $mean")
         // Test invalid input
@@ -414,13 +414,13 @@ class RandomnessTest {
     @Test
     fun testReadCauchy() {
         val x0 = 0.0
-        val gamma = 1.0
+        //val gamma = 1.0
         repeat(100) {
-            val double = randomness.readCauchy(x0, gamma)
+            val double = randomness.readCauchy()
             assertTrue(double.isFinite() || double.isInfinite(), "Cauchy must be finite or infinite")
         }
         // Cauchy has undefined mean, so we check median approximately
-        val samples = (0 until 1000).map { randomness.readCauchy(x0, gamma) }.filter { it.isFinite() }
+        val samples = (0 until 1000).map { randomness.readCauchy() }.filter { it.isFinite() }
         val sampleMedian = samples.sorted()[samples.size / 2]
         assertTrue(abs(sampleMedian - x0) < 1.0, "Sample median $sampleMedian too far from $x0")
         // Test invalid input
