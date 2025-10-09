@@ -17,7 +17,7 @@ package org.angproj.sec.rand
 import org.angproj.sec.util.Hash
 import org.angproj.sec.util.hash256
 
-class AbstractSponge256Test : SpongeHashTest<AbstractSponge256>() {
+class AbstractSponge256Test : SpongeTest<AbstractSponge256>() {
 
     override val emptyHash = "16ac5a3c169bbc6528f1763c28a7b6dccf9a5568cfbcd6caf656a5cff6e4b80e"
     override val singleAHash = "3fdd987dde638ac03fbd22a15c4663157b499b1fa6b8cf8f7717aea8a5cea6cd"
