@@ -230,9 +230,9 @@ public object Octet {
         else -> n - 10 + 0x61
     }.toByte()
 
-    public fun asHexSymbolString(data: ByteArray): String = buildString {
-        data.forEach {
-            toHex(it, data, -1) { _, value ->
+    public fun ByteArray.asHexSymbols(): String = buildString {
+        this@asHexSymbols.forEach {
+            toHex(it, this, -1) { _, value ->
                 append(value.toInt().toChar())
             }
         }

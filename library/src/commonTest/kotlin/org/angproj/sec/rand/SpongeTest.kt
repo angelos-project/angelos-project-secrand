@@ -15,6 +15,7 @@
 package org.angproj.sec.rand
 
 import org.angproj.sec.util.Hash
+import org.angproj.sec.util.Octet.asHexSymbols
 import org.angproj.sec.util.hashDigestOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -129,7 +130,7 @@ class HashTestGenerator {
         NamedTest.TEST_ALPHA_NUM -> alphaNumTest(hash)
         NamedTest.TEST_EIGHT_NUM -> eightNumTest(hash)
         NamedTest.TEST_MILLION_A -> millionATest(hash)
-    }.toHex()
+    }.asHexSymbols()
 
     private fun<E: Sponge> emptyTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
         update(byteArrayOf())
