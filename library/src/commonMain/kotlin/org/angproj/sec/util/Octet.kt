@@ -80,7 +80,7 @@ public object Octet {
     /**
      * @param E The type of the source to read bytes from.
      */
-    public interface ImportBytes<E> {
+    public fun interface ImportBytes<E> {
 
         /**
          * Imports a range of bytes from the given source.
@@ -98,7 +98,7 @@ public object Octet {
     /**
      * @param E The type of the source to read long integers from.
      */
-    public interface ImportLongs<E> {
+    public fun interface ImportLongs<E> {
 
         /**
          * Imports a range of long integers from the given source.
