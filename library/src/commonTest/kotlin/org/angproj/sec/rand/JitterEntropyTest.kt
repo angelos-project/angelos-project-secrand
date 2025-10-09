@@ -18,7 +18,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-class EntropyTest {
+class JitterEntropyTest {
 
     @Test
     fun testExportBytesLengthAndRandomness() {
@@ -32,7 +32,7 @@ class EntropyTest {
         assertEquals(size, buffer1.size)
         assertEquals(size, buffer2.size)
         // With high probability, two random arrays should not be equal
-        assertNotEquals(buffer1.toList(), buffer2.toList())
+        assertNotEquals(buffer1, buffer2)
     }
 
     @Test
@@ -47,6 +47,6 @@ class EntropyTest {
         assertEquals(size, buffer1.size)
         assertEquals(size, buffer2.size)
         // With high probability, two random arrays should not be equal
-        assertNotEquals(buffer1.toList(), buffer2.toList())
+        assertNotEquals(buffer1, buffer2)
     }
 }

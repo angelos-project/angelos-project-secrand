@@ -33,7 +33,7 @@ public fun interface RandomBits {
 
     public companion object {
         public fun nextBitsToLong(randomBits: RandomBits): Long {
-            return (randomBits.nextBits(TypeSize.intBits) shl TypeSize.intBits).toLong() or (randomBits.nextBits(
+            return (randomBits.nextBits(TypeSize.intBits).toLong() shl TypeSize.intBits) or (randomBits.nextBits(
                 TypeSize.intBits).toLong() and 0xFFFFFFFFL)
         }
 

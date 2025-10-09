@@ -35,7 +35,7 @@ class SecureFeedTest {
         assertEquals(size, buffer1.size)
         assertEquals(size, buffer2.size)
         // With high probability, two random arrays should not be equal
-        assertNotEquals(buffer1.toList(), buffer2.toList())
+        assertNotEquals(buffer1, buffer2)
     }
 
     @Test
@@ -50,29 +50,8 @@ class SecureFeedTest {
         assertEquals(size, buffer1.size)
         assertEquals(size, buffer2.size)
         // With high probability, two random arrays should not be equal
-        assertNotEquals(buffer1.toList(), buffer2.toList())
+        assertNotEquals(buffer1, buffer2)
     }
-
-    /*@Test
-    fun testPrintUuid() {
-        repeat(100) {
-            println(Uuid())
-        }
-
-        val array = ByteArray(1024)
-        SecureFeed.readBytes(array, 0, array.size) { index, value ->
-            array[index] = value
-        }
-        println(Octet.asHexSymbolString(array))
-
-        SecureEntropy.readBytes(array, 0, array.size) { index, value ->
-            array[index] = value
-        }
-        println(Octet.asHexSymbolString(array))
-
-        SecureRandom.readBytes(array)
-        println(Octet.asHexSymbolString(array))
-    }*/
 
     @Test
     fun testHealthCheck() {
