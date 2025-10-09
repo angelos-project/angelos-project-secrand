@@ -83,4 +83,10 @@ class SecureFeedTest {
             assertFalse(true)
         }
     }
+
+    @Test
+    fun testTotalBits() {
+        SecureFeed.nextBits(21)
+        assertNotEquals(0, SecureFeed.totalBits)
+    }
 }

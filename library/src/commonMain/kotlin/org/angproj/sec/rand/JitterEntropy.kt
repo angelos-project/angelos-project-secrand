@@ -114,7 +114,7 @@ public object JitterEntropy {
         require(length <= 1024) { "Too large for time-gated entropy! Max 1Kb." }
 
         var pos = 0
-        repeat(length.ceilDiv(TypeSize.intSize)) { index ->
+        repeat(length.ceilDiv(TypeSize.intSize)) { _ ->
             val bytes = min(TypeSize.intSize, length - pos)
             var entropy = state.nextBits(bytes * TypeSize.byteBits)
             repeat(bytes) {

@@ -59,4 +59,10 @@ class SecureEntropyTest {
             assertFalse(true)
         }
     }
+
+    @Test
+    fun testTotalBits() {
+        SecureEntropy.readLongs(LongArray(2), 0, 2) { idx, value -> this[idx] = value }
+        assertNotEquals(0, SecureEntropy.totalBits)
+    }
 }

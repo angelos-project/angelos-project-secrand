@@ -59,4 +59,9 @@ class OctetTest {
         beBuffer.reverse()
         assertContentEquals(leBuffer, beBuffer)
     }
+
+    @Test
+    fun testAsHexSymbol() {
+        assertEquals(Octet.asHexSymbolString(byteArrayOf(0x11, 0x22, 0x33, 0x44)), "11223344")
+    }
 }

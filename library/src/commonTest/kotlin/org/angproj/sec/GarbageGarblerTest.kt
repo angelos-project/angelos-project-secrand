@@ -169,6 +169,13 @@ class GarbageGarblerTest {
     }
 
     @Test
+    fun testReadBytes() {
+        val buffer = ByteArray(16)
+        GarbageGarbler().readBytes(buffer)
+        assertNotEquals(0, buffer.sum())
+    }
+
+    @Test
     fun testHealthCheck() {
         try {
             val garbler = GarbageGarbler()
@@ -177,5 +184,13 @@ class GarbageGarblerTest {
         } catch (_: IllegalStateException) {
             assertFalse(true)
         }
+    }
+
+    @Test
+    fun testTotalBits() {
+        val garbler = GarbageGarbler()
+        assertEquals(0, garbler.totalBits)
+        garbler.readByte()
+        assertEquals(8, garbler.totalBits)
     }
 }

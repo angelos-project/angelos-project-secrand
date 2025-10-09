@@ -149,10 +149,10 @@ class UtilityTest {
     @Test
     fun testEnsureMandatory() {
         assertFailsWith<RuntimeException> {
-            val value: Long = when {
+            when {
                 1 < 2 -> ensure { RuntimeException("This should fail") }
                 else -> 3L
-            }
+            }.toInt()
         }
     }
 }

@@ -16,6 +16,7 @@ package org.angproj.sec.rand
 
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.floorMod
+import kotlin.jvm.JvmStatic
 
 /**
  * `AbstractSponge` is an abstract base class for cryptographic sponge constructions,
@@ -139,6 +140,7 @@ public abstract class AbstractSponge(
      * simple output prediction or state recovery.
      */
     protected companion object {
+        @JvmStatic
         protected val export: List<Int> = listOf(
             3, 7, 11, 19, 23, 31, 43, 47, 59, 67, 71, 79, 83, 103, 107, 127
         )
