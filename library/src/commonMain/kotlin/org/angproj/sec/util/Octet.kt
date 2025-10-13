@@ -140,7 +140,7 @@ public object Octet {
         size: Int,
         readOctet: ReadOctet<E, Byte>
     ): Long {
-        require(size in TypeSize.shortSize..TypeSize.longSize)
+        require(size in 1 .. TypeSize.longSize)
         var dst: Long = 0
         repeat(size) {
             dst = dst or ((src.readOctet(index + it).toLong() shl (8 * (size - 1 - it))) and (0xffL shl (8 * (size - 1 - it))))
@@ -158,7 +158,7 @@ public object Octet {
         size: Int,
         writeOctet: WriteOctet<E, Byte>
     ) {
-        require(size in TypeSize.shortSize..TypeSize.longSize)
+        require(size in 1 .. TypeSize.longSize)
         repeat(size) {
             dst.writeOctet(it + index, ((src ushr ((size - 1) - it) * 8) and 0xff).toByte())
         }
@@ -173,7 +173,7 @@ public object Octet {
         size: Int,
         readOctet: ReadOctet<E, Byte>
     ): Long {
-        require(size in TypeSize.shortSize..TypeSize.longSize)
+        require(size in 1 .. TypeSize.longSize)
         var dst: Long = 0
         repeat(size) {
             dst = dst or ((src.readOctet(index + it).toLong() shl (8 * it)) and (0xffL shl (8 * it)))
@@ -191,7 +191,7 @@ public object Octet {
         size: Int,
         writeOctet: WriteOctet<E, Byte>
     ) {
-        require(size in TypeSize.shortSize..TypeSize.longSize)
+        require(size in 1 .. TypeSize.longSize)
         repeat(size) {
             dst.writeOctet(it + index, ((src ushr it * 8) and 0xff).toByte())
         }

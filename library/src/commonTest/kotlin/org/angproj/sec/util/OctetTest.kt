@@ -23,7 +23,7 @@ class OctetTest {
 
     @Test
     fun testReverseOrderReadWrite() {
-        (2 .. 8).forEach { size ->
+        (1 .. 8).forEach { size ->
             val testData = 0x1122334455667788L ushr (64 - (size * 8))
 
             val buffer = ByteArray(8)
@@ -41,7 +41,7 @@ class OctetTest {
 
     @Test
     fun testLitterEndianOrderReadWrite() {
-        (2 .. 8).forEach { size ->
+        (1 .. 8).forEach { size ->
             val testData = 0x1122334455667788L ushr (64 - (size * 8))
 
             val buffer = ByteArray(8)

@@ -17,6 +17,22 @@ package org.angproj.sec.util
 import org.angproj.sec.rand.Sponge
 import org.angproj.sec.util.Octet.importBytes
 
+public class HashAbsorber(private val sponge: Sponge) {
+
+    private var _position = 0
+
+    public val position: Int
+        get() = _position
+
+    public fun absorb(value: Long) {
+        sponge.absorb(value, _position++)
+        if(_position == sponge.visibleSize) {
+            _position = 0
+            sponge.round()
+        }
+    }
+}
+
 /**
  * Abstract base class for hash functions using a sponge construction.
  *
