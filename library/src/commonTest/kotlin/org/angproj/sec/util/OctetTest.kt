@@ -27,11 +27,11 @@ class OctetTest {
             val testData = 0x1122334455667788L ushr (64 - (size * 8))
 
             val buffer = ByteArray(8)
-            Octet.writeBE(testData, buffer, 0, size) { index, value ->
+            Octet.write(testData, buffer, 0, size) { index, value ->
                 buffer[index] = value
             }
 
-            val readLong = Octet.readBE(buffer, 0, size) { index ->
+            val readLong = Octet.read(buffer, 0, size) { index ->
                 buffer[index]
             }
 
@@ -45,11 +45,11 @@ class OctetTest {
             val testData = 0x1122334455667788L ushr (64 - (size * 8))
 
             val buffer = ByteArray(8)
-            Octet.writeLE(testData, buffer, 0, size) { index, value ->
+            Octet.writeRev(testData, buffer, 0, size) { index, value ->
                 buffer[index] = value
             }
 
-            val readLong = Octet.readLE(buffer, 0, size) { index ->
+            val readLong = Octet.readRev(buffer, 0, size) { index ->
                 buffer[index]
             }
 
@@ -62,12 +62,12 @@ class OctetTest {
         val testData = 0x1122334455667788L
 
         val leBuffer = ByteArray(8)
-        Octet.writeLE(testData, leBuffer, 0, leBuffer.size) { index, value ->
+        Octet.writeRev(testData, leBuffer, 0, leBuffer.size) { index, value ->
             leBuffer[index] = value
         }
 
         val beBuffer = ByteArray(8)
-        Octet.writeBE(testData, beBuffer, 0, beBuffer.size) { index, value ->
+        Octet.write(testData, beBuffer, 0, beBuffer.size) { index, value ->
             beBuffer[index] = value
         }
 

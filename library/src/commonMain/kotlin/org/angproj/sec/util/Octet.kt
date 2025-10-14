@@ -120,11 +120,11 @@ public object Octet {
         val valueData = 0x1122334455667788L
         val streamData = ByteArray(8) { (0x11 * (it+1)).toByte() }
 
-        isLittleEndian = readLE(streamData, 0, streamData.size) { index ->
+        isLittleEndian = readRev(streamData, 0, streamData.size) { index ->
             streamData[index]
         } == valueData
 
-        isBigEndian = readBE(streamData, 0, streamData.size) { index ->
+        isBigEndian = read(streamData, 0, streamData.size) { index ->
             streamData[index]
         } == valueData
 
@@ -134,7 +134,7 @@ public object Octet {
     /**
      * Reading a long integer from a Big Endian stream [src] into a Little Endian architecture.
      * */
-    public fun<E> readLE(
+    public fun<E> readRev(
         src: E,
         index: Int,
         size: Int,
@@ -151,7 +151,7 @@ public object Octet {
     /**
      * Writing a long integer [src] as bytes from a Little Endian architecture to a Big Endian stream [dst].
      * */
-    public fun<E> writeLE(
+    public fun<E> writeRev(
         src: Long,
         dst: E,
         index: Int,
@@ -167,7 +167,7 @@ public object Octet {
     /**
      * Reading a long integer from a Big Endian stream [src] into a Big Endian architecture.
      * */
-    public fun<E> readBE(
+    public fun<E> read(
         src: E,
         index: Int,
         size: Int,
@@ -184,7 +184,7 @@ public object Octet {
     /**
      * Writing a long integer [src] as bytes from a Big Endian architecture to a Big Endian stream [dst].
      * */
-    public fun<E> writeBE(
+    public fun<E> write(
         src: Long,
         dst: E,
         index: Int,
@@ -203,8 +203,8 @@ public object Octet {
     public fun<E> readNet(
         src: E, index: Int, size: Int, readOctet: ReadOctet<E, Byte>
     ): Long = when {
-        isLittleEndian -> readLE(src, index, size, readOctet)
-        isBigEndian -> readBE(src, index, size, readOctet)
+        isLittleEndian -> readRev(src, index, size, readOctet)
+        isBigEndian -> read(src, index, size, readOctet)
         else -> error("Impossible endian")
     }
 
@@ -214,8 +214,8 @@ public object Octet {
     public fun<E> writeNet(
         src: Long, dst: E, index: Int, size: Int, writeOctet: WriteOctet<E, Byte>
     ): Unit = when {
-        isLittleEndian -> writeLE(src, dst, index, size, writeOctet)
-        isBigEndian -> writeBE(src, dst, index, size, writeOctet)
+        isLittleEndian -> writeRev(src, dst, index, size, writeOctet)
+        isBigEndian -> write(src, dst, index, size, writeOctet)
         else -> error("Impossible endian")
     }
 

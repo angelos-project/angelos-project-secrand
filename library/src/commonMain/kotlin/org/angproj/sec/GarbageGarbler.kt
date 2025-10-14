@@ -69,7 +69,7 @@ public class GarbageGarbler: Security(), RandomBits, Randomness {
 
     override fun reseedImpl() {
         repeat(sponge.visibleSize) {
-            val data = Octet.readNet(entropy, it * TypeSize.longSize, TypeSize.longSize) { index ->
+            val data = Octet.read(entropy, it * TypeSize.longSize, TypeSize.longSize) { index ->
                 this[index]
             }
             sponge.absorb(data, it)

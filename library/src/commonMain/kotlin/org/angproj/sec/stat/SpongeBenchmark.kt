@@ -39,7 +39,7 @@ public class SpongeBenchmark(obj: Sponge): BenchmarkObject<Sponge>(obj) {
     override fun nextSample(): ByteArray {
         val sample = allocSampleArray()
         repeat(sampleByteSize / TypeSize.longSize) {
-            Octet.writeNet(
+            Octet.write(
                 obj.squeeze(it),
                 sample,
                 it * TypeSize.longSize,
