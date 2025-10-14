@@ -23,22 +23,22 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 
-public object FuzzerOctetReadKt : FuzzPrefs() {
+public object FuzzerOctetWriteKt : FuzzPrefs() {
 
     @JvmStatic
     public fun fuzzerTestOneInput(data: FuzzedDataProvider) {
         val value = data.consumeLong()
         val array = ByteArray(8)
 
+        Octet.write(value, array, 0, array.size) { index, value ->
+            array[index] = value
+        }
+
         val buffer = ByteBuffer.wrap(array)
         if(ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
             buffer.order(ByteOrder.LITTLE_ENDIAN)
         }
-        buffer.putLong(value)
-
-        val loaded = Octet.read(array, 0, array.size) { index ->
-            array[index]
-        }
+        val loaded = buffer.getLong()
 
         assertEquals(value, loaded)
     }
