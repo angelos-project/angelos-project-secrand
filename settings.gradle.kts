@@ -34,3 +34,4 @@ plugins {
 
 include(":library")
 include(":benchmark")
+include(":jazzer")
