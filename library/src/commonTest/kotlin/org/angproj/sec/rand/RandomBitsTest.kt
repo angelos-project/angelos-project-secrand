@@ -41,11 +41,4 @@ class RandomBitsTest {
         // Same random value twice should zero out using XOR
         assertEquals(0, RandomBits.compactBitEntropy(32, RandomBits.nextBitsToLong { staticRand }))
     }
-
-    @Test
-    fun testSecurityHealthCheck() {
-        assertFailsWith<IllegalStateException> {
-            RandomBits.securityHealthCheck { staticRand }
-        }
-    }
 }

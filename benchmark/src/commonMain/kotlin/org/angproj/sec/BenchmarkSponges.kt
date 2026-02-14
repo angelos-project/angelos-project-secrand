@@ -51,7 +51,11 @@ public fun healthCheck(sponge: Sponge): Boolean {
 }
 
 
-public fun main(args: Array<String>) {
+public fun main(args: Array<String> = arrayOf()) {
+    if(args.isNotEmpty()) {
+        println("Arguments provided, skipping benchmarks. Arguments: " + args.joinToString(", "))
+    }
+
     mapOf(
         "AbstractSponge256" to object : AbstractSponge256() {},
         "AbstractSponge512" to object : AbstractSponge512() {},

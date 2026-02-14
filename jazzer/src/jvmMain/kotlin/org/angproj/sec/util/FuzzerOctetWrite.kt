@@ -30,8 +30,8 @@ public object FuzzerOctetWriteKt : FuzzPrefs() {
         val value = data.consumeLong()
         val array = ByteArray(8)
 
-        Octet.write(value, array, 0, array.size) { index, value ->
-            array[index] = value
+        Octet.write(value, array, 0, array.size) { index, v ->
+            array[index] = v
         }
 
         val buffer = ByteBuffer.wrap(array)

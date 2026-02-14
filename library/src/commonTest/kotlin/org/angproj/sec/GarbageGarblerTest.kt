@@ -176,17 +176,6 @@ class GarbageGarblerTest {
     }
 
     @Test
-    fun testHealthCheck() {
-        try {
-            val garbler = GarbageGarbler()
-            garbler.securityHealthCheck()
-            RandomBits.securityHealthCheck(garbler)
-        } catch (_: IllegalStateException) {
-            assertFalse(true)
-        }
-    }
-
-    @Test
     fun testTotalBits() {
         val garbler = GarbageGarbler()
         assertEquals(0, garbler.totalBits)

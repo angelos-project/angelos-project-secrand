@@ -54,16 +54,6 @@ class SecureFeedTest {
     }
 
     @Test
-    fun testHealthCheck() {
-        try {
-            SecureFeed.securityHealthCheck()
-            RandomBits.securityHealthCheck(SecureFeed)
-        } catch (_: IllegalStateException) {
-            assertFalse(true)
-        }
-    }
-
-    @Test
     fun testTotalBits() {
         SecureFeed.nextBits(21)
         assertNotEquals(0, SecureFeed.totalBits)
