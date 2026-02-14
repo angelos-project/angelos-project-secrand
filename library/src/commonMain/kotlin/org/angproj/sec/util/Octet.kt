@@ -265,4 +265,51 @@ public object Octet {
             return res
         }
     }
+
+    public data class Sanity(
+        val total: Int,
+        val ones: Int,
+        val zeros: Int,
+        val hex: List<Int>,
+        val runs: List<Int>,
+        val longRuns: Int
+    )
+
+    public fun sanityCheck(entropy: ByteArray): Sanity {
+        if (entropy.isEmpty()) throw IllegalArgumentException("Entropy cannot be empty")
+
+        var total = 0
+        var longRun = 0
+        val runs = IntArray(20)
+        val hex = IntArray(16)
+        var run = 0
+        var ones = 0
+        var zeros = 0
+        var last = false
+        var data = 0
+
+        if (entropy.isNotEmpty()) {
+            last = (entropy[0].toInt() ushr 7 and 1) == 1
+        }
+
+        entropy.bitIterator().forEach { bit ->
+            total++
+            data = (data shl 1) or if (bit) 1 else 0
+            if(total % 4 == 0) hex[data and 0xF]++
+            if (bit) ones++ else zeros++
+            if (bit == last) run++ else {
+                if (run > 0) {
+                    if (run > 20) longRun++ else runs[run - 1]++
+                }
+                last = bit
+                run = 1
+            }
+        }
+
+        if (run > 0) {
+            if (run > 20) longRun++ else runs[run - 1]++
+        }
+
+        return Sanity(total, ones, zeros, hex.toList(), runs.toList(), longRun)
+    }
 }
