@@ -247,4 +247,22 @@ public object Octet {
     public fun ByteArray.exportBytes(importer: ImportBytes<ByteArray>, readOctet: ReadOctet<ByteArray, Byte>) {
         importer.import(this, 0, this.size, readOctet)
     }
+
+    public fun ByteArray.bitIterator(range: IntRange = 0..lastIndex): Iterator<Boolean> = bitIterator(range, this) { index ->
+        this[index]
+    }
+
+    public fun<E> bitIterator(range: IntRange, src: E, readOctet: ReadOctet<E, Byte>): Iterator<Boolean> = object : Iterator<Boolean> {
+        private var current = 0
+        private var pos = range.first * 8
+        private val end = (range.last + 1) * 8 - 1
+        override fun hasNext() = pos <= end
+        override fun next(): Boolean {
+            val bitIndex = 7 - (pos % 8)
+            if(bitIndex == 7) current = src.readOctet(pos / 8).toInt() and 0xff
+            val res = (current and (1 shl bitIndex)) != 0
+            pos++
+            return res
+        }
+    }
 }
