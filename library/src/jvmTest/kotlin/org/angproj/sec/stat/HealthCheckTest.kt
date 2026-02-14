@@ -18,12 +18,8 @@ import org.angproj.sec.GarbageGarbler
 import org.angproj.sec.SecureEntropy
 import org.angproj.sec.SecureFeed
 import org.angproj.sec.rand.RandomBits
-import org.angproj.sec.rand.RandomBitsTest
 import kotlin.test.Test
-import kotlin.test.assertContains
-import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
 import kotlin.test.*
 
 class HealthCheckTest {
