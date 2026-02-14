@@ -275,8 +275,12 @@ public object Octet {
         val longRuns: Int
     )
 
-    public fun sanityCheck(entropy: ByteArray): Sanity {
-        if (entropy.isEmpty()) throw IllegalArgumentException("Entropy cannot be empty")
+    public fun<E> sanityCheck(
+        src: E,
+        size: Int,
+        readOctet: ReadOctet<E, Byte>
+    ): Sanity {
+        check(size > 0) { "Entropy cannot be empty" }
 
         var total = 0
         var longRun = 0
@@ -288,11 +292,7 @@ public object Octet {
         var last = false
         var data = 0
 
-        if (entropy.isNotEmpty()) {
-            last = (entropy[0].toInt() ushr 7 and 1) == 1
-        }
-
-        entropy.bitIterator().forEach { bit ->
+        fun stat(bit: Boolean) {
             total++
             data = (data shl 1) or if (bit) 1 else 0
             if(total % 4 == 0) hex[data and 0xF]++
@@ -304,6 +304,13 @@ public object Octet {
                 last = bit
                 run = 1
             }
+        }
+
+        val iter = bitIterator(0 until size, src, readOctet)
+        last = iter.next().also { stat(it) }
+
+        iter.forEach { bit ->
+            stat(bit)
         }
 
         if (run > 0) {
