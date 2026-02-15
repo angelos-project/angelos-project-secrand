@@ -16,6 +16,8 @@ package org.angproj.sec.stat
 
 import org.angproj.sec.util.bitStatisticCollection
 import kotlin.math.abs
+import kotlin.math.exp
+import kotlin.math.floor
 import kotlin.math.sqrt
 import kotlin.math.pow
 import kotlin.math.log2
@@ -64,6 +66,21 @@ public fun BitStatistic.checkEntropy(threshold: Double = 0.99): Boolean {
     val freq = hex.map { it.toDouble() / (total / 4) }  // Nibbles
     val ent = -freq.filter { it > 0 }.sumOf { it * log2(it) }
     return ent > threshold * 4.0  // Max 4 for nibbles
+}
+
+public fun BitStatistic.checkRunDistribution(tolerance: Double = 5.0): Boolean {
+    val logExp = log2(total / 4.0)
+    val length = floor(logExp).toInt()-3
+    return runs.indices.all { kIdx ->
+        when(kIdx) {
+            in 0..length -> {
+                val expectation = 2.0.pow(logExp - kIdx.toDouble())
+                val deviance = (0.031 * exp(0.341 * ((kIdx + 1.0) - logExp + 8.488))) * expectation * tolerance
+                runs[kIdx].toDouble() in (expectation - deviance)..(expectation + deviance)
+            }
+            else -> true
+        }
+    }
 }
 
 // Long runs: longRuns == 0

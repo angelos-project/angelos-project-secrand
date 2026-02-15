@@ -90,7 +90,7 @@ public fun main(args: Array<String> = arrayOf()) {
         val bitStat = bitStatisticOf(entropy)
 
         val logExp = log2(bitStat.total / 4.0)
-        val length = floor(logExp).toInt()-4
+        val length = floor(logExp).toInt()-3
         var allInside = true
         (0..length).forEach { idx ->
             val expectation = 2.0.pow(logExp - idx.toDouble())
