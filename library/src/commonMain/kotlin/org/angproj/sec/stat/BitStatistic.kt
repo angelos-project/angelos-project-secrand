@@ -51,16 +51,6 @@ public fun BitStatistic.checkPatternUniformity(alpha: Double = 0.01): Boolean {
     return chi2 <= 30.58  // Approx for alpha=0.01
 }
 
-// Runs: for each k, |o - e| < tolerance * sqrt(e)
-public fun BitStatistic.checkRuns(tolerance: Double = 3.0): Boolean {
-    val n = total.toDouble()
-    return runs.indices.all { kIdx ->
-        val k = kIdx + 1
-        val e = (n - k + 3) / 2.0.pow(k + 1)
-        abs(runs[kIdx].toDouble() - e) < tolerance * sqrt(e)
-    }
-}
-
 // Shannon entropy: > threshold * log2(16) for nibbles
 public fun BitStatistic.checkEntropy(threshold: Double = 0.99): Boolean {
     val freq = hex.map { it.toDouble() / (total / 4) }  // Nibbles
@@ -88,8 +78,8 @@ public fun BitStatistic.checkLongRuns(): Boolean = longRuns == 0
 
 public fun BitStatistic.isValid(): Boolean = checkBitBalance(3.0)
         && checkPatternUniformity(0.01)
-        && checkRuns(3.0)
         && checkEntropy(0.99)
+        && checkRunDistribution(5.0)
         && checkLongRuns()
 
 public fun BitStatistic.toReport(): String = """
