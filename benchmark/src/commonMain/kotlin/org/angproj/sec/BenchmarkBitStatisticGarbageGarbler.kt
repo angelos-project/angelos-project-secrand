@@ -33,7 +33,7 @@ public fun main(args: Array<String> = arrayOf()) {
         println("Arguments provided, skipping benchmarks. Arguments: " + args.joinToString(", "))
     }
 
-    val garbler = GarbageGarbler()
+    val garbler = SecureRandom
     repeat(32) { exp ->
         val entropy = ByteArray((exp + 1) * 1024) // 16 MiB
 
@@ -71,7 +71,7 @@ public fun main(args: Array<String> = arrayOf()) {
             //println("k=${idx + 1}; max $value, avg ${avg[idx] / loops}, factor ${value / (avg[idx] / loops)}")
         }
         println()
-    }
+    } //Yes, $  f(k, \log Exp) \approx 0.031 e^{0.341(k - \log Exp + 8.488)}  $, RMSE 0.008.
 
 
     /*var fails = 0
@@ -103,4 +103,11 @@ public fun main(args: Array<String> = arrayOf()) {
     println("Fails: $fails, Total: $total, Fail rate: ${fails.toDouble() / total}")
 
     println(bitStatisticOf(entropy).toReport())*/
+}
+
+import kotlin.math.exp
+
+// Yes, $ f(k, \log Exp) \approx 0.031 e^{0.341(k - \log Exp + 8.488)} $, RMSE 0.008.
+public fun f(k: Double, logExp: Double): Double {
+    return 0.031 * exp(0.341 * (k - logExp + 8.488))
 }
