@@ -60,7 +60,7 @@ public fun BitStatistic.checkEntropy(threshold: Double = 0.99): Boolean {
 
 public fun BitStatistic.checkRunDistribution(tolerance: Double = 5.0): Boolean {
     val logExp = log2(total / 4.0)
-    val length = floor(logExp).toInt()-3
+    val length = floor(logExp).toInt()-3 // Check runs up to log2(n/4) - 3
     return runs.indices.all { kIdx ->
         when(kIdx) {
             in 0..length -> {
