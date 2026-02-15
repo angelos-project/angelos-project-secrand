@@ -67,3 +67,8 @@ public fun BitStatistic.checkRuns(tolerance: Double = 3.0): List<Boolean> {
 public fun BitStatistic.checkLongRuns(maxAllowed: Int = 0): Boolean {
     return longRuns <= maxAllowed
 }
+
+public fun BitStatistic.isValid(): Boolean = checkBitBalance(3.0) &&
+        checkPatternUniformity(0.01) &&
+        checkRuns(3.0).all { it } &&
+        checkLongRuns(0)
