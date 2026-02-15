@@ -15,6 +15,7 @@
 package org.angproj.sec.stat
 
 import org.angproj.sec.util.bitStatisticCollection
+import kotlin.math.abs
 import kotlin.math.sqrt
 import kotlin.math.pow
 import kotlin.math.log2
@@ -33,49 +34,43 @@ public fun bitStatisticOf(entropy: ByteArray): BitStatistic = bitStatisticCollec
     this[idx]
 }
 
-// Check if ones and zeros are balanced (within ~3 std devs of n/2)
+// Bit balance: |ones - n/2| < tolerance * sqrt(n/4)
 public fun BitStatistic.checkBitBalance(tolerance: Double = 3.0): Boolean {
     val n = total.toDouble()
-    val expected = n / 2
-    val stdDev = sqrt(n / 4)
-    val lower = expected - tolerance * stdDev
-    val upper = expected + tolerance * stdDev
-    return ones.toDouble() in lower..upper && zeros.toDouble() in lower..upper
+    val diff = abs(ones.toDouble() - n / 2)
+    return diff < tolerance * sqrt(n / 4)
 }
 
-// Chi-square test for nibble uniformity (pattern)
+// Nibble chi2: sum((o-e)^2/e) <= critical (df=15, alpha=0.01 ~30.58)
 public fun BitStatistic.checkPatternUniformity(alpha: Double = 0.01): Boolean {
-    val totalNibbles = total / 4
-    val expected = totalNibbles.toDouble() / 16
-    var chi2 = 0.0
-    hex.forEach { observed ->
-        chi2 += (observed.toDouble() - expected).pow(2.0) / expected
-    }
-    // Degrees of freedom = 15, critical value for alpha=0.01 is ~30.58 (from chi-square table)
-    val criticalValue = 30.58  // Adjust or use a library for exact quantile
-    return chi2 <= criticalValue
+    val totalNibbles = total / 4.toDouble()
+    val e = totalNibbles / 16
+    val chi2 = hex.sumOf { (it.toDouble() - e).pow(2) / e }
+    return chi2 <= 30.58  // Approx for alpha=0.01
 }
 
-// Check runs distribution against expected (returns list of booleans for each k=1 to runs.size)
-public fun BitStatistic.checkRuns(tolerance: Double = 3.0): List<Boolean> {
+// Runs: for each k, |o - e| < tolerance * sqrt(e)
+public fun BitStatistic.checkRuns(tolerance: Double = 3.0): Boolean {
     val n = total.toDouble()
-    return runs.indices.map { idx ->
-        val k = idx + 1
-        val expected = (n - k + 3) / 2.0.pow((k + 1).toDouble())
-        val stdDev = sqrt(expected)  // Poisson approx
-        val lower = expected - tolerance * stdDev
-        val upper = expected + tolerance * stdDev
-        val observed = runs[idx].toDouble()
-        observed in lower.coerceAtLeast(0.0)..upper
+    return runs.indices.all { kIdx ->
+        val k = kIdx + 1
+        val e = (n - k + 3) / 2.0.pow(k + 1)
+        abs(runs[kIdx].toDouble() - e) < tolerance * sqrt(e)
     }
 }
 
-// Simple check for long runs (should be 0 or very low for crypto randomness)
-public fun BitStatistic.checkLongRuns(maxAllowed: Int = 0): Boolean {
-    return longRuns <= maxAllowed
+// Shannon entropy: > threshold * log2(16) for nibbles
+public fun BitStatistic.checkEntropy(threshold: Double = 0.99): Boolean {
+    val freq = hex.map { it.toDouble() / (total / 4) }  // Nibbles
+    val ent = -freq.filter { it > 0 }.sumOf { it * log2(it) }
+    return ent > threshold * 4.0  // Max 4 for nibbles
 }
 
-public fun BitStatistic.isValid(): Boolean = checkBitBalance(3.0) &&
-        checkPatternUniformity(0.01) &&
-        checkRuns(3.0).all { it } &&
-        checkLongRuns(0)
+// Long runs: longRuns == 0
+public fun BitStatistic.checkLongRuns(): Boolean = longRuns == 0
+
+public fun BitStatistic.isValid(): Boolean = checkBitBalance(3.0)
+        && checkPatternUniformity(0.01)
+        && checkRuns(3.0)
+        && checkEntropy(0.99)
+        && checkLongRuns()
