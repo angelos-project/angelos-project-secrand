@@ -14,9 +14,11 @@
  */
 package org.angproj.sec.stat
 
-import org.angproj.sec.util.Octet
+import org.angproj.sec.util.bitStatisticCollection
 import kotlin.math.sqrt
 import kotlin.math.pow
+import kotlin.math.log2
+
 
 public data class BitStatistic(
     val total: Int,
@@ -27,7 +29,7 @@ public data class BitStatistic(
     val longRuns: Int
 )
 
-public fun bitStatisticOf(entropy: ByteArray): BitStatistic = Octet.sanityCheck(entropy, entropy.size) { idx ->
+public fun bitStatisticOf(entropy: ByteArray): BitStatistic = bitStatisticCollection(entropy, entropy.size) { idx ->
     this[idx]
 }
 
@@ -47,7 +49,7 @@ public fun BitStatistic.checkPatternUniformity(alpha: Double = 0.01): Boolean {
     val expected = totalNibbles.toDouble() / 16
     var chi2 = 0.0
     hex.forEach { observed ->
-        chi2 += pow(observed.toDouble() - expected, 2.0) / expected
+        chi2 += (observed.toDouble() - expected).pow(2.0) / expected
     }
     // Degrees of freedom = 15, critical value for alpha=0.01 is ~30.58 (from chi-square table)
     val criticalValue = 30.58  // Adjust or use a library for exact quantile
@@ -59,7 +61,7 @@ public fun BitStatistic.checkRuns(tolerance: Double = 3.0): List<Boolean> {
     val n = total.toDouble()
     return runs.indices.map { idx ->
         val k = idx + 1
-        val expected = (n - k + 3) / pow(2.0, (k + 1).toDouble())
+        val expected = (n - k + 3) / 2.0.pow((k + 1).toDouble())
         val stdDev = sqrt(expected)  // Poisson approx
         val lower = expected - tolerance * stdDev
         val upper = expected + tolerance * stdDev
