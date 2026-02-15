@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.stat
 
+import org.angproj.sec.util.Octet
 import kotlin.math.sqrt
 import kotlin.math.pow
 
@@ -25,6 +26,10 @@ public data class BitStatistic(
     val runs: List<Int>,
     val longRuns: Int
 )
+
+public fun bitStatisticOf(entropy: ByteArray): BitStatistic = Octet.sanityCheck(entropy, entropy.size) { idx ->
+    this[idx]
+}
 
 // Check if ones and zeros are balanced (within ~3 std devs of n/2)
 public fun BitStatistic.checkBitBalance(tolerance: Double = 3.0): Boolean {
