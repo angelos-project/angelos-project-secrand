@@ -14,8 +14,6 @@
  */
 package org.angproj.sec.util
 
-import org.angproj.sec.stat.BitStatistic
-
 
 public typealias WriteOctet<E, T> = E.(index: Int, value: T) -> Unit
 
@@ -266,50 +264,5 @@ public object Octet {
             pos++
             return res
         }
-    }
-
-    public fun<E> sanityCheck(
-        src: E,
-        size: Int,
-        readOctet: ReadOctet<E, Byte>
-    ): BitStatistic {
-        check(size > 0) { "Entropy cannot be empty" }
-
-        var total = 0
-        var longRun = 0
-        val runs = IntArray(20)
-        val hex = IntArray(16)
-        var run = 0
-        var ones = 0
-        var zeros = 0
-        var last = false
-        var data = 0
-
-        fun stat(bit: Boolean) {
-            total++
-            data = (data shl 1) or if (bit) 1 else 0
-            if(total % 4 == 0) hex[data and 0xF]++
-            if (bit) ones++ else zeros++
-            if (bit == last) run++ else {
-                if (run > 0) {
-                    if (run > 20) longRun++ else runs[run - 1]++
-                }
-                last = bit
-                run = 1
-            }
-        }
-
-        val iter = bitIterator(0 until size, src, readOctet)
-        last = iter.next().also { stat(it) }
-
-        iter.forEach { bit ->
-            stat(bit)
-        }
-
-        if (run > 0) {
-            if (run > 20) longRun++ else runs[run - 1]++
-        }
-
-        return BitStatistic(total, ones, zeros, hex.toList(), runs.toList(), longRun)
     }
 }
