@@ -14,6 +14,8 @@
  */
 package org.angproj.sec.util
 
+import org.angproj.sec.stat.BitStatistic
+
 
 public typealias WriteOctet<E, T> = E.(index: Int, value: T) -> Unit
 
@@ -266,20 +268,11 @@ public object Octet {
         }
     }
 
-    public data class Sanity(
-        val total: Int,
-        val ones: Int,
-        val zeros: Int,
-        val hex: List<Int>,
-        val runs: List<Int>,
-        val longRuns: Int
-    )
-
     public fun<E> sanityCheck(
         src: E,
         size: Int,
         readOctet: ReadOctet<E, Byte>
-    ): Sanity {
+    ): BitStatistic {
         check(size > 0) { "Entropy cannot be empty" }
 
         var total = 0
@@ -317,6 +310,6 @@ public object Octet {
             if (run > 20) longRun++ else runs[run - 1]++
         }
 
-        return Sanity(total, ones, zeros, hex.toList(), runs.toList(), longRun)
+        return BitStatistic(total, ones, zeros, hex.toList(), runs.toList(), longRun)
     }
 }

@@ -14,53 +14,31 @@
  */
 package org.angproj.sec.stat
 
+import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.RandomBits
-import org.angproj.sec.rand.Sponge
-import org.angproj.sec.util.TypeSize
+import org.angproj.sec.rand.RandomBits.Companion.compactBitEntropy
+import org.angproj.sec.rand.RandomBits.Companion.nextBitsToLong
 import org.angproj.sec.util.toUnitFraction
 import kotlin.math.abs
 import kotlin.math.pow
-import kotlin.random.Random
 import kotlin.test.*
 
-class RandomMock : Randomness, RandomBits, Sponge {
+class RandomMock : AbstractSponge256(), Randomness, RandomBits {
     override fun readByte(): Byte = nextBits(8).toByte()
     override fun readShort(): Short = nextBits(16).toShort()
     override fun readInt(): Int = nextBits(32)
     override fun readBytes(data: ByteArray, offset: Int, size: Int) {
-        Random.nextBytes(data, offset, offset + size)
+        (offset until offset + size).forEach { data[it] = nextBits(8).toByte() }
     }
 
     override fun readDouble(): Double {
         // Mocking the generation of a uniform random double in [0.0, 1.0)
-        return nextBits(32).toUnitFraction().toDouble()
+        return nextBitsToLong(this).toUnitFraction()
     }
 
     override fun nextBits(bits: Int): Int {
-        return Random.nextBits(bits)
-    }
-
-    override val spongeSize: Int
-        get() = 4
-    override val visibleSize: Int
-        get() = 4
-    override val byteSize: Int
-        get() = 4 * TypeSize.longSize
-
-    override fun reset() {
-        error("Not mocked")
-    }
-
-    override fun round() {
-
-    }
-
-    override fun absorb(value: Long, position: Int) {
-        error("Not mocked")
-    }
-
-    override fun squeeze(position: Int): Long {
-        return Random.nextLong()
+        round()
+        return compactBitEntropy(bits, squeeze(0))
     }
 }
 
