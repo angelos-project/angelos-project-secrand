@@ -14,7 +14,10 @@
  */
 package org.angproj.sec.stat
 
+import org.angproj.sec.SecureRandomException
+import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.bitStatisticCollection
+import org.angproj.sec.util.ensure
 import kotlin.math.abs
 import kotlin.math.exp
 import kotlin.math.floor
@@ -70,7 +73,16 @@ public fun BitStatistic.checkRunDistribution(tolerance: Double = 5.0): Boolean {
 // Long runs: longRuns == 0
 public fun BitStatistic.checkLongRuns(): Boolean = longRuns == 0
 
-public fun BitStatistic.isValid(strict: Boolean = false): Boolean = checkBitBalance()
-        && checkHexUniformity()
-        && checkRunDistribution()
-        && if(strict) checkLongRuns() else true
+public fun BitStatistic.securityHealthCheck(): Boolean {
+    ensure<SecureRandomException>(
+        total in (1024 * TypeSize.byteBits)..(32 * 1024 * TypeSize.byteBits)
+    ) { SecureRandomException("Chunk size not between 1K and 32K bytes long.") }
+    return checkBitBalance() && checkHexUniformity() && checkRunDistribution()
+}
+
+public fun BitStatistic.cryptoHealthCheck(): Boolean {
+    ensure<SecureRandomException>(
+        total in (32 * TypeSize.byteBits)..(1024 * TypeSize.byteBits)
+    ) { SecureRandomException("Chunk size not between 32 and 1024 bytes long.") }
+    return checkLongRuns()
+}

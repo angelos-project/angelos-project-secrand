@@ -22,6 +22,7 @@ import org.angproj.sec.util.Octet
 import org.angproj.sec.rand.RandomBits
 import org.angproj.sec.util.ReadOctet
 import org.angproj.sec.util.TypeSize
+import org.angproj.sec.util.ensure
 import kotlin.math.min
 
 
@@ -129,7 +130,7 @@ public class GarbageGarbler: Security(), RandomBits, Randomness {
      */
     override fun nextBits(bits: Int): Int {
         require(bits in 1..TypeSize.intBits) { "Bits must be between 1 and 32" }
-        check(remainingBits >= bits) { "GarbageGarbler has depleted" }
+        ensure<SecureRandomException>(remainingBits >= bits) { SecureRandomException("GarbageGarbler has depleted") }
         return sponge.getNextBits(bits)
     }
 

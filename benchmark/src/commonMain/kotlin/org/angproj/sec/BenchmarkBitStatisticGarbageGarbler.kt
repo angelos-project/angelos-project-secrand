@@ -59,7 +59,7 @@ public fun calculateBitRunDistributionAverage() {
 
         println("Avg runs difference:")
 
-        max.forEachIndexed { idx, value ->
+        max.forEachIndexed { idx, _ ->
             println("k=${idx + 1}; avg ${avg[idx] / loops}")
             //println("k=${idx + 1}; max $value, avg ${avg[idx] / loops}")
             //println("k=${idx + 1}; max $value, avg ${avg[idx] / loops}, factor ${value / (avg[idx] / loops)}")
@@ -101,7 +101,7 @@ public fun calculateBitPatternUniformityAverage() {
 
         println("Avg runs difference:")
 
-        max.forEachIndexed { idx, value ->
+        max.forEachIndexed { idx, _ ->
             println("k=${idx + 1}; avg ${avg[idx] / loops}")
             //println("k=${idx + 1}; max $value, avg ${avg[idx] / loops}")
             //println("k=${idx + 1}; max $value, avg ${avg[idx] / loops}, factor ${value / (avg[idx] / loops)}")
@@ -180,7 +180,7 @@ public fun main(args: Array<String> = arrayOf()) {
             if (!bitStat.checkRunDistribution()) runDistributionFails++
             if (!bitStat.checkLongRuns()) longRunFails++
 
-            if(bitStat.isValid()) {
+            if(bitStat.securityHealthCheck()) {
                 totalInside++
             }
         }

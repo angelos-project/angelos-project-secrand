@@ -14,12 +14,14 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.SecureRandomException
 import org.angproj.sec.stat.BenchmarkSession
 import org.angproj.sec.stat.MonteCarloTester
 import org.angproj.sec.stat.SpongeBenchmark
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.WriteOctet
 import org.angproj.sec.util.ceilDiv
+import org.angproj.sec.util.ensure
 import org.angproj.sec.util.incrementWithWrap
 import kotlin.math.PI
 import kotlin.math.abs
@@ -172,6 +174,7 @@ public abstract class Security {
      * Throws an exception if the health check fails.
      */
     public fun securityHealthCheck() {
-        check(healthCheck(sponge)) { "Security health check failed!" }
+        ensure<SecureRandomException>(healthCheck(sponge)) {
+            SecureRandomException("Security health check failed!") }
     }
 }
