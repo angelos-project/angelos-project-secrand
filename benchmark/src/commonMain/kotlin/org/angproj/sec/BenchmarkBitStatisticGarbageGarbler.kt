@@ -22,6 +22,7 @@ import kotlin.math.exp
 import kotlin.math.log2
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.random.Random
 
 
 public fun calculateBitRunDistributionAverage() {
@@ -114,9 +115,9 @@ public fun main(args: Array<String> = arrayOf()) {
         println("Arguments provided, skipping benchmarks. Arguments: " + args.joinToString(", "))
     }
 
-    calculateBitPatternUniformityAverage()
+    //calculateBitPatternUniformityAverage()
 
-    /*val garbler = SecureRandom
+    val garbler = SecureRandom
     val entropy = ByteArray(8 * 1024) // 16 MiB
 
     val loops = 10000
@@ -127,11 +128,26 @@ public fun main(args: Array<String> = arrayOf()) {
     repeat(loops) {
         garbler.readBytes(entropy)
         val bitStat = bitStatisticOf(entropy)
-        if(bitStat.checkBitBalance(3.5)) {
+
+        var allInside = 0
+        val average = bitStat.hex.sum() / 16.0
+        bitStat.hex.sorted().forEachIndexed { idx, value ->
+            val expectation = average
+            val factor = 0.188 * exp(0.299 * abs((idx + 1.0) - 8.48)) / sqrt(average)
+            val deviance = factor * expectation * (0.137 / factor)
+            val variance = (expectation - deviance)..(expectation + deviance)
+            val inside = value.toDouble() in variance
+            if(inside) {
+                allInside++
+            }
+            //println("$idx, $average, $value, $variance, $inside")
+        }
+
+        if(allInside == 16) {
             totalInside++
         }
     }
-    println("Total inside: $totalInside / $loops, percentage: ${totalInside.toDouble() / loops * 100}%")*/
+    println("Total inside: $totalInside / $loops, percentage: ${totalInside.toDouble() / loops * 100}%")
 
 
     /*var fails = 0
