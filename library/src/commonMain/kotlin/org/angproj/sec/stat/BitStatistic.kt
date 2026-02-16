@@ -18,6 +18,7 @@ import org.angproj.sec.util.bitStatisticCollection
 import kotlin.math.abs
 import kotlin.math.exp
 import kotlin.math.floor
+import kotlin.math.log
 import kotlin.math.sqrt
 import kotlin.math.pow
 import kotlin.math.log2
@@ -43,12 +44,12 @@ public fun BitStatistic.checkBitBalance(tolerance: Double = 3.0): Boolean {
     return diff < tolerance * sqrt(n / 4)
 }
 
-public fun BitStatistic.checkHexUniformity(): Boolean {
+public fun BitStatistic.checkHexUniformity(tolerance: Double = 3.7): Boolean {
     val n = hex.sum() / 16.0
     val order = hex.sorted()
     return order.indices.all { kIdx ->
         val factor = 0.188 * exp(0.299 * abs((kIdx + 1.0) - 8.48)) / sqrt(n)
-        val deviance = factor * n * (0.137 / factor)
+        val deviance = factor * n * tolerance
         order[kIdx].toDouble() in (n - deviance)..(n + deviance)
     }
 }
