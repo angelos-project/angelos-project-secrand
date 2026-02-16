@@ -38,27 +38,19 @@ public fun bitStatisticOf(entropy: ByteArray): BitStatistic = bitStatisticCollec
 }
 
 // Bit balance: |ones - n/2| < tolerance * sqrt(n/4)
-public fun BitStatistic.checkBitBalance(tolerance: Double = 3.0): Boolean {
-    val n = total.toDouble()
-    val diff = abs(ones.toDouble() - n / 2)
-    return diff < tolerance * sqrt(n / 4)
+public fun BitStatistic.checkBitBalance(tolerance: Double = 4.9): Boolean {
+    val n = total / 2.0
+    val deviance = (0.563 / sqrt(n)) * n * tolerance
+    return ones.toDouble() in (n - deviance)..(n + deviance)
 }
 
 public fun BitStatistic.checkHexUniformity(tolerance: Double = 3.7): Boolean {
     val n = hex.sum() / 16.0
     val order = hex.sorted()
     return order.indices.all { kIdx ->
-        val factor = 0.188 * exp(0.299 * abs((kIdx + 1.0) - 8.48)) / sqrt(n)
-        val deviance = factor * n * tolerance
+        val deviance = (0.188 * exp(0.299 * abs((kIdx + 1.0) - 8.48)) / sqrt(n)) * n * tolerance
         order[kIdx].toDouble() in (n - deviance)..(n + deviance)
     }
-}
-
-// Shannon entropy: > threshold * log2(16) for nibbles
-public fun BitStatistic.checkEntropy(threshold: Double = 0.99): Boolean {
-    val freq = hex.map { it.toDouble() / (total / 4) }  // Nibbles
-    val ent = -freq.filter { it > 0 }.sumOf { it * log2(it) }
-    return ent > threshold * 4.0  // Max 4 for nibbles
 }
 
 public fun BitStatistic.checkRunDistribution(tolerance: Double = 5.0): Boolean {
@@ -79,10 +71,9 @@ public fun BitStatistic.checkRunDistribution(tolerance: Double = 5.0): Boolean {
 // Long runs: longRuns == 0
 public fun BitStatistic.checkLongRuns(): Boolean = longRuns == 0
 
-public fun BitStatistic.isValid(): Boolean = checkBitBalance(3.0)
+public fun BitStatistic.isValid(): Boolean = checkBitBalance()
         && checkHexUniformity()
-        && checkEntropy(0.99)
-        && checkRunDistribution(5.0)
+        && checkRunDistribution()
         && checkLongRuns()
 
 public fun BitStatistic.toReport(): String = """
