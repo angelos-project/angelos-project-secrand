@@ -20,6 +20,7 @@ import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.exp
 import kotlin.math.log2
+import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
@@ -110,15 +111,53 @@ public fun calculateBitPatternUniformityAverage() {
 }
 
 
+public fun calculateBitBalanceAverage() {
+    val garbler = SecureRandom
+    repeat(32) { exp ->
+        val entropy = ByteArray((exp + 1) * 1024) // 16 MiB
+
+        var max = 0.0
+        var avg = 0.0
+
+        val loops = 10000
+
+        println("average: ${entropy.size * 8 / 2.0}")
+
+        repeat(loops) {
+            garbler.readBytes(entropy)
+            val bitStat = bitStatisticOf(entropy)
+
+            val average = bitStat.total / 2.0
+            //val expectation = 2.0.pow(logExp - idx.toDouble())
+            val difference = average - bitStat.ones
+            //val difference = abs(expectation - bitStat.runs[idx])
+            val deviation = difference.div(average).absoluteValue
+            //val tolerance = log(difference +1, idx.toDouble()+1)
+            //println("$idx, $average, $value, $difference, $deviation")
+            max = max(max, deviation)
+            avg += deviation
+        }
+
+        println("Avg runs difference:")
+
+        println("avg ${avg / loops}")
+        //println("max $max, avg ${avg / loops}")
+        //println("max $max, avg ${avg / loops}, factor ${max / (avg / loops)}")
+
+        println()
+    }
+}
+
+
 public fun main(args: Array<String> = arrayOf()) {
     if(args.isNotEmpty()) {
         println("Arguments provided, skipping benchmarks. Arguments: " + args.joinToString(", "))
     }
 
-    //calculateBitPatternUniformityAverage()
+    calculateBitBalanceAverage()
 
-    val garbler = SecureRandom
-    val entropy = ByteArray(8 * 1024) // 16 MiB
+    /*val garbler = SecureRandom
+    val entropy = ByteArray(4 * 1024) // 16 MiB
 
     val loops = 10000
     var totalInside = 0
@@ -127,13 +166,14 @@ public fun main(args: Array<String> = arrayOf()) {
 
     repeat(loops) {
         garbler.readBytes(entropy)
+        //Random.nextBytes(entropy)
         val bitStat = bitStatisticOf(entropy)
 
-        if(bitStat.checkHexUniformity()) {
+        if(bitStat.checkHexUniformity() && bitStat.checkRunDistribution()) {
             totalInside++
         }
     }
-    println("Total inside: $totalInside / $loops, percentage: ${totalInside.toDouble() / loops * 100}%")
+    println("Total inside: $totalInside / $loops, percentage: ${totalInside.toDouble() / loops * 100}%")*/
 
 
     /*var fails = 0
@@ -175,4 +215,8 @@ public fun stdDev(k: Double, logExp: Double): Double {
 
 public fun f(k: Double, average: Double): Double {
     return 0.188 * exp(0.299 * abs(k - 8.48)) / sqrt(average)
+}
+
+public fun f(average: Double): Double {
+    return 0.563 / sqrt(average)
 }
