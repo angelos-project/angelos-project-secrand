@@ -18,7 +18,6 @@ import org.angproj.sec.util.bitStatisticCollection
 import kotlin.math.abs
 import kotlin.math.exp
 import kotlin.math.floor
-import kotlin.math.log
 import kotlin.math.sqrt
 import kotlin.math.pow
 import kotlin.math.log2
@@ -71,10 +70,10 @@ public fun BitStatistic.checkRunDistribution(tolerance: Double = 5.0): Boolean {
 // Long runs: longRuns == 0
 public fun BitStatistic.checkLongRuns(): Boolean = longRuns == 0
 
-public fun BitStatistic.isValid(): Boolean = checkBitBalance()
+public fun BitStatistic.isValid(strict: Boolean = false): Boolean = checkBitBalance()
         && checkHexUniformity()
         && checkRunDistribution()
-        && checkLongRuns()
+        && if(strict) checkLongRuns() else true
 
 public fun BitStatistic.toReport(): String = """
     Total bits: $total

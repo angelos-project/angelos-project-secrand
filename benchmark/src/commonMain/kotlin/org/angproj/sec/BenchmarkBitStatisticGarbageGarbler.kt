@@ -154,29 +154,46 @@ public fun main(args: Array<String> = arrayOf()) {
         println("Arguments provided, skipping benchmarks. Arguments: " + args.joinToString(", "))
     }
 
-    calculateBitBalanceAverage()
+    //calculateBitBalanceAverage()
 
-    /*val garbler = SecureRandom
-    val entropy = ByteArray(4 * 1024) // 16 MiB
+    val garbler = SecureRandom
+    repeat(32) { exp ->
+        val entropy = ByteArray((exp + 1) * 1024) // 16 MiB
 
-    val loops = 10000
-    var totalInside = 0
+        val loops = 10000
+        var totalInside = 0
 
-    println("logExp: ${log2(entropy.size *4 / 4.0)}")
+        var bitBalanceFails = 0
+        var hexUniformityFails = 0
+        var runDistributionFails = 0
+        var longRunFails = 0
 
-    repeat(loops) {
-        garbler.readBytes(entropy)
-        //Random.nextBytes(entropy)
-        val bitStat = bitStatisticOf(entropy)
+        println("logExp: ${log2(entropy.size *4 / 4.0)}")
 
-        if(bitStat.checkHexUniformity() && bitStat.checkRunDistribution()) {
-            totalInside++
+        repeat(loops) {
+            garbler.readBytes(entropy)
+            //Random.nextBytes(entropy)
+            val bitStat = bitStatisticOf(entropy)
+
+            if (!bitStat.checkBitBalance()) bitBalanceFails++
+            if (!bitStat.checkHexUniformity()) hexUniformityFails++
+            if (!bitStat.checkRunDistribution()) runDistributionFails++
+            if (!bitStat.checkLongRuns()) longRunFails++
+
+            if(bitStat.isValid()) {
+                totalInside++
+            }
         }
+        println("Bit balance fails: $bitBalanceFails")
+        println("Hex uniformity fails: $hexUniformityFails")
+        println("Run distribution fails: $runDistributionFails")
+        println("Long run fails: $longRunFails")
+        println("Total inside: $totalInside / $loops, percentage: ${totalInside.toDouble() / loops * 100}%")
     }
-    println("Total inside: $totalInside / $loops, percentage: ${totalInside.toDouble() / loops * 100}%")*/
 
 
-    /*var fails = 0
+    /*
+    var fails = 0
     var total = 0
     var bitBalanceFails = 0
     var patternUniformityFails = 0
