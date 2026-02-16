@@ -25,6 +25,7 @@ import org.angproj.sec.stat.AvalancheEffectTester
 import org.angproj.sec.stat.BenchmarkSession
 import org.angproj.sec.stat.MonteCarloTester
 import org.angproj.sec.stat.SpongeBenchmark
+import kotlin.jvm.JvmStatic
 import kotlin.math.PI
 import kotlin.math.abs
 
@@ -50,22 +51,24 @@ public fun healthCheck(sponge: Sponge): Boolean {
             abs(PI - results[monteCarlo]!!.keyValue) > 0.01)
 }
 
+public object BenchmarkSponges {
+    @JvmStatic
+    public fun main(args: Array<String> = arrayOf()) {
+        if(args.isNotEmpty()) {
+            println("Arguments provided, skipping benchmarks. Arguments: " + args.joinToString(", "))
+        }
 
-public fun main(args: Array<String> = arrayOf()) {
-    if(args.isNotEmpty()) {
-        println("Arguments provided, skipping benchmarks. Arguments: " + args.joinToString(", "))
-    }
-
-    mapOf(
-        "AbstractSponge256" to object : AbstractSponge256() {},
-        "AbstractSponge512" to object : AbstractSponge512() {},
-        "AbstractSponge1024" to object : AbstractSponge1024() {},
-        "AbstractSponge2256" to object : AbstractSponge2256() {},
-        "AbstractSponge2512" to object : AbstractSponge2512() {},
-        "AbstractSponge21024" to object : AbstractSponge21024() {}
-    ).forEach {
-        println("Benchmarking: " + it.key)
-        println("Result: " + healthCheck(it.value))
-        println()
+        mapOf(
+            "AbstractSponge256" to object : AbstractSponge256() {},
+            "AbstractSponge512" to object : AbstractSponge512() {},
+            "AbstractSponge1024" to object : AbstractSponge1024() {},
+            "AbstractSponge2256" to object : AbstractSponge2256() {},
+            "AbstractSponge2512" to object : AbstractSponge2512() {},
+            "AbstractSponge21024" to object : AbstractSponge21024() {}
+        ).forEach {
+            println("Benchmarking: " + it.key)
+            println("Result: " + healthCheck(it.value))
+            println()
+        }
     }
 }

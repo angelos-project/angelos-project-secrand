@@ -16,6 +16,7 @@ package org.angproj.sec
 
 import org.angproj.sec.stat.bitStatisticOf
 import org.angproj.sec.stat.*
+import kotlin.jvm.JvmStatic
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.exp
@@ -148,80 +149,50 @@ public fun calculateBitBalanceAverage() {
     }
 }
 
-
-public fun main(args: Array<String> = arrayOf()) {
-    if(args.isNotEmpty()) {
-        println("Arguments provided, skipping benchmarks. Arguments: " + args.joinToString(", "))
-    }
-
-    //calculateBitBalanceAverage()
-
-    val garbler = SecureRandom
-    repeat(32) { exp ->
-        val entropy = ByteArray((exp + 1) * 1024) // 16 MiB
-
-        val loops = 10000
-        var totalInside = 0
-
-        var bitBalanceFails = 0
-        var hexUniformityFails = 0
-        var runDistributionFails = 0
-        var longRunFails = 0
-
-        println("logExp: ${log2(entropy.size *4 / 4.0)}")
-
-        repeat(loops) {
-            garbler.readBytes(entropy)
-            //Random.nextBytes(entropy)
-            val bitStat = bitStatisticOf(entropy)
-
-            if (!bitStat.checkBitBalance()) bitBalanceFails++
-            if (!bitStat.checkHexUniformity()) hexUniformityFails++
-            if (!bitStat.checkRunDistribution()) runDistributionFails++
-            if (!bitStat.checkLongRuns()) longRunFails++
-
-            if(bitStat.securityHealthCheck()) {
-                totalInside++
-            }
+public object BenchmarkBitStatistic {
+    @JvmStatic
+    public fun main(args: Array<String> = arrayOf()) {
+        if(args.isNotEmpty()) {
+            println("Arguments provided, skipping benchmarks. Arguments: " + args.joinToString(", "))
         }
-        println("Bit balance fails: $bitBalanceFails")
-        println("Hex uniformity fails: $hexUniformityFails")
-        println("Run distribution fails: $runDistributionFails")
-        println("Long run fails: $longRunFails")
-        println("Total inside: $totalInside / $loops, percentage: ${totalInside.toDouble() / loops * 100}%")
+
+        //calculateBitBalanceAverage()
+
+        val garbler = SecureRandom
+        repeat(32) { exp ->
+            val entropy = ByteArray((exp + 1) * 1024) // 16 MiB
+
+            val loops = 10000
+            var totalInside = 0
+
+            var bitBalanceFails = 0
+            var hexUniformityFails = 0
+            var runDistributionFails = 0
+            var longRunFails = 0
+
+            println("logExp: ${log2(entropy.size *4 / 4.0)}")
+
+            repeat(loops) {
+                garbler.readBytes(entropy)
+                //Random.nextBytes(entropy)
+                val bitStat = bitStatisticOf(entropy)
+
+                if (!bitStat.checkBitBalance()) bitBalanceFails++
+                if (!bitStat.checkHexUniformity()) hexUniformityFails++
+                if (!bitStat.checkRunDistribution()) runDistributionFails++
+                if (!bitStat.checkLongRuns()) longRunFails++
+
+                if(bitStat.securityHealthCheck()) {
+                    totalInside++
+                }
+            }
+            println("Bit balance fails: $bitBalanceFails")
+            println("Hex uniformity fails: $hexUniformityFails")
+            println("Run distribution fails: $runDistributionFails")
+            println("Long run fails: $longRunFails")
+            println("Total inside: $totalInside / $loops, percentage: ${totalInside.toDouble() / loops * 100}%")
+        }
     }
-
-
-    /*
-    var fails = 0
-    var total = 0
-    var bitBalanceFails = 0
-    var patternUniformityFails = 0
-    var runsFails = 0
-    var entropyFails = 0
-    var longRunsFails = 0
-
-
-    while (total < 100) {
-        garbler.readBytes(entropy)
-        //Random.nextBytes(entropy)
-        total++
-        val bitStat = bitStatisticOf(entropy)
-        if (!bitStat.checkBitBalance()) bitBalanceFails++
-        if (!bitStat.checkPatternUniformity()) patternUniformityFails++
-        if (!bitStat.checkRuns()) runsFails++
-        if (!bitStat.checkEntropy(0.99)) entropyFails++
-        if (!bitStat.checkLongRuns()) longRunsFails++
-        if (!bitStat.isValid()) fails++
-    }
-    println("Bit balance fails: $bitBalanceFails")
-    println("Pattern uniformity fails: $patternUniformityFails")
-    println("Runs fails: $runsFails")
-    println("Entropy fails: $entropyFails")
-    println("Long runs fails: $longRunsFails")
-    println("Fails: $fails, Total: $total, Fail rate: ${fails.toDouble() / total}")
-
-    println(bitStatisticOf(entropy).toReport())*/
 }
 
 // RMSE 0.008.
