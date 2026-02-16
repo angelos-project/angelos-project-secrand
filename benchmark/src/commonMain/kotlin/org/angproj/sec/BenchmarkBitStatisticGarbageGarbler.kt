@@ -129,21 +129,7 @@ public fun main(args: Array<String> = arrayOf()) {
         garbler.readBytes(entropy)
         val bitStat = bitStatisticOf(entropy)
 
-        var allInside = 0
-        val average = bitStat.hex.sum() / 16.0
-        bitStat.hex.sorted().forEachIndexed { idx, value ->
-            val expectation = average
-            val factor = 0.188 * exp(0.299 * abs((idx + 1.0) - 8.48)) / sqrt(average)
-            val deviance = factor * expectation * (0.137 / factor)
-            val variance = (expectation - deviance)..(expectation + deviance)
-            val inside = value.toDouble() in variance
-            if(inside) {
-                allInside++
-            }
-            //println("$idx, $average, $value, $variance, $inside")
-        }
-
-        if(allInside == 16) {
+        if(bitStat.checkHexUniformity()) {
             totalInside++
         }
     }

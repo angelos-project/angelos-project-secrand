@@ -45,8 +45,8 @@ public fun BitStatistic.checkBitBalance(tolerance: Double = 3.0): Boolean {
 
 public fun BitStatistic.checkHexUniformity(): Boolean {
     val n = hex.sum() / 16.0
-    val order =hex.sorted()
-    return order.all { kIdx ->
+    val order = hex.sorted()
+    return order.indices.all { kIdx ->
         val factor = 0.188 * exp(0.299 * abs((kIdx + 1.0) - 8.48)) / sqrt(n)
         val deviance = factor * n * (0.137 / factor)
         order[kIdx].toDouble() in (n - deviance)..(n + deviance)
