@@ -74,12 +74,3 @@ public fun BitStatistic.isValid(strict: Boolean = false): Boolean = checkBitBala
         && checkHexUniformity()
         && checkRunDistribution()
         && if(strict) checkLongRuns() else true
-
-public fun BitStatistic.toReport(): String = """
-    Total bits: $total
-    Ones: $ones
-    Zeros: $zeros
-    Hex counts: ${hex.joinToString(", ")}
-    Runs counts: ${runs.joinToString(", ")}
-    Long runs: $longRuns
-""".trimIndent()
