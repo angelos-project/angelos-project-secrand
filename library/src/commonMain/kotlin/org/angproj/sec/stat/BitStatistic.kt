@@ -43,12 +43,14 @@ public fun BitStatistic.checkBitBalance(tolerance: Double = 3.0): Boolean {
     return diff < tolerance * sqrt(n / 4)
 }
 
-// Nibble chi2: sum((o-e)^2/e) <= critical (df=15, alpha=0.01 ~30.58)
-public fun BitStatistic.checkPatternUniformity(alpha: Double = 0.01): Boolean {
-    val totalNibbles = total / 4.toDouble()
-    val e = totalNibbles / 16
-    val chi2 = hex.sumOf { (it.toDouble() - e).pow(2) / e }
-    return chi2 <= 30.58  // Approx for alpha=0.01
+public fun BitStatistic.checkHexUniformity(): Boolean {
+    val n = hex.sum() / 16.0
+    val order =hex.sorted()
+    return order.all { kIdx ->
+        val factor = 0.188 * exp(0.299 * abs((kIdx + 1.0) - 8.48)) / sqrt(n)
+        val deviance = factor * n * (0.137 / factor)
+        order[kIdx].toDouble() in (n - deviance)..(n + deviance)
+    }
 }
 
 // Shannon entropy: > threshold * log2(16) for nibbles
@@ -77,7 +79,7 @@ public fun BitStatistic.checkRunDistribution(tolerance: Double = 5.0): Boolean {
 public fun BitStatistic.checkLongRuns(): Boolean = longRuns == 0
 
 public fun BitStatistic.isValid(): Boolean = checkBitBalance(3.0)
-        && checkPatternUniformity(0.01)
+        && checkHexUniformity()
         && checkEntropy(0.99)
         && checkRunDistribution(5.0)
         && checkLongRuns()
