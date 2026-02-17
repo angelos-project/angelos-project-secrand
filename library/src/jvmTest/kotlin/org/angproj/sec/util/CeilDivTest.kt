@@ -20,6 +20,12 @@ import kotlin.test.assertEquals
 
 class CeilDivTest {
 
+    fun refImpl(dividend: Long, divisor: Long): Long {
+        val q: Long = dividend / divisor
+        val r: Long = dividend % divisor
+        return q + if (r != 0L && (dividend >= 0) == (divisor >= 0)) 1 else 0
+    }
+
     @Test
     fun testCeilDiv() {
         repeat(10) {
@@ -30,8 +36,8 @@ class CeilDivTest {
 
             assertEquals(
                 dividend.ceilDiv(divisor),
-                Math.ceilDiv(dividend, divisor),
-                "Failed for dividend: $dividend, divisor: $divisor"
+                refImpl(dividend.toLong(), divisor.toLong()).toInt(),
+                //"Failed for dividend: $dividend, divisor: $divisor"
             )
         }
     }
@@ -46,8 +52,8 @@ class CeilDivTest {
 
             assertEquals(
                 dividend.ceilDiv(divisor),
-                Math.ceilDiv(dividend, divisor),
-                "Failed for dividend: $dividend, divisor: $divisor"
+                refImpl(dividend, divisor),
+                //"Failed for dividend: $dividend, divisor: $divisor"
             )
         }
     }
