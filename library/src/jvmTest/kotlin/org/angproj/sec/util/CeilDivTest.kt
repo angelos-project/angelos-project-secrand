@@ -36,7 +36,7 @@ class CeilDivTest {
 
             assertEquals(
                 dividend.ceilDiv(divisor),
-                refImpl(dividend.toLong(), divisor.toLong()).toInt(),
+                Math.ceilDiv(dividend, divisor),
                 //"Failed for dividend: $dividend, divisor: $divisor"
             )
         }
@@ -52,7 +52,7 @@ class CeilDivTest {
 
             assertEquals(
                 dividend.ceilDiv(divisor),
-                refImpl(dividend, divisor),
+                Math.ceilDiv(dividend, divisor),
                 //"Failed for dividend: $dividend, divisor: $divisor"
             )
         }

@@ -3,12 +3,12 @@ version: 2.1
 executors:
   gradle:
     docker:
-      - image: cimg/openjdk:17.0   # bump to 23.0 or 24.0 when you upgrade wrapper
+      - image: cimg/android:2026.02   # Official Android image (Java 21 + full SDK)
     resource_class: medium
 
 jobs:
   build-test-and-publish-local:
-    executor: gradle
+    executor: gradle-android
     environment:
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g"
     steps:
@@ -26,6 +26,16 @@ jobs:
                 -o gradle/wrapper/gradle-wrapper.jar \
                 "https://raw.githubusercontent.com/gradle/gradle/v${GRADLE_VERSION}/gradle/wrapper/gradle-wrapper.jar"
             fi
+
+      # Android SDK licenses (safe no-op if already accepted)  # With android sdk
+      - run:
+          name: Accept Android licenses
+          command: yes | sdkmanager --licenses || true
+
+      # Suppress K/N warning on Linux CI (common for KMP)  # With android sdk
+      - run:
+          name: Configure Kotlin Native for CI
+          command: echo "kotlin.native.ignoreDisabledTargets=true" >> gradle.properties
 
       - restore_cache:
           keys:
