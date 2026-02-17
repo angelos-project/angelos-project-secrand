@@ -1,5 +1,7 @@
-documentation:
-  MissingKDocClass:
-    excludes: ["**/src/commonTest/**", "**/src/jvmTest/**"]
-  MissingKDocFunction:
-    excludes: ["**/src/commonTest/**", "**/src/jvmTest/**"]
+comments:
+  UndocumentedPublicClass:
+    excludes: ["**/commonTest/**", "**/jvmTest/**", "**/androidTest/**"]
+  UndocumentedPublicFunction:
+    excludes: ["**/commonTest/**", "**/jvmTest/**", "**/androidTest/**"]
+  UndocumentedPublicProperty:
+    excludes: ["**/commonTest/**", "**/jvmTest/**", "**/androidTest/**"]
