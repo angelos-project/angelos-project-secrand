@@ -36,7 +36,8 @@ class CeilDivTest {
 
             assertEquals(
                 dividend.ceilDiv(divisor),
-                Math.ceilDiv(dividend, divisor),
+                refImpl(dividend.toLong(), divisor.toLong()).toInt(),
+                //Math.ceilDiv(dividend, divisor), // Downgrade to Java 17
                 //"Failed for dividend: $dividend, divisor: $divisor"
             )
         }
@@ -52,7 +53,8 @@ class CeilDivTest {
 
             assertEquals(
                 dividend.ceilDiv(divisor),
-                Math.ceilDiv(dividend, divisor),
+                refImpl(dividend, divisor)
+                //Math.ceilDiv(dividend, divisor), // Downgrade to Java 17
                 //"Failed for dividend: $dividend, divisor: $divisor"
             )
         }
