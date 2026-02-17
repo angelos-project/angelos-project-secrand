@@ -14,6 +14,35 @@ jobs:
     steps:
       - checkout
 
+      # === GRADLE VERSION ONLY (unchanged from last suggestion) ===
+      - run:
+          name: Extract Gradle version for cache key
+          command: |
+            GRADLE_VERSION=$(grep -o 'gradle-[0-9.]*' gradle/wrapper/gradle-wrapper.properties | cut -d- -f2)
+            echo "Gradle version: $GRADLE_VERSION"
+            echo "$GRADLE_VERSION" > /tmp/gradle-cache-key.txt
+
+      # === KOTLIN VERSION ONLY for Konan ===
+      - run:
+          name: Extract Kotlin version for Konan cache key
+          command: |
+            KOTLIN_VERSION=$(grep 'kotlin =' gradle/libs.versions.toml | cut -d'"' -f2)
+            echo "Kotlin version: $KOTLIN_VERSION"
+            echo "$KOTLIN_VERSION" > /tmp/kotlin-cache-key.txt
+
+      # === RESTORE BOTH CACHES ===
+      - restore_cache:
+          name: Restore Gradle cache
+          keys:
+            - gradle-v1-{{ checksum "/tmp/gradle-cache-key.txt" }}
+            - gradle-v1-
+
+      - restore_cache:
+          name: Restore Kotlin/Native (Konan) cache
+          keys:
+            - konan-v1-{{ checksum "/tmp/kotlin-cache-key.txt" }}
+            - konan-v1-
+
       # === FULLY DYNAMIC & FUTURE-PROOF GRADLE WRAPPER JAR ===
       - run:
           name: Ensure Gradle Wrapper JAR
@@ -36,11 +65,6 @@ jobs:
       - run:
           name: Configure Kotlin Native for CI
           command: echo "kotlin.native.ignoreDisabledTargets=true" >> gradle.properties
-
-      - restore_cache:
-          keys:
-            - gradle-cache-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-            - gradle-cache-v2-
 
       - run:
           name: Run allTests
@@ -69,6 +93,20 @@ jobs:
           paths:
             - build/
             - .gradle/
+
+      # === SAVE BOTH CACHES ===
+      - save_cache:
+          name: Save Gradle cache
+          key: gradle-v1-{{ checksum "/tmp/gradle-cache-key.txt" }}
+          paths:
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
+
+      - save_cache:
+          name: Save Kotlin/Native (Konan) cache
+          key: konan-v1-{{ checksum "/tmp/kotlin-cache-key.txt" }}
+          paths:
+            - ~/.konan
 
 workflows:
   version: 2
