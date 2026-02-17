@@ -1,5 +1,5 @@
 documentation:
   MissingKDocClass:
-    excludes: ["**/src/commonTest/**", "**/src/jvmText/**"]
+    excludes: ["**/src/commonTest/**", "**/src/jvmTest/**"]
   MissingKDocFunction:
-    excludes: ["**/src/commonTest/**", "**/src/jvmText/**"]
+    excludes: ["**/src/commonTest/**", "**/src/jvmTest/**"]
