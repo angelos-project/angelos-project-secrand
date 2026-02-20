@@ -103,6 +103,23 @@ commands:
           key: m2-v1-{{ checksum "/tmp/m2-cache-key.txt" }}
           paths:
             - ~/.m2
+  prepare:
+    steps:
+      - checkout
+      - extract_gradle_version
+      - extract_kotlin_version
+      - extract_m2_version
+      - restore_gradle_cache
+      - restore_konan_cache
+      - restore_m2_cache
+      - ensure_gradle_wrapper
+      - accept_android_licenses
+      - configure_kotlin_native
+  cleanup:
+    steps:
+      - save_gradle_cache
+      - save_konan_cache
+      - save_m2_cache
 
 jobs:
   build-test-and-publish-local:
