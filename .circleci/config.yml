@@ -7,6 +7,12 @@ executors:
     resource_class: medium
 
 commands:
+  extract_m2_version:
+    steps:
+      - run:
+          name: Extract LocalRepo name
+          command: |
+            echo "m2-v1" > /tmp/m2-cache-key.txt
   extract_gradle_version:
     steps:
       - run:
@@ -33,6 +39,12 @@ commands:
           keys:
             - konan-v1-{{ checksum "/tmp/kotlin-cache-key.txt" }}
             - konan-v1-
+  restore_m2_cache:
+    steps:
+      - restore_cache:
+          keys:
+            - m2-v1-{{ checksum "/tmp/m2-cache-key.txt" }}
+            - m2-v1-
   ensure_gradle_wrapper:
     steps:
       - run:
@@ -85,6 +97,12 @@ commands:
           key: konan-v1-{{ checksum "/tmp/kotlin-cache-key.txt" }}
           paths:
             - ~/.konan
+  save_m2_cache:
+    steps:
+      - save_cache:
+          key: m2-v1-{{ checksum "/tmp/m2-cache-key.txt" }}
+          paths:
+            - ~/.m2
 
 jobs:
   build-test-and-publish-local:
@@ -95,6 +113,7 @@ jobs:
       - checkout
       - extract_gradle_version
       - extract_kotlin_version
+      - extract_m2_version
       - restore_gradle_cache
       - restore_konan_cache
       - ensure_gradle_wrapper
@@ -115,6 +134,7 @@ jobs:
             - .gradle/
       - save_gradle_cache
       - save_konan_cache
+      - save_m2_cache
 
 workflows:
   version: 2
