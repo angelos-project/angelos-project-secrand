@@ -68,7 +68,7 @@ jobs:
 
       - run:
           name: Run allTests
-          command: ./gradlew allTests --no-daemon --stacktrace
+          command: ./gradlew allTests --no-daemon --stacktrace --DchromeHeadless=false
 
       - run:
           name: Publish to Maven Local

@@ -24,7 +24,7 @@ kotlin {
 
     jvm()
     js {
-        //browser()
+        browser()
         nodejs()
     }
     // Wasm
