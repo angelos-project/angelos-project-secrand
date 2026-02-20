@@ -139,7 +139,7 @@ jobs:
       - prepare
       - codacy_kover_report
       - coverage-reporter/send_report:
-          coverage-reports: library/build/reports/kover/report.xml
+          coverage-reports: library/build/reports/kover/report.xml --partial
           project-token: $CODACY_PROJECT_TOKEN
       - cleanup
   build-test-and-publish-local:
