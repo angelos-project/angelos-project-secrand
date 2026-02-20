@@ -1,5 +1,9 @@
 version: 2.1
 
+orbs:
+  coverage-reporter: codacy/coverage-reporter@14.1.0
+
+
 executors:
   gradle:
     docker:
@@ -84,6 +88,11 @@ commands:
             mkdir -p ~/test-results/junit/
             find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} ~/test-results/junit/ \;
           when: always
+  codacy_kover_report:
+    steps:
+    - run:
+        name: Generate Kover XML report for Codacy
+        command: ./gradlew koverXmlReport --no-daemon
   save_gradle_cache:
     steps:
       - save_cache:
@@ -122,6 +131,17 @@ commands:
       - save_m2_cache
 
 jobs:
+  codacy-coverage-report:
+    executor: gradle
+    environment:
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g"
+    steps:
+      - prepare
+      - codacy_kover_report
+      - coverage-reporter/send_report:
+          coverage-reports: build/reports/kover/report.xml
+          project-token: $CODACY_PROJECT_TOKEN
+      - cleanup
   build-test-and-publish-local:
     executor: gradle
     environment:
