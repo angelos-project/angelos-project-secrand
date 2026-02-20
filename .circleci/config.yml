@@ -3,7 +3,7 @@ version: 2.1
 executors:
   gradle:
     docker:
-      - image: cimg/android:2026.02
+      - image: cimg/android:2026.02-browsers
     resource_class: medium
 
 commands:
