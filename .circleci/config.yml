@@ -3,7 +3,7 @@ version: 2.1
 executors:
   gradle:
     docker:
-      - image: cimg/android:2026.02   # Official Android image (Java 21 + full SDK)
+      - image: cimg/android:2026.02-browsers   # Official Android image (Java 21 + full SDK)
     resource_class: medium
 
 jobs:
@@ -68,7 +68,7 @@ jobs:
 
       - run:
           name: Run allTests
-          command: ./gradlew allTests --no-daemon --stacktrace --DchromeHeadless=false
+          command: ./gradlew allTests --no-daemon --stacktrace
 
       - run:
           name: Publish to Maven Local
