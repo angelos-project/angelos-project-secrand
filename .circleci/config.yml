@@ -127,15 +127,6 @@ jobs:
     environment:
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g"
     steps:
-      - checkout
-      - extract_gradle_version
-      - extract_kotlin_version
-      - extract_m2_version
-      - restore_gradle_cache
-      - restore_konan_cache
-      - ensure_gradle_wrapper
-      - accept_android_licenses
-      - configure_kotlin_native
       - run_tests
       - publish_to_maven_local
       - collect_test_results
@@ -149,9 +140,6 @@ jobs:
           paths:
             - build/
             - .gradle/
-      - save_gradle_cache
-      - save_konan_cache
-      - save_m2_cache
 
 workflows:
   version: 2
