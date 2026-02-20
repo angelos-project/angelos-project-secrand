@@ -3,8 +3,88 @@ version: 2.1
 executors:
   gradle:
     docker:
-      - image: cimg/android:2026.02-browsers   # Official Android image (Java 21 + full SDK)
+      - image: cimg/android:2026.02
     resource_class: medium
+
+commands:
+  extract_gradle_version:
+    steps:
+      - run:
+          name: Extract Gradle version
+          command: |
+            GRADLE_VERSION=$(grep -o 'gradle-[0-9.]*' gradle/wrapper/gradle-wrapper.properties | cut -d- -f2)
+            echo "$GRADLE_VERSION" > /tmp/gradle-cache-key.txt
+  extract_kotlin_version:
+    steps:
+      - run:
+          name: Extract Kotlin version
+          command: |
+            KOTLIN_VERSION=$(grep 'kotlin =' gradle/libs.versions.toml | cut -d'"' -f2)
+            echo "$KOTLIN_VERSION" > /tmp/kotlin-cache-key.txt
+  restore_gradle_cache:
+    steps:
+      - restore_cache:
+          keys:
+            - gradle-v1-{{ checksum "/tmp/gradle-cache-key.txt" }}
+            - gradle-v1-
+  restore_konan_cache:
+    steps:
+      - restore_cache:
+          keys:
+            - konan-v1-{{ checksum "/tmp/kotlin-cache-key.txt" }}
+            - konan-v1-
+  ensure_gradle_wrapper:
+    steps:
+      - run:
+          name: Ensure Gradle Wrapper JAR
+          command: |
+            mkdir -p gradle/wrapper
+            if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
+              GRADLE_VERSION=$(sed -n 's/.*gradle-\(.*\)-bin\.zip.*/\1/p' gradle/wrapper/gradle-wrapper.properties)
+              curl -L --fail --silent -o gradle/wrapper/gradle-wrapper.jar \
+                "https://raw.githubusercontent.com/gradle/gradle/v${GRADLE_VERSION}/gradle/wrapper/gradle-wrapper.jar"
+            fi
+  accept_android_licenses:
+    steps:
+      - run:
+          name: Accept Android licenses
+          command: yes | sdkmanager --licenses || true
+  configure_kotlin_native:
+    steps:
+      - run:
+          name: Configure Kotlin Native
+          command: echo "kotlin.native.ignoreDisabledTargets=true" >> gradle.properties
+  run_tests:
+    steps:
+      - run:
+          name: Run allTests
+          command: ./gradlew allTests --no-daemon --stacktrace
+  publish_to_maven_local:
+    steps:
+      - run:
+          name: Publish to Maven Local
+          command: ./gradlew publishToMavenLocal --no-daemon --stacktrace
+  collect_test_results:
+    steps:
+      - run:
+          name: Collect test results
+          command: |
+            mkdir -p ~/test-results/junit/
+            find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} ~/test-results/junit/ \;
+          when: always
+  save_gradle_cache:
+    steps:
+      - save_cache:
+          key: gradle-v1-{{ checksum "/tmp/gradle-cache-key.txt" }}
+          paths:
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
+  save_konan_cache:
+    steps:
+      - save_cache:
+          key: konan-v1-{{ checksum "/tmp/kotlin-cache-key.txt" }}
+          paths:
+            - ~/.konan
 
 jobs:
   build-test-and-publish-local:
@@ -13,100 +93,28 @@ jobs:
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g"
     steps:
       - checkout
-
-      # === GRADLE VERSION ONLY (unchanged from last suggestion) ===
-      - run:
-          name: Extract Gradle version for cache key
-          command: |
-            GRADLE_VERSION=$(grep -o 'gradle-[0-9.]*' gradle/wrapper/gradle-wrapper.properties | cut -d- -f2)
-            echo "Gradle version: $GRADLE_VERSION"
-            echo "$GRADLE_VERSION" > /tmp/gradle-cache-key.txt
-
-      # === KOTLIN VERSION ONLY for Konan ===
-      - run:
-          name: Extract Kotlin version for Konan cache key
-          command: |
-            KOTLIN_VERSION=$(grep 'kotlin =' gradle/libs.versions.toml | cut -d'"' -f2)
-            echo "Kotlin version: $KOTLIN_VERSION"
-            echo "$KOTLIN_VERSION" > /tmp/kotlin-cache-key.txt
-
-      # === RESTORE BOTH CACHES ===
-      - restore_cache:
-          name: Restore Gradle cache
-          keys:
-            - gradle-v1-{{ checksum "/tmp/gradle-cache-key.txt" }}
-            - gradle-v1-
-
-      - restore_cache:
-          name: Restore Kotlin/Native (Konan) cache
-          keys:
-            - konan-v1-{{ checksum "/tmp/kotlin-cache-key.txt" }}
-            - konan-v1-
-
-      # === FULLY DYNAMIC & FUTURE-PROOF GRADLE WRAPPER JAR ===
-      - run:
-          name: Ensure Gradle Wrapper JAR
-          command: |
-            mkdir -p gradle/wrapper
-            if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
-              GRADLE_VERSION=$(sed -n 's/.*gradle-\(.*\)-bin\.zip.*/\1/p' gradle/wrapper/gradle-wrapper.properties)
-              echo "Downloading Gradle wrapper JAR for version ${GRADLE_VERSION}..."
-              curl -L --fail --silent --show-error \
-                -o gradle/wrapper/gradle-wrapper.jar \
-                "https://raw.githubusercontent.com/gradle/gradle/v${GRADLE_VERSION}/gradle/wrapper/gradle-wrapper.jar"
-            fi
-
-      # Android SDK licenses (safe no-op if already accepted)  # With android sdk
-      - run:
-          name: Accept Android licenses
-          command: yes | sdkmanager --licenses || true
-
-      # Suppress K/N warning on Linux CI (common for KMP)  # With android sdk
-      - run:
-          name: Configure Kotlin Native for CI
-          command: echo "kotlin.native.ignoreDisabledTargets=true" >> gradle.properties
-
-      - run:
-          name: Run allTests
-          command: ./gradlew allTests --no-daemon --stacktrace
-
-      - run:
-          name: Publish to Maven Local
-          command: ./gradlew publishToMavenLocal --no-daemon --stacktrace
-
-      - run:
-          name: Collect test results
-          command: |
-            mkdir -p ~/test-results/junit/
-            find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} ~/test-results/junit/ \;
-          when: always
-
+      - extract_gradle_version
+      - extract_kotlin_version
+      - restore_gradle_cache
+      - restore_konan_cache
+      - ensure_gradle_wrapper
+      - accept_android_licenses
+      - configure_kotlin_native
+      - run_tests
+      - publish_to_maven_local
+      - collect_test_results
       - store_test_results:
           path: ~/test-results
-
       - store_artifacts:
           path: build/reports
           destination: test-reports
-
       - persist_to_workspace:
           root: .
           paths:
             - build/
             - .gradle/
-
-      # === SAVE BOTH CACHES ===
-      - save_cache:
-          name: Save Gradle cache
-          key: gradle-v1-{{ checksum "/tmp/gradle-cache-key.txt" }}
-          paths:
-            - ~/.gradle/caches
-            - ~/.gradle/wrapper
-
-      - save_cache:
-          name: Save Kotlin/Native (Konan) cache
-          key: konan-v1-{{ checksum "/tmp/kotlin-cache-key.txt" }}
-          paths:
-            - ~/.konan
+      - save_gradle_cache
+      - save_konan_cache
 
 workflows:
   version: 2
