@@ -166,13 +166,13 @@ jobs:
       - run_build
       - run_tests
       - cleanup
-  publish-local:
+  publish-local-artifacts:
     executor: gradle
     environment:
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g"
     steps:
       - prepare
-      - publish_to_maven_local
+      - publish_and_backup_maven
       - cleanup
 
 workflows:
