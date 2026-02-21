@@ -85,6 +85,16 @@ commands:
       - run:
           name: Publish to Maven Local
           command: ./gradlew publishToMavenLocal --no-daemon --stacktrace
+  publish_and_backup_maven:
+    steps:
+      - run:
+          name: Publish to custom local & backup
+          command: |
+            ./gradlew publishToMavenLocal -Dmaven.repo.local=/tmp/maven-local --no-daemon --stacktrace
+            tar -czf /tmp/maven-local.tar.gz -C /tmp maven-local
+      - store_artifacts:
+          path: /tmp/maven-local.tar.gz
+          destination: maven-local
   collect_test_results:
     steps:
       - run:
