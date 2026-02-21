@@ -152,7 +152,8 @@ jobs:
     steps:
       - prepare
       - kover_xml_report
-      - coveralls/upload
+      - coveralls/upload:
+          coverage_file: build/reports/kover/report.xml
       - cleanup
   build-and-test:
     executor: gradle
