@@ -105,8 +105,12 @@ commands:
   kover_xml_report:
     steps:
     - run:
-        name: Generate Kover XML report for Codacy
+        name: Generate Kover XML report
         command: ./gradlew koverXmlReport --no-daemon
+  coveralls_coverage_upload:
+    steps:
+      - coveralls/upload:
+          coverage_file: build/reports/kover/report.xml
   save_gradle_cache:
     steps:
       - save_cache:
@@ -152,8 +156,7 @@ jobs:
     steps:
       - prepare
       - kover_xml_report
-      - coveralls/upload:
-          coverage_file: build/reports/kover/report.xml
+      - coveralls_coverage_upload
       - cleanup
   build-and-test:
     executor: gradle
