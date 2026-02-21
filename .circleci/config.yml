@@ -70,6 +70,11 @@ commands:
       - run:
           name: Configure Kotlin Native
           command: echo "kotlin.native.ignoreDisabledTargets=true" >> gradle.properties
+  run_build:
+    steps:
+      - run:
+          name: Run build
+          command: ./gradlew build --no-daemon --stacktrace -x test
   run_tests:
     steps:
       - run:
@@ -142,25 +147,22 @@ jobs:
           coverage-reports: library/build/reports/kover/report.xml -l Kotlin final
           project-token: $CODACY_PROJECT_TOKEN
       - cleanup
-  build-test-and-publish-local:
+  build-and-test:
     executor: gradle
     environment:
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g"
     steps:
       - prepare
+      - run_build
       - run_tests
+      - cleanup
+  publish-local:
+    executor: gradle
+    environment:
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g"
+    steps:
+      - prepare
       - publish_to_maven_local
-      - collect_test_results
-      - store_test_results:
-          path: ~/test-results
-      - store_artifacts:
-          path: build/reports
-          destination: test-reports
-      - persist_to_workspace:
-          root: .
-          paths:
-            - build/
-            - .gradle/
       - cleanup
 
 workflows:
