@@ -110,11 +110,11 @@ commands:
         command: ./gradlew koverXmlReport --no-daemon
   coveralls_coverage_upload:
     steps:
-      - coveralls/upload:
+      - coveralls/upload:  # COVERALLS_REPO_TOKEN must be set in CircleCI project settings
           coverage_file: library/build/reports/kover/report.xml
   codacy_coverage_upload:
     steps:
-      - coverage-reporter/send_report:
+      - coverage-reporter/send_report:  # CODACY_PROJECT_TOKEN must be set in CircleCI project settings
           coverage-reports: library/build/reports/kover/report.xml -l Kotlin final
           project-token: $CODACY_PROJECT_TOKEN
   save_gradle_cache:
@@ -186,4 +186,4 @@ workflows:
   version: 2
   ci:
     jobs:
-      - coveralls-coverage-report
+      - publish-local-artifacts
