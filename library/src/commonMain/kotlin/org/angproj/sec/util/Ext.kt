@@ -154,6 +154,19 @@ public fun Int.toUnitFraction(): Float = ((this and 0x7FFFFFFF) / (1 shl 31).toF
 public fun Long.toUnitFraction(): Double = ((this and 0x7fffffffffffffffL) / (1L shl 63).toDouble()).absoluteValue
 
 
+/**
+ * Collects statistical information about the bits in the given source data.
+ *
+ * This function analyzes the bits of the source data [src] using the provided [readOctet] function to read bytes.
+ * It computes various statistics, including the total number of bits, counts of ones and zeros, distribution of hexadecimal values,
+ * run lengths of consecutive bits, and counts of long runs. The results are encapsulated in a [BitStatistic] object.
+ *
+ * @param src The source data from which to collect bit statistics.
+ * @param size The size of the source data in bytes. Must be greater than 0.
+ * @param readOctet A function that reads a byte from the source data at a given index.
+ * @return A [BitStatistic] object containing the collected statistics about the bits in the source data.
+ * @throws IllegalArgumentException if [size] is not greater than 0.
+ */
 public fun<E> bitStatisticCollection(
     src: E,
     size: Int,

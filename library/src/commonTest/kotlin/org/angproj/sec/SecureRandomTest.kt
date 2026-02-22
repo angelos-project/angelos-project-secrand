@@ -14,9 +14,11 @@
  */
 package org.angproj.sec
 
+import org.angproj.sec.stat.doubleHealthCheck
 import kotlin.test.Test
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
+import kotlin.test.assertFalse
 
 class SecureRandomTest {
 
@@ -108,5 +110,12 @@ class SecureRandomTest {
         SecureRandom.readBytes(bytes2)
         // With high probability, two random arrays should not be equal
         assertNotEquals(bytes1.toList(), bytes2.toList())
+    }
+
+    @Test
+    fun testSecurityHealth() {
+        assertTrue{ doubleHealthCheck { SecureRandom.readInt() } }
+        assertFalse{ doubleHealthCheck { SecureRandom.readInt() and 0x1f_ff_ff_ff } }
+        // Statistically it looks like 3 out of 32 being distorted leads to double failures.
     }
 }
