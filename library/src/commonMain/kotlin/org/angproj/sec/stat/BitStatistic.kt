@@ -210,6 +210,6 @@ public fun doubleHealthCheck(randomBits: RandomBits): Boolean {
 public fun BitStatistic.cryptoHealthCheck(): Boolean {
     ensure<SecureRandomException>(
         total in 0..(32 * 1024 * TypeSize.byteBits)
-    ) { SecureRandomException("Chunk size not between 32 and 1024 bytes long.") }
+    ) { SecureRandomException("Chunk size not between 0 and 32K bytes long.") }
     return checkLongRuns()
 }
