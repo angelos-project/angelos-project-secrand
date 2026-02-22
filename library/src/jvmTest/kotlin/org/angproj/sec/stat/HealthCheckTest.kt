@@ -57,6 +57,7 @@ class HealthCheckTest {
     fun testRandomBits() {
         val staticRand = 0x11223344
         assertFailsWith<IllegalStateException> {
+            println("One (1) failure expected at 4.0:")
             RandomBits.securityHealthCheck { staticRand }
         }
     }

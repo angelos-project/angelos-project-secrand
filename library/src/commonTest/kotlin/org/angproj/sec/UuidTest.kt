@@ -88,11 +88,11 @@ class UuidTest {
     fun uuid4Sample(uuid:() -> Uuid): ByteArray {
         val sample = ByteArray(1024)
         repeat(64) {
-            val uuid = uuid()
-            Octet.write(uuid.upper, sample, it * 16, 8) { idx, value ->
+            val uuidSample = uuid()
+            Octet.write(uuidSample.upper, sample, it * 16, 8) { idx, value ->
                 sample[idx] = value
             }
-            Octet.write(uuid.lower, sample, it * 16 + 8, 8) { idx, value ->
+            Octet.write(uuidSample.lower, sample, it * 16 + 8, 8) { idx, value ->
                 sample[idx] = value
             }
         }
