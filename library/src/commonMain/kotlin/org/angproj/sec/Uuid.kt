@@ -80,7 +80,7 @@ public data class Uuid(
          * @return A randomly generated version 4 UUID.
          */
         public fun uuid4(): Uuid = Uuid(
-            (RandomBits.nextBitsToLong(SecureFeed) and 0xffff0fff) or 0x4000,
+            (RandomBits.nextBitsToLong(SecureFeed) and 0xffffffff_ffff0fffuL.toLong()) or 0x4000,
             (RandomBits.nextBitsToLong(SecureFeed) and 0x3fffffff_ffffffff) or uuid4Variant
         )
 

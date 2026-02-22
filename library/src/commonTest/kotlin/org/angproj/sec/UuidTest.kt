@@ -15,11 +15,15 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.RandomBits
+import org.angproj.sec.stat.bitStatisticOf
+import org.angproj.sec.stat.securityHealthCheck
+import org.angproj.sec.util.Octet
 import kotlin.math.E
 import kotlin.math.PI
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 class UuidTest {
 
@@ -69,6 +73,8 @@ class UuidTest {
     fun testRandomBits() {
         val error = RandomBits { 0x11223344 }
 
+        println(error.nextBits(32).toString(16))
+
         assertEquals("11223344-1122-3344-1122-334411223344",Uuid(error).toString())
     }
 
@@ -77,5 +83,26 @@ class UuidTest {
         val error = 0x1122334455667788
 
         assertEquals("11223344-5566-7788-1122-334455667788",Uuid(error, error).toString())
+    }
+
+    fun uuid4Sample(uuid:() -> Uuid): ByteArray {
+        val sample = ByteArray(1024)
+        repeat(64) {
+            val uuid = uuid()
+            Octet.write(uuid.upper, sample, it * 16, 8) { idx, value ->
+                sample[idx] = value
+            }
+            Octet.write(uuid.lower, sample, it * 16 + 8, 8) { idx, value ->
+                sample[idx] = value
+            }
+        }
+        return sample
+    }
+
+    @Test
+    fun testUuid4Health() {
+        val result = bitStatisticOf(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
+        val result2 = bitStatisticOf(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
+        assertTrue{ result || result2 }
     }
 }
