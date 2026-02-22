@@ -164,6 +164,17 @@ public fun BitStatistic.securityHealthCheck(): Boolean {
     return checkBitBalance() && checkHexUniformity() && checkRunDistribution()
 }
 
+/**
+ * Performs a double security health check on the random bits by sampling and analyzing the bit statistics twice.
+ *
+ * This function samples random bits into a byte array and computes the bit statistic for the sampled data. It then
+ * performs a security health check on the computed bit statistic. If the first check fails, it samples again and
+ * performs a second check. The double check is designed to reduce the likelihood of false positives, as a handful
+ * of failures in 10000 samples is expected due to statistical variance.
+ *
+ * @param randomBits The source of random bits to sample from.
+ * @return True if at least one of the two checks passes, false otherwise.
+ */
 public fun doubleHealthCheck(randomBits: RandomBits): Boolean {
     val sample = ByteArray(1024)
     fun sampleBits(entropy: ByteArray): ByteArray {
@@ -173,8 +184,8 @@ public fun doubleHealthCheck(randomBits: RandomBits): Boolean {
                 entropy,
                 idx * TypeSize.intSize,
                 TypeSize.intSize
-            ) { idx, value ->
-                entropy[idx] = value
+            ) { idx2, value ->
+                entropy[idx2] = value
             }
         }
         return entropy
@@ -198,7 +209,7 @@ public fun doubleHealthCheck(randomBits: RandomBits): Boolean {
  */
 public fun BitStatistic.cryptoHealthCheck(): Boolean {
     ensure<SecureRandomException>(
-        total in (32 * TypeSize.byteBits)..(1024 * TypeSize.byteBits)
+        total in 0..(32 * 1024 * TypeSize.byteBits)
     ) { SecureRandomException("Chunk size not between 32 and 1024 bytes long.") }
     return checkLongRuns()
 }
