@@ -14,11 +14,11 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.rand.RandomBits
+import org.angproj.sec.stat.doubleHealthCheck
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
-import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 
 class SecureFeedTest {
@@ -57,5 +57,10 @@ class SecureFeedTest {
     fun testTotalBits() {
         SecureFeed.nextBits(21)
         assertNotEquals(0, SecureFeed.totalBits)
+    }
+
+    @Test
+    fun testSecurityHealth() {
+        assertTrue{ doubleHealthCheck(SecureFeed) }
     }
 }

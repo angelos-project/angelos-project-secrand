@@ -14,9 +14,11 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.stat.doubleHealthCheck
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 class JitterEntropyTest {
 
@@ -48,5 +50,10 @@ class JitterEntropyTest {
         assertEquals(size, buffer2.size)
         // With high probability, two random arrays should not be equal
         assertNotEquals(buffer1, buffer2)
+    }
+
+    @Test
+    fun testSecurityHealth() {
+        assertTrue{ doubleHealthCheck(JitterEntropy.JitterEntropyState()) }
     }
 }

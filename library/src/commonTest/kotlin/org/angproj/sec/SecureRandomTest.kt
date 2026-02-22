@@ -14,6 +14,7 @@
  */
 package org.angproj.sec
 
+import org.angproj.sec.stat.doubleHealthCheck
 import kotlin.test.Test
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
@@ -108,5 +109,10 @@ class SecureRandomTest {
         SecureRandom.readBytes(bytes2)
         // With high probability, two random arrays should not be equal
         assertNotEquals(bytes1.toList(), bytes2.toList())
+    }
+
+    @Test
+    fun testSecurityHealth() {
+        assertTrue{ doubleHealthCheck { SecureRandom.readInt() } }
     }
 }
