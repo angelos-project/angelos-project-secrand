@@ -14,10 +14,9 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.rand.RandomBits
+import org.angproj.sec.stat.doubleHealthCheck
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
@@ -181,5 +180,10 @@ class GarbageGarblerTest {
         assertEquals(0, garbler.totalBits)
         garbler.readByte()
         assertEquals(8, garbler.totalBits)
+    }
+
+    @Test
+    fun testSecurityHealth() {
+        assertTrue{ doubleHealthCheck(GarbageGarbler()) }
     }
 }

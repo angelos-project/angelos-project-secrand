@@ -100,6 +100,13 @@ class UuidTest {
     }
 
     @Test
+    fun testUuidHealth() {
+        val result = bitStatisticOf(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
+        val result2 = bitStatisticOf(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
+        assertTrue{ result || result2 }
+    }
+
+    @Test
     fun testUuid4Health() {
         val result = bitStatisticOf(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
         val result2 = bitStatisticOf(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()

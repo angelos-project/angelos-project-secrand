@@ -15,6 +15,8 @@
 package org.angproj.sec.stat
 
 import org.angproj.sec.SecureRandomException
+import org.angproj.sec.rand.RandomBits
+import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.bitStatisticCollection
 import org.angproj.sec.util.ensure
@@ -160,6 +162,27 @@ public fun BitStatistic.securityHealthCheck(): Boolean {
         total in (1024 * TypeSize.byteBits)..(32 * 1024 * TypeSize.byteBits)
     ) { SecureRandomException("Chunk size not between 1K and 32K bytes long.") }
     return checkBitBalance() && checkHexUniformity() && checkRunDistribution()
+}
+
+public fun doubleHealthCheck(randomBits: RandomBits): Boolean {
+    val sample = ByteArray(1024)
+    fun sampleBits(entropy: ByteArray): ByteArray {
+        repeat(sample.size / TypeSize.intSize) { idx ->
+            Octet.write(
+                randomBits.nextBits(TypeSize.intBits).toLong(),
+                entropy,
+                idx * TypeSize.intSize,
+                TypeSize.intSize
+            ) { idx, value ->
+                entropy[idx] = value
+            }
+        }
+        return entropy
+    }
+    return bitStatisticOf(
+        sampleBits(sample)).securityHealthCheck() ||
+            bitStatisticOf(
+                sampleBits(sample)).securityHealthCheck()
 }
 
 
