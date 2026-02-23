@@ -45,6 +45,7 @@ public object JitterEntropy {
     public class JitterEntropyState : RandomBits {
         // Monotonic clock mark to measure elapsed time for entropy generation
         private val start = TimeSource.Monotonic.markNow()
+        private var count = 0
 
         /**
          * Generates a true random [Int] with the specified number of bits (1 to 32) based on timing jitter.
@@ -60,7 +61,7 @@ public object JitterEntropy {
             val recent = start.elapsedNow()
             // Derive entropy from nanosecond and microsecond timing jitter
             val nano: Double = 1.0 / recent.inWholeNanoseconds
-            val micro: Double = 1.0 - (1.0 / recent.inWholeMicroseconds)
+            val micro: Double = 1.0 - ((count++).toDouble() / recent.inWholeMicroseconds)
 
             // Apply trigonometric functions to introduce non-linearity
             val nanoBits: Long = sin(nano).toRawBits()
@@ -79,9 +80,6 @@ public object JitterEntropy {
         }
     }
 
-    // Single instance of the entropy state
-    private val state = JitterEntropyState()
-
     /**
      * Exports true random [Long] values to the provided data structure.
      * Generates up to 128 [Long] values (1024 bytes) to prevent excessive computation.
@@ -94,6 +92,8 @@ public object JitterEntropy {
      */
     public fun <E> readLongs(data: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Long>) {
         require(length <= 128) { "Too large for time-gated entropy! Max 1Kb." }
+
+        val state = JitterEntropyState()
 
         repeat(length) { index ->
             data.writeOctet(offset + index, RandomBits.nextBitsToLong { state.nextBits(it) })
@@ -113,10 +113,12 @@ public object JitterEntropy {
     public fun <E> readBytes(data: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Byte>) {
         require(length <= 1024) { "Too large for time-gated entropy! Max 1Kb." }
 
+        val state = JitterEntropyState()
+
         var pos = 0
-        repeat(length.ceilDiv(TypeSize.intSize)) { _ ->
-            val bytes = min(TypeSize.intSize, length - pos)
-            var entropy = state.nextBits(bytes * TypeSize.byteBits)
+        repeat(length.ceilDiv(TypeSize.longSize)) { _ ->
+            val bytes = min(TypeSize.longSize, length - pos)
+            var entropy = RandomBits.nextBitsToLong { state.nextBits(it) }
             repeat(bytes) {
                 data.writeOctet(offset + pos++, entropy.toByte())
                 entropy = entropy ushr TypeSize.byteBits
