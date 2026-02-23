@@ -14,7 +14,7 @@
  */
 package org.angproj.sec.rand
 
-import org.angproj.sec.stat.doubleHealthCheck import org.angproj.sec.util.Octet.asHexSymbols
+import org.angproj.sec.stat.doubleHealthCheck
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals

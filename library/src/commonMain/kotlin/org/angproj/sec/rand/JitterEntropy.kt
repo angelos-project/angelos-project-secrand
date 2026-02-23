@@ -42,7 +42,7 @@ public object JitterEntropy {
     /**
      * Internal state for tracking timing measurements and generating jitter-based entropy.
      */
-    public class JitterEntropyState : RandomBits {
+    internal class JitterEntropyState : RandomBits {
         // Monotonic clock mark to measure elapsed time for entropy generation
         private val start = TimeSource.Monotonic.markNow()
         private var count = 0
