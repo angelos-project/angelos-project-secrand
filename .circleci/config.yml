@@ -9,6 +9,14 @@ executors:
     docker:
       - image: cimg/android:2026.02-browsers
     resource_class: medium
+  macos:
+    macos:
+      xcode: 26.3.0
+    resource_class: m4pro.medium
+  windows:
+    machine:
+      image: windows-server-2022-gui:current
+    resource_class: windows.medium
 
 commands:
   extract_m2_version:
@@ -105,9 +113,14 @@ commands:
           when: always
   kover_xml_report:
     steps:
-    - run:
-        name: Generate Kover XML report
-        command: ./gradlew koverXmlReport --no-daemon
+      - run:
+          name: Generate Kover XML report
+          command: ./gradlew koverXmlReport --no-daemon
+  kover_html_report:
+    steps:
+      - run:
+          name: Generate Kover XML report
+          command: ./gradlew koverHtmlReport --no-daemon
   coveralls_coverage_upload:
     steps:
       - coveralls/upload:  # COVERALLS_REPO_TOKEN must be set in CircleCI project settings
@@ -164,8 +177,16 @@ jobs:
       - kover_xml_report
       - coveralls_coverage_upload
       - cleanup
-  build-and-test:
+  human-coverage-report:
     executor: gradle
+    environment:
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g"
+    steps:
+      - prepare
+      - kover_html_report
+      - cleanup
+  build-and-test:
+    executor: << pipeline.parameters.platform >>
     environment:
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g"
     steps:
@@ -182,8 +203,33 @@ jobs:
       - publish_and_backup_maven
       - cleanup
 
+parameters:
+  action:
+    type: enum
+    enum: [test, coverage, report]
+    default: coverage
+  platform:
+    type: enum
+    enum: [gradle, macos, windows]
+    default: gradle
+
 workflows:
-  version: 2
-  ci:
+  #  version: 2
+  #  ci:
+  #    jobs:
+  #      - publish-local-artifacts
+  coverage:
+    when:
+      equal: [ coverage, << pipeline.parameters.action >> ]
     jobs:
-      - publish-local-artifacts
+      - coveralls-coverage-report
+  report:
+    when:
+      equal: [ report, << pipeline.parameters.action >> ]
+    jobs:
+      - human-coverage-report
+  test:
+    when:
+      equal: [ test, << pipeline.parameters.action >> ]
+    jobs:
+      - build-and-test
