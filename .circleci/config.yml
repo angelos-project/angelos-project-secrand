@@ -207,7 +207,7 @@ parameters:
   action:
     type: enum
     enum: [test, coverage, report]
-    default: coverage
+    default: test
   platform:
     type: enum
     enum: [gradle, macos, windows]
