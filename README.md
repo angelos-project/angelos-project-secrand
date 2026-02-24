@@ -9,10 +9,11 @@ It is written without any external dependencies, except the Kotlin monotonic clo
 The package offers several out of the box random generators:
 
 * `SecureRandom` - a ready to use secure random generator.
-* `Uuid` - a UUID generator only dependent on the underlying `SecureFeed` generator, offering raw UUID and UUIDv4. No use of 3rd party sources.
+* `Uuid` - a UUID generator only dependent on the underlying `SecureFeed` generator, offering raw UUID and UUIDv4.
 * `GarbageGarbler` - a secure random generator freely reseedable with any given entropy. Requires reseeding every 1 Gb of generated data.
 
 Other utility classes or functions for internal or 3rd party use:
+
 * `AbstractSponge*` - six sponges of 256, 512 and 1024 bits visible state to be used for most cryptographic use, with absorb and squeeze capabilities.
 * `JitterEntropy` - a jitter based random generator building on the monotonic clock.
 * `BenchmarkTester` - a utility framework for benchmarking data samples, includes Monte Carlo and Avalanche Effect testers.
@@ -20,12 +21,16 @@ Other utility classes or functions for internal or 3rd party use:
 
 ## Usage
 
+For use in a Kotlin/Multiplatform project, or compatible, publish the library to your own local maven repository.
+
+1. Run `./gradlew publishToMavenLocal`
+2. Add the dependency `org.angproj.sec:angelos-project-secrand:X.Y.Z`
+3. Replace `X.Y.X` with version number in `library/build.gradle.kts`
 
 ## Tests
 
-run `./gradlew check` for unit tests and code quality checks
+Run `./gradlew clean build allTests` for unit tests.
 
-Integration tests can be skipped by running `./gradlew check -PrunIntegrationTest=false` if you do not have ffmpeg & mediainfo installed.
 
 ## Getting help
 
