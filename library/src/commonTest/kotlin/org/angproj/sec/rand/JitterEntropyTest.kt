@@ -54,6 +54,11 @@ class JitterEntropyTest {
 
     @Test
     fun testSecurityHealth() {
+        /*val jitter = ByteArray(1024)
+        repeat(2) {
+            JitterEntropy.readBytes(jitter, 0, jitter.size) { idx, value -> this[idx] = value }
+            println(jitter.asHexSymbols())
+        }*/
         assertTrue{ doubleHealthCheck(JitterEntropy.JitterEntropyState()) }
     }
 }
