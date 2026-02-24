@@ -34,11 +34,19 @@ Run `./gradlew clean build allTests` for unit tests.
 
 ## Getting help
 
-If you have questions, concerns, bug reports, etc, please file an issue in this repository's Issue Tracker.
+If you have questions, concerns, bug reports, etc, please file an issue in this repository.
 
 ## Getting involved
 
-This project is very much a work in progress so all kinds of feedback are welcome, bug reports,
-feature requests etc are welcome. Details on how to contribute can be found in [CONTRIBUTING](docs/CONTRIBUTING.adoc).
+If you want to contribute to the project, please read the projects:
+
+* [Mission statement](https://github.com/angelos-project/.github/blob/master/profile/README.md)
+* [Contributor License Agreement (CLA)](https://github.com/angelos-project/.github/blob/master/misc/ADMISSION.md)
+* [Code of conduct](https://github.com/angelos-project/.github/blob/master/docs/CODE_OF_CONDUCT.md)
+* [Contributing guidelines](https://github.com/angelos-project/.github/blob/master/docs/CONTRIBUTING.md)
+
+We welcome contributions of all kinds, including bug fixes, new features, and documentation improvements. please fork the repository and submit a pull request with your updates.
 
 ## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
