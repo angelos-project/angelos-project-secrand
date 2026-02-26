@@ -87,12 +87,4 @@ public abstract class AbstractRandom<E>(
             SecureRandomException("Catastrophic failure: 2 consecutive failed secure health check attempts.")
         }
     }
-
-    /*public fun reseed(entropySource: Security) {
-        innerFill(entropySource::readLongs) { idx, v -> }
-    }
-
-    public fun reseed(entropySource: JitterEntropy) {
-        innerFill(entropySource::readLongs) { idx, v -> }
-    }*/
 }

@@ -14,64 +14,11 @@
  */
 package org.angproj.sec.rand
 
-import org.angproj.sec.SecureRandomException
-import org.angproj.sec.stat.BitStatisticCollector
-import org.angproj.sec.stat.cryptoHealthCheck
-import org.angproj.sec.stat.securityHealthCheck
-import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.WriteOctet
-import org.angproj.sec.util.ceilDiv
-import org.angproj.sec.util.ensure
-import kotlin.math.max
-import kotlin.math.min
+
 
 public class Reseeder(sponge: Sponge) : AbstractRandom<Sponge>(sponge, sponge.visibleSize){
-    /*private fun consumeLong(value: Long): Unit = consume<Unit>(value, TypeSize.longBits)
-
-    private fun innerReseed(sponge: Sponge, size: Int, exporter: Octet.ExportLongs<Sponge>) {
-        var pos = size
-        var fails = 0
-        val mask = (1L shl (TypeSize.longBits - 1))
-
-        do {
-            reset()
-            sponge.reset()
-
-            var lastCrypto = snapshot()
-            var satisfied = false
-            var counter = 0
-
-            exporter.export(sponge, 0, 1024 / TypeSize.longSize) { _, value ->
-                if(!satisfied) {
-                    sponge.absorb(value, pos++)
-                    if(pos == size) {
-                        lastCrypto = snapshot().also {
-                            satisfied = it.diff(lastCrypto).cryptoHealthCheck()
-                        }
-                        when(satisfied) {
-                            true -> sponge.scramble()
-                            false -> {
-                                sponge.reset()
-                                pos = 0
-                            }
-                        }
-                    }
-                }
-                if(counter++ == 0) setup(value and mask == 0L)
-                consumeLong(value)
-            }
-
-            finish()
-            if(!snapshot().securityHealthCheck()) {
-                fails++
-                satisfied = false
-            }
-        } while (!satisfied && fails <= 2)
-        if(fails >= 2) ensure<SecureRandomException> {
-            SecureRandomException("Catastrophic failure: 2 consecutive failed secure health check attempts.")
-        }
-    }*/
 
     override fun exportSize(): Int = 1024 / TypeSize.longSize
 
@@ -93,10 +40,10 @@ public class Reseeder(sponge: Sponge) : AbstractRandom<Sponge>(sponge, sponge.vi
     }
 
     public fun reseed(entropySource: Security) {
-        innerFill(entropySource::readLongs) { idx, v -> }
+        innerFill(entropySource::readLongs) { _, _ -> }
     }
 
     public fun reseed(entropySource: JitterEntropy) {
-        innerFill(entropySource::readLongs) { idx, v -> }
+        innerFill(entropySource::readLongs) { _, _ -> }
     }
 }
