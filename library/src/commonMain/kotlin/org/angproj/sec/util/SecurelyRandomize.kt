@@ -64,3 +64,17 @@ public fun ByteArray.securelyRandomize() {
         }
     }.randomize(SecureFeed) { idx, v -> this[idx] = v }
 }
+
+/**
+ * Fills this [ByteArray] with cryptographically secure random bytes using jitter entropy.
+ *
+ * Uses [JitterEntropy] to generate random data and writes it into the array.
+ * The entire array is overwritten with new random values.
+ */
+public fun ByteArray.securelyEntropize() {
+    object : SecurelyRandomize<ByteArray>(this, size) {
+        override fun invalidateState() {
+            obj.fill(0)
+        }
+    }.randomize(JitterEntropy) { idx, v -> this[idx] = v }
+}

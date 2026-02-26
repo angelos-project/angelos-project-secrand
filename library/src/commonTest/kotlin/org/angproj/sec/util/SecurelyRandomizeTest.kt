@@ -34,4 +34,19 @@ class SecurelyRandomizeTest {
         // With high probability, two random arrays should not be equal
         assertNotEquals(buffer1.toList(), buffer2.toList())
     }
+
+    @Test
+    fun testSecurelyEntropizeByteArray() {
+        val size = 128
+        val buffer1 = ByteArray(size)
+        val buffer2 = ByteArray(size)
+
+        buffer1.securelyEntropize()
+        buffer2.securelyEntropize()
+
+        assertEquals(size, buffer1.size)
+        assertEquals(size, buffer2.size)
+        // With high probability, two random arrays should not be equal
+        assertNotEquals(buffer1.toList(), buffer2.toList())
+    }
 }
