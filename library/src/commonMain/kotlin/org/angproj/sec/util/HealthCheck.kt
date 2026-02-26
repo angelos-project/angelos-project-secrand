@@ -18,6 +18,7 @@ import org.angproj.sec.rand.RandomBits
 import org.angproj.sec.stat.BitStatisticCollector
 import org.angproj.sec.stat.BitStatisticSnapshot
 import org.angproj.sec.stat.securityHealthCheck
+import org.angproj.sec.util.Octet.asHexSymbols
 
 
 /**
@@ -77,16 +78,34 @@ public class HealthCheck : BitStatisticCollector() {
      * @param randomBits The RandomBits source to analyze.
      * @return A snapshot of the collected bit statistics after analyzing the provided bits.
      */
-    public fun analyze(randomBits: RandomBits): BitStatisticSnapshot {
+    public fun analyze(randomBits: RandomBits, debug: Boolean = false): BitStatisticSnapshot {
         reset()
+        val sample = ByteArray(if(debug) 1024 else 0)
         val first = RandomBits.nextBitsToLong(randomBits)
         setup(1L shl (TypeSize.longBits - 1) and first != 0L)
         consumeLong(first)
+        if(debug) {
+            Octet.write(first, sample, 0, TypeSize.longSize) { idx, value ->
+                sample[idx] = value
+            }
+        }
 
-        repeat((1024 / TypeSize.longSize) - 1) { _ ->
+        repeat((1024 / TypeSize.longSize) - 1) {
             consumeLong(RandomBits.nextBitsToLong(randomBits))
+            if(debug) {
+                Octet.write(
+                    RandomBits.nextBitsToLong(randomBits),
+                    sample, (it + 1) * TypeSize.longSize,
+                    TypeSize.longSize)
+                { idx, value ->
+                    sample[idx] = value
+                }
+            }
         }
         finish()
+        if(debug) {
+            println("Sample: " + sample.asHexSymbols())
+        }
         return snapshot()
     }
 
@@ -99,7 +118,9 @@ public class HealthCheck : BitStatisticCollector() {
          * @param randomBits The RandomBits source to perform the health check on.
          * @return `true` if the security health check passes, `false` otherwise.
          */
-        public fun healthCheck(randomBits: RandomBits): Boolean = HealthCheck().analyze(randomBits).securityHealthCheck()
+        public fun healthCheck(
+            randomBits: RandomBits, debug: Boolean = false
+        ): Boolean = HealthCheck().analyze(randomBits, debug).securityHealthCheck()
 
         /**
          * Perform a double health check on the provided RandomBits source by conducting two separate health
@@ -108,6 +129,8 @@ public class HealthCheck : BitStatisticCollector() {
          * @param randomBits The RandomBits source to perform the double health check on.
          * @return `true` if at least one of the two health checks passes, `false` if both checks fail.
          */
-        public fun doubleHealthCheck(randomBits: RandomBits): Boolean = healthCheck(randomBits) || healthCheck(randomBits)
+        public fun doubleHealthCheck(
+            randomBits: RandomBits, debug: Boolean = false
+        ): Boolean = healthCheck(randomBits, debug) || healthCheck(randomBits, debug)
     }
 }
