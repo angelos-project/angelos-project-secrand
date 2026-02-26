@@ -62,7 +62,7 @@ public class HealthCheck : BitStatisticCollector() {
      */
     public fun<E> analyze(
         src: E, size: Int, readOctet: ReadOctet<E, Byte>
-    ): BitStatisticSnapshot = analyze(Octet.bitIterator(0..size, src, readOctet))
+    ): BitStatisticSnapshot = analyze(Octet.bitIterator(0..<size, src, readOctet))
 
     /**
      * Analyze bits from a ByteArray and return a snapshot of the collected statistics.
