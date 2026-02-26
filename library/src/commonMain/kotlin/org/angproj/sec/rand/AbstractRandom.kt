@@ -20,35 +20,54 @@ import org.angproj.sec.stat.cryptoHealthCheck
 import org.angproj.sec.stat.securityHealthCheck
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
+import org.angproj.sec.util.WriteOctet
 import org.angproj.sec.util.ensure
 
-public class Reseeder(private val sponge: Sponge) : BitStatisticCollector() {
+
+public abstract class AbstractRandom<E>(
+    protected val obj: E,
+    protected val size: Int
+): BitStatisticCollector() {
+
     private fun consumeLong(value: Long): Unit = consume<Unit>(value, TypeSize.longBits)
 
-    private fun innerReseed(sponge: Sponge, size: Int, exporter: Octet.ExportLongs<Sponge>) {
-        var pos = size
+    protected abstract fun exportSize(): Int
+
+    protected abstract fun posProgress(pos: Int): Int
+
+    protected abstract fun invalidateState()
+
+    protected abstract fun digest(value: Long, pos: Int, len: Int, writeOctet: WriteOctet<E, Byte>): Long
+
+    protected abstract fun whenSatisfied()
+
+    protected fun innerFill(exporter: Octet.ExportLongs<E>, writeOctet: WriteOctet<E, Byte>) {
+        require(size in 0..(32 * 1024)) { "Array size must be between 0 and 32768 bytes." }
+        var pos = 0
         var fails = 0
         val mask = (1L shl (TypeSize.longBits - 1))
 
         do {
             reset()
-            sponge.reset()
+            invalidateState()
 
             var lastCrypto = snapshot()
             var satisfied = false
             var counter = 0
 
-            exporter.export(sponge, 0, 1024 / TypeSize.longSize) { _, value ->
+            exporter.export(obj, 0, exportSize()) { _, value ->
                 if(!satisfied) {
-                    sponge.absorb(value, pos++)
+                    val len = posProgress(pos)
+                    digest(value, pos, len, writeOctet)
+                    pos += len
                     if(pos == size) {
                         lastCrypto = snapshot().also {
                             satisfied = it.diff(lastCrypto).cryptoHealthCheck()
                         }
                         when(satisfied) {
-                            true -> sponge.scramble()
+                            true -> whenSatisfied()
                             false -> {
-                                sponge.reset()
+                                invalidateState()
                                 pos = 0
                             }
                         }
@@ -70,10 +89,10 @@ public class Reseeder(private val sponge: Sponge) : BitStatisticCollector() {
     }
 
     public fun reseed(entropySource: Security) {
-        innerReseed(sponge, sponge.visibleSize,  entropySource::readLongs)
+        innerFill(entropySource::readLongs) { idx, v -> }
     }
 
     public fun reseed(entropySource: JitterEntropy) {
-        innerReseed(sponge, sponge.visibleSize, entropySource::readLongs)
+        innerFill(entropySource::readLongs) { idx, v -> }
     }
 }

@@ -20,6 +20,7 @@ import org.angproj.sec.rand.Security
 import org.angproj.sec.stat.Randomness
 import org.angproj.sec.util.Octet
 import org.angproj.sec.rand.RandomBits
+import org.angproj.sec.rand.Reseeder
 import org.angproj.sec.util.ReadOctet
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.ensure
@@ -58,10 +59,11 @@ public class GarbageGarbler: Security(), RandomBits, Randomness {
 
     init {
         // Seed the sponge
-        JitterEntropy.readLongs(sponge, 0, sponge.visibleSize) { index, value ->
+        /*JitterEntropy.readLongs(sponge, 0, sponge.visibleSize) { index, value ->
             sponge.absorb(value, index)
         }
-        sponge.scramble()
+        sponge.scramble()*/
+        Reseeder(sponge).reseed(JitterEntropy)
     }
 
     override fun checkReseedConditions(): Boolean {

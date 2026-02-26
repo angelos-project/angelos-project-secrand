@@ -18,6 +18,7 @@ import org.angproj.sec.rand.AbstractSponge512
 import org.angproj.sec.rand.Security
 import org.angproj.sec.rand.Sponge
 import org.angproj.sec.rand.RandomBits
+import org.angproj.sec.rand.Reseeder
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.floorMod
 
@@ -43,10 +44,11 @@ public object SecureFeed : Security(), RandomBits {
     override fun checkReseedConditions(): Boolean = true
 
     override fun reseedImpl() {
-        SecureEntropy.readLongs(sponge, 0, sponge.visibleSize) { index, value ->
+        /*SecureEntropy.readLongs(sponge, 0, sponge.visibleSize) { index, value ->
             sponge.absorb(value, index)
         }
-        sponge.scramble()
+        sponge.scramble()*/
+        Reseeder(sponge).reseed(SecureEntropy)
     }
 
     /**

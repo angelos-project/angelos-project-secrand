@@ -16,6 +16,7 @@ package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.JitterEntropy
+import org.angproj.sec.rand.Reseeder
 import org.angproj.sec.rand.Security
 import org.angproj.sec.rand.Sponge
 
@@ -35,10 +36,11 @@ public object SecureEntropy : Security() {
     override fun checkReseedConditions(): Boolean = true
 
     override fun reseedImpl() {
-        JitterEntropy.readLongs(sponge, 0, sponge.visibleSize) { index, value ->
+        /*JitterEntropy.readLongs(sponge, 0, sponge.visibleSize) { index, value ->
             sponge.absorb(value, index)
         }
-        sponge.scramble()
+        sponge.scramble()*/
+        Reseeder(sponge).reseed(JitterEntropy)
     }
 
     override fun checkExportConditions(length: Int): Boolean {
