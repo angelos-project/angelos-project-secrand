@@ -14,16 +14,17 @@
  */
 package org.angproj.sec.stat
 
+import org.angproj.sec.util.TypeSize
 import kotlin.math.*
 
 
-public class BitStatisticCollector : BitStatistic {
-    private var _total: Int = 0
-    private var _ones: Int = 0
-    private var _zeros: Int = 0
-    private val _hex: IntArray = IntArray(16)
-    private val _runs: IntArray = IntArray(20)
-    private var _longRuns: Int = 0
+public abstract class BitStatisticCollector : BitStatistic {
+    protected var _total: Int = 0
+    protected var _ones: Int = 0
+    protected var _zeros: Int = 0
+    protected val _hex: IntArray = IntArray(16)
+    protected val _runs: IntArray = IntArray(20)
+    protected var _longRuns: Int = 0
 
     override val total: Int get() = _total
     override val ones: Int get() = _ones
@@ -32,11 +33,33 @@ public class BitStatisticCollector : BitStatistic {
     override val runs: List<Int> get() = _runs.toList()
     override val longRuns: Int get() = _longRuns
 
-    private var run = 0
-    private var last = false
-    private var data = 0
+    protected var run: Int = 0
+    protected var last: Boolean = false
+    protected var data: Int = 0
 
-    protected fun collectBit(bit: Boolean) {
+    protected fun reset() {
+        _total = 0
+        _ones = 0
+        _zeros = 0
+        _hex.fill(0)
+        _runs.fill(0)
+        _longRuns = 0
+        run = 0
+        last = false
+        data = 0
+    }
+
+    protected fun setup(first: Boolean) {
+        last = first
+    }
+
+    protected fun finish() {
+        if (run > 0) {
+            if (run > 20) _longRuns++ else _runs[run - 1]++
+        }
+    }
+
+    protected inline fun<reified E: Any> collectBit(bit: Boolean) {
         _total++
         data = (data shl 1) or if (bit) 1 else 0
         if(total % 4 == 0) _hex[data and 0xF]++
@@ -47,6 +70,14 @@ public class BitStatisticCollector : BitStatistic {
             }
             last = bit
             run = 1
+        }
+    }
+
+    protected inline fun<reified E: Any> consume(data: Long, bitSize: Int) {
+        var mask = 1L shl (bitSize - 1)
+        repeat(bitSize) {
+            collectBit<Unit>((data and mask) != 0L)
+            mask = mask ushr 1
         }
     }
 }
