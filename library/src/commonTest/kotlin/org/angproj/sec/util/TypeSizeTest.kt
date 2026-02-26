@@ -62,4 +62,32 @@ class TypeSizeTest {
         assertEquals(Float.SIZE_BYTES, TypeSize.floatSize)
         assertEquals(Double.SIZE_BYTES, TypeSize.doubleSize)
     }
+
+    @Test
+    fun testBitSizeFunction() {
+        assertEquals(Byte.SIZE_BITS, TypeSize.bitSize(Byte))
+        assertEquals(Short.SIZE_BITS, TypeSize.bitSize(Short))
+        assertEquals(Int.SIZE_BITS, TypeSize.bitSize(Int))
+        assertEquals(Long.SIZE_BITS, TypeSize.bitSize(Long))
+        assertEquals(Float.SIZE_BITS, TypeSize.bitSize(Float))
+        assertEquals(Double.SIZE_BITS, TypeSize.bitSize(Double))
+        assertEquals(UByte.SIZE_BITS, TypeSize.bitSize(UByte))
+        assertEquals(UShort.SIZE_BITS, TypeSize.bitSize(UShort))
+        assertEquals(UInt.SIZE_BITS, TypeSize.bitSize(UInt))
+        assertEquals(ULong.SIZE_BITS, TypeSize.bitSize(ULong))
+    }
+
+    @Test
+    fun testByteSizeFunction() {
+        assertEquals(Byte.SIZE_BYTES, TypeSize.byteSize(Byte))
+        assertEquals(Short.SIZE_BYTES, TypeSize.byteSize(Short))
+        assertEquals(Int.SIZE_BYTES, TypeSize.byteSize(Int))
+        assertEquals(Long.SIZE_BYTES, TypeSize.byteSize(Long))
+        assertEquals(Float.SIZE_BYTES, TypeSize.byteSize(Float))
+        assertEquals(Double.SIZE_BYTES, TypeSize.byteSize(Double))
+        assertEquals(UByte.SIZE_BYTES, TypeSize.byteSize(UByte))
+        assertEquals(UShort.SIZE_BYTES, TypeSize.byteSize(UShort))
+        assertEquals(UInt.SIZE_BYTES, TypeSize.byteSize(UInt))
+        assertEquals(ULong.SIZE_BYTES, TypeSize.byteSize(ULong))
+    }
 }
