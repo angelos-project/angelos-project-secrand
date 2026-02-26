@@ -20,10 +20,14 @@ import org.angproj.sec.stat.cryptoHealthCheck
 import org.angproj.sec.stat.securityHealthCheck
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
+import org.angproj.sec.util.WriteOctet
+import org.angproj.sec.util.ceilDiv
 import org.angproj.sec.util.ensure
+import kotlin.math.max
+import kotlin.math.min
 
-public class Reseeder(private val sponge: Sponge) : BitStatisticCollector() {
-    private fun consumeLong(value: Long): Unit = consume<Unit>(value, TypeSize.longBits)
+public class Reseeder(sponge: Sponge) : AbstractRandom<Sponge>(sponge, sponge.visibleSize){
+    /*private fun consumeLong(value: Long): Unit = consume<Unit>(value, TypeSize.longBits)
 
     private fun innerReseed(sponge: Sponge, size: Int, exporter: Octet.ExportLongs<Sponge>) {
         var pos = size
@@ -67,13 +71,32 @@ public class Reseeder(private val sponge: Sponge) : BitStatisticCollector() {
         if(fails >= 2) ensure<SecureRandomException> {
             SecureRandomException("Catastrophic failure: 2 consecutive failed secure health check attempts.")
         }
+    }*/
+
+    override fun exportSize(): Int = 1024 / TypeSize.longSize
+
+    override fun posProgress(pos: Int): Int = 1
+
+    override fun invalidateState() { obj.reset() }
+
+    override fun digest(
+        value: Long,
+        pos: Int,
+        len: Int,
+        writeOctet: WriteOctet<Sponge, Byte>
+    ) {
+        obj.absorb(value, pos)
+    }
+
+    override fun whenSatisfied() {
+        obj.scramble()
     }
 
     public fun reseed(entropySource: Security) {
-        innerReseed(sponge, sponge.visibleSize,  entropySource::readLongs)
+        innerFill(entropySource::readLongs) { idx, v -> }
     }
 
     public fun reseed(entropySource: JitterEntropy) {
-        innerReseed(sponge, sponge.visibleSize, entropySource::readLongs)
+        innerFill(entropySource::readLongs) { idx, v -> }
     }
 }

@@ -15,18 +15,15 @@
 package org.angproj.sec.util
 
 import org.angproj.sec.SecureFeed
-import org.angproj.sec.SecureRandomException
+import org.angproj.sec.rand.AbstractRandom
 import org.angproj.sec.rand.JitterEntropy
 import org.angproj.sec.rand.Security
-import org.angproj.sec.stat.BitStatisticCollector
-import org.angproj.sec.stat.cryptoHealthCheck
-import org.angproj.sec.stat.securityHealthCheck
 import kotlin.math.max
 import kotlin.math.min
 
 
-public class SecurelyRandomize : BitStatisticCollector() {
-    private fun consumeLong(value: Long): Unit = consume<Unit>(value, TypeSize.longBits)
+public class SecurelyRandomize(obj: ByteArray) : AbstractRandom<ByteArray>(obj, obj.size) {
+    /*private fun consumeLong(value: Long): Unit = consume<Unit>(value, TypeSize.longBits)
 
     private fun<E> innerReseed(array: E, size: Int, exporter: Octet.ExportLongs<E>, writeOctet: WriteOctet<E, Byte>) {
         require(size in 0..(32 * 1024)) { "Array size must be between 0 and 32768 bytes." }
@@ -70,17 +67,36 @@ public class SecurelyRandomize : BitStatisticCollector() {
         if(fails >= 2) ensure<SecureRandomException> {
             SecureRandomException("Catastrophic failure: 2 consecutive failed secure health check attempts.")
         }
+    }*/
+
+    override fun exportSize(): Int = max(1024 / TypeSize.longSize, size.ceilDiv(8))
+
+    override fun posProgress(pos: Int): Int = min(8, size - pos)
+
+    override fun invalidateState() { obj.fill(0) }
+
+    override fun digest(
+        value: Long,
+        pos: Int,
+        len: Int,
+        writeOctet: WriteOctet<ByteArray, Byte>
+    ) {
+        Octet.write(value, obj, pos, len, writeOctet)
     }
 
-    public fun reseed(array: ByteArray, entropySource: Security) {
-        innerReseed(array, array.size, entropySource::readLongs) { idx, v ->
-            array[idx] = v
+    override fun whenSatisfied() {
+    /* No additional action needed when satisfied, as the array is already filled with random data. */
+    }
+
+    public fun randomize(entropySource: Security) {
+        innerFill(entropySource::readLongs) { idx, v ->
+            obj[idx] = v
         }
     }
 
-    public fun reseed(array: ByteArray, entropySource: JitterEntropy) {
-        innerReseed(array, array.size,  entropySource::readLongs) { idx, v ->
-            array[idx] = v
+    public fun randomize(entropySource: JitterEntropy) {
+        innerFill(entropySource::readLongs) { idx, v ->
+            obj[idx] = v
         }
     }
 }
@@ -104,7 +120,7 @@ public fun ByteArray.securelyRandomize() {
             data = data ushr TypeSize.byteBits
         }*/
     }*/
-        SecurelyRandomize().reseed(this, SecureFeed)
+        SecurelyRandomize(this).randomize(JitterEntropy)
 }
 
 /**

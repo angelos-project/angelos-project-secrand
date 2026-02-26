@@ -37,7 +37,7 @@ public abstract class AbstractRandom<E>(
 
     protected abstract fun invalidateState()
 
-    protected abstract fun digest(value: Long, pos: Int, len: Int, writeOctet: WriteOctet<E, Byte>): Long
+    protected abstract fun digest(value: Long, pos: Int, len: Int, writeOctet: WriteOctet<E, Byte>)
 
     protected abstract fun whenSatisfied()
 
@@ -88,11 +88,11 @@ public abstract class AbstractRandom<E>(
         }
     }
 
-    public fun reseed(entropySource: Security) {
+    /*public fun reseed(entropySource: Security) {
         innerFill(entropySource::readLongs) { idx, v -> }
     }
 
     public fun reseed(entropySource: JitterEntropy) {
         innerFill(entropySource::readLongs) { idx, v -> }
-    }
+    }*/
 }
