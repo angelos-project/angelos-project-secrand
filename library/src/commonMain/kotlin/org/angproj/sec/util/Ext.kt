@@ -14,7 +14,7 @@
  */
 package org.angproj.sec.util
 
-import org.angproj.sec.stat.BitStatistic
+import org.angproj.sec.stat.BitStatisticSnapshot
 import kotlin.math.absoluteValue
 
 /**
@@ -159,19 +159,19 @@ public fun Long.toUnitFraction(): Double = ((this and 0x7fffffffffffffffL) / (1L
  *
  * This function analyzes the bits of the source data [src] using the provided [readOctet] function to read bytes.
  * It computes various statistics, including the total number of bits, counts of ones and zeros, distribution of hexadecimal values,
- * run lengths of consecutive bits, and counts of long runs. The results are encapsulated in a [BitStatistic] object.
+ * run lengths of consecutive bits, and counts of long runs. The results are encapsulated in a [BitStatisticSnapshot] object.
  *
  * @param src The source data from which to collect bit statistics.
  * @param size The size of the source data in bytes. Must be greater than 0.
  * @param readOctet A function that reads a byte from the source data at a given index.
- * @return A [BitStatistic] object containing the collected statistics about the bits in the source data.
+ * @return A [BitStatisticSnapshot] object containing the collected statistics about the bits in the source data.
  * @throws IllegalArgumentException if [size] is not greater than 0.
  */
 public fun<E> bitStatisticCollection(
     src: E,
     size: Int,
     readOctet: ReadOctet<E, Byte>
-): BitStatistic {
+): BitStatisticSnapshot {
     check(size > 0) { "Entropy cannot be empty" }
 
     var total = 0
@@ -209,5 +209,5 @@ public fun<E> bitStatisticCollection(
         if (run > 20) longRun++ else runs[run - 1]++
     }
 
-    return BitStatistic(total, ones, zeros, hex.toList(), runs.toList(), longRun)
+    return BitStatisticSnapshot(total, ones, zeros, hex.toList(), runs.toList(), longRun)
 }
