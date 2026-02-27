@@ -16,6 +16,7 @@ package org.angproj.sec.util
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class TypeSizeTest {
 
@@ -75,6 +76,10 @@ class TypeSizeTest {
         assertEquals(UShort.SIZE_BITS, TypeSize.bitSize(8.toUShort()))
         assertEquals(UInt.SIZE_BITS, TypeSize.bitSize(9.toUInt()))
         assertEquals(ULong.SIZE_BITS, TypeSize.bitSize(10.toULong()))
+
+        assertFailsWith<IllegalStateException> {
+            TypeSize.bitSize("Unsupported type")
+        }
     }
 
     @Test
@@ -89,5 +94,9 @@ class TypeSizeTest {
         assertEquals(UShort.SIZE_BYTES, TypeSize.byteSize(8.toUShort()))
         assertEquals(UInt.SIZE_BYTES, TypeSize.byteSize(9.toUInt()))
         assertEquals(ULong.SIZE_BYTES, TypeSize.byteSize(10.toULong()))
+
+        assertFailsWith<IllegalStateException> {
+            TypeSize.byteSize("Unsupported type")
+        }
     }
 }
