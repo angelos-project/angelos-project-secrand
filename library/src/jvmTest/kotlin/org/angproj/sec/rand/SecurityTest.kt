@@ -12,17 +12,16 @@
  * Contributors:
  *      Kristoffer Paulsson - initial implementation
  */
-package org.angproj.sec.stat
+package org.angproj.sec.rand
 
 import org.angproj.sec.GarbageGarbler
 import org.angproj.sec.SecureEntropy
 import org.angproj.sec.SecureFeed
-import org.angproj.sec.rand.RandomBits
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.*
 
-class HealthCheckTest {
+class SecurityTest {
     @Test
     fun testGarbageGarbler() {
         try {
