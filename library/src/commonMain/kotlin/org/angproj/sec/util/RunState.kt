@@ -14,6 +14,14 @@
  */
 package org.angproj.sec.util
 
+/**
+ * Represents the state of a process or operation.
+ *
+ * This enum class defines three states:
+ * - INITIALIZE: The process is in the initialization phase, where setup and preparation are being performed.
+ * - RUNNING: The process is currently active and executing its main tasks.
+ * - FINISHED: The process has completed its execution and is no longer active.
+ */
 public enum class RunState {
     INITIALIZE, RUNNING, FINISHED
 }

@@ -14,11 +14,13 @@
  */
 package org.angproj.sec.stat
 
-import org.angproj.sec.util.TypeSize
+import org.angproj.sec.util.RunState
 import kotlin.math.*
 
 
 public abstract class BitStatisticCollector : BitStatistic {
+    protected var _state: RunState = RunState.INITIALIZE
+
     protected var _total: Int = 0
     protected var _ones: Int = 0
     protected var _zeros: Int = 0
@@ -47,16 +49,21 @@ public abstract class BitStatisticCollector : BitStatistic {
         run = 0
         last = false
         data = 0
+        _state = RunState.INITIALIZE
     }
 
     protected fun setup(first: Boolean) {
+        check(_state == RunState.INITIALIZE) { "Invalid state: $_state, expected INITIALIZE" }
         last = first
+        _state = RunState.RUNNING
     }
 
     protected fun finish() {
+        check(_state == RunState.RUNNING) { "Invalid state: $_state, expected RUNNING" }
         if (run > 0) {
             if (run > 20) _longRuns++ else _runs[run - 1]++
         }
+        _state = RunState.FINISHED
     }
 
     protected inline fun<reified E: Any> collectBit(bit: Boolean) {
@@ -74,6 +81,7 @@ public abstract class BitStatisticCollector : BitStatistic {
     }
 
     protected inline fun<reified E: Any> consume(data: Long, bitSize: Int) {
+        check(_state == RunState.RUNNING) { "Invalid state: $_state, expected RUNNING" }
         var mask = 1L shl (bitSize - 1)
         repeat(bitSize) {
             collectBit<Unit>((data and mask) != 0L)
