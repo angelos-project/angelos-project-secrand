@@ -138,30 +138,30 @@ public object TypeSize {
     public const val doubleSize: Int = Double.SIZE_BYTES
 
     public fun<E> bitSize(type: E): Int = when (type) {
-        Byte -> byteBits
-        Short -> shortBits
-        Int -> intBits
-        Long -> longBits
-        Float -> floatBits
-        Double -> doubleBits
-        UByte -> uByteBits
-        UShort -> uShortBits
-        UInt -> uIntBits
-        ULong -> uLongBits
+        is Byte -> byteBits
+        is Short -> shortBits
+        is Int -> intBits
+        is Long -> longBits
+        is Float -> floatBits
+        is Double -> doubleBits
+        is UByte -> uByteBits
+        is UShort -> uShortBits
+        is UInt -> uIntBits
+        is ULong -> uLongBits
         else -> error("Unsupported type: ${this::class}")
     }
 
     public fun <E> byteSize(type: E): Int = when (type) {
-        Byte -> byteSize
-        Short -> shortSize
-        Int -> intSize
-        Long -> longSize
-        Float -> floatSize
-        Double -> doubleSize
-        UByte -> uByteSize
-        UShort -> uShortSize
-        UInt -> uIntSize
-        ULong -> uLongSize
+        is Byte -> byteSize
+        is Short -> shortSize
+        is Int -> intSize
+        is Long -> longSize
+        is Float -> floatSize
+        is Double -> doubleSize
+        is UByte -> uByteSize
+        is UShort -> uShortSize
+        is UInt -> uIntSize
+        is ULong -> uLongSize
         else -> error("Unsupported type: ${this::class}")
     }
 }
