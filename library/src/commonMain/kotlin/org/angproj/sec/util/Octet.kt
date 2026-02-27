@@ -248,10 +248,6 @@ public object Octet {
         importer.import(this, 0, this.size, readOctet)
     }
 
-    public fun ByteArray.bitIterator(range: IntRange = 0..lastIndex): Iterator<Boolean> = bitIterator(range, this) { index ->
-        this[index]
-    }
-
     public fun<E> bitIterator(range: IntRange, src: E, readOctet: ReadOctet<E, Byte>): Iterator<Boolean> = object : Iterator<Boolean> {
         private var current = 0
         private var pos = range.first * 8

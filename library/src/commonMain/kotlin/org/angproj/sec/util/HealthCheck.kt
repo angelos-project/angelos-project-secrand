@@ -49,9 +49,8 @@ public class HealthCheck : BitStatisticCollector() {
      * @return A snapshot of the collected bit statistics after analyzing the provided bits.
      */
     public fun analyze(iter: Iterator<Boolean>): BitStatisticSnapshot {
-        reset()
         consumeIterator(iter)
-        return snapshot()
+        return snapshot().also { reset() }
     }
 
     /**

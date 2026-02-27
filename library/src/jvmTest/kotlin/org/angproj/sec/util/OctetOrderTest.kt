@@ -14,7 +14,9 @@
  */
 package org.angproj.sec.util
 
+import org.angproj.sec.rand.AbstractSponge256
 import java.nio.ByteOrder
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -23,5 +25,16 @@ class OctetOrderTest {
     @Test
     fun testNativeEndian() {
         assertEquals(ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN, Octet.isLittleEndian)
+    }
+
+    @Test
+    fun testHashAbsorber() {
+        val sponge = object : AbstractSponge256() {}
+        val absorber = HashAbsorber(sponge)
+        repeat(16) {
+            absorber.absorb(Random.nextLong())
+        }
+        sponge.scramble()
+        assertEquals(absorber.position, 0)
     }
 }
