@@ -40,6 +40,7 @@ public abstract class BitStatisticCollector : BitStatistic {
     protected var data: Int = 0
 
     protected fun reset() {
+        check(_state == RunState.FINISHED)
         _total = 0
         _ones = 0
         _zeros = 0

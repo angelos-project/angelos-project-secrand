@@ -48,7 +48,6 @@ public abstract class AbstractRandom<E>(
         val mask = (1L shl (TypeSize.longBits - 1))
 
         do {
-            reset()
             invalidateState()
 
             var lastCrypto = snapshot()
@@ -82,6 +81,7 @@ public abstract class AbstractRandom<E>(
                 fails++
                 satisfied = false
             }
+            reset()
         } while (!satisfied && fails <= 2)
         if(fails >= 2) ensure<SecureRandomException> {
             SecureRandomException("Catastrophic failure: 2 consecutive failed secure health check attempts.")
