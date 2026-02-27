@@ -45,7 +45,6 @@ public abstract class AbstractRandom<E>(
         require(size in 0..(32 * 1024)) { "Array size must be between 0 and 32768 bytes." }
         var pos = 0
         var fails = 0
-        val mask = (1L shl (TypeSize.longBits - 1))
 
         do {
             invalidateState()
@@ -72,7 +71,7 @@ public abstract class AbstractRandom<E>(
                         }
                     }
                 }
-                if(counter++ == 0) setup(value and mask == 0L)
+                if(counter++ == 0) setup(boolFromIndex<Unit>(0, boolMask<Unit>(TypeSize.longBits), value))
                 consumeLong(value)
             }
 

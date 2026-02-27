@@ -70,7 +70,7 @@ public abstract class BitStatisticCollector : BitStatistic {
     protected inline fun<reified E: Any> collectBit(bit: Boolean) {
         _total++
         data = (data shl 1) or if (bit) 1 else 0
-        if(total % 4 == 0) _hex[data and 0xF]++
+        if(_total % 4 == 0) _hex[data and 0xF]++
         if (bit) _ones++ else _zeros++
         if (bit == last) run++ else {
             if (run > 0) {
@@ -83,10 +83,21 @@ public abstract class BitStatisticCollector : BitStatistic {
 
     protected inline fun<reified E: Any> consume(data: Long, bitSize: Int) {
         check(_state == RunState.RUNNING) { "Invalid state: $_state, expected RUNNING" }
-        var mask = 1L shl (bitSize - 1)
+        val boolMask = boolMask<Unit>(bitSize)
         repeat(bitSize) {
-            collectBit<Unit>((data and mask) != 0L)
-            mask = mask ushr 1
+            collectBit<Unit>(boolFromIndex<Unit>(it, boolMask, data))
         }
+    }
+
+    /**
+     * Calculates a mask with only one bit and places the bit leftmost based on bitSize.
+     */
+    protected inline fun<reified E: Any> boolMask(bitSize: Int): Long = 1L shl (bitSize - 1)
+
+    /**
+     * Uses a sing bit mask and returns a bit as boolean based on the index from left to right.
+     * */
+    protected inline fun<reified E: Any> boolFromIndex(index: Int, mask: Long, value: Long): Boolean {
+        return value and (mask ushr index) != 0L
     }
 }

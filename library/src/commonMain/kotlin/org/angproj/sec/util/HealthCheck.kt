@@ -35,8 +35,10 @@ public class HealthCheck : BitStatisticCollector() {
     private fun consumeLong(value: Long): Unit = consume<Unit>(value, TypeSize.longBits)
 
     private fun consumeIterator(iter: Iterator<Boolean>) {
-        setup(iter.next().also { collectBit<Unit>(it) })
-        iter.forEach { bit -> collectBit<Unit>(bit) }
+        val first = iter.next()
+        setup(first)
+        collectBit<Unit>(first)
+        while (iter.hasNext()) { collectBit<Unit>(iter.next()) }
         finish()
     }
 
@@ -79,22 +81,22 @@ public class HealthCheck : BitStatisticCollector() {
      * @return A snapshot of the collected bit statistics after analyzing the provided bits.
      */
     public fun analyze(randomBits: RandomBits, debug: Boolean = false): BitStatisticSnapshot {
-        reset()
         val sample = ByteArray(if(debug) 1024 else 0)
-        val first = RandomBits.nextBitsToLong(randomBits)
-        setup(1L shl (TypeSize.longBits - 1) and first != 0L)
-        consumeLong(first)
+        var random = RandomBits.nextBitsToLong(randomBits)
+        setup(boolFromIndex<Unit>(0, boolMask<Unit>(TypeSize.longBits), random))
+        consumeLong(random)
         if(debug) {
-            Octet.write(first, sample, 0, TypeSize.longSize) { idx, value ->
+            Octet.write(random, sample, 0, TypeSize.longSize) { idx, value ->
                 sample[idx] = value
             }
         }
 
         repeat((1024 / TypeSize.longSize) - 1) {
-            consumeLong(RandomBits.nextBitsToLong(randomBits))
+            random = RandomBits.nextBitsToLong(randomBits)
+            consumeLong(random)
             if(debug) {
                 Octet.write(
-                    RandomBits.nextBitsToLong(randomBits),
+                    random,
                     sample, (it + 1) * TypeSize.longSize,
                     TypeSize.longSize)
                 { idx, value ->
@@ -106,7 +108,7 @@ public class HealthCheck : BitStatisticCollector() {
         if(debug) {
             println("Sample: " + sample.asHexSymbols())
         }
-        return snapshot()
+        return snapshot().also { reset() }
     }
 
     public companion object {
@@ -131,6 +133,10 @@ public class HealthCheck : BitStatisticCollector() {
          */
         public fun doubleHealthCheck(
             randomBits: RandomBits, debug: Boolean = false
-        ): Boolean = healthCheck(randomBits, debug) || healthCheck(randomBits, debug)
+        ): Boolean {
+            val hc1 = healthCheck(randomBits, debug)
+            val hc2 = healthCheck(randomBits, debug)
+            return hc1 || hc2
+        }
     }
 }

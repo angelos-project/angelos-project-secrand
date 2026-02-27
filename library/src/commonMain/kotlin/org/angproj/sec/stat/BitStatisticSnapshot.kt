@@ -40,11 +40,7 @@ public data class BitStatisticSnapshot(
     override val hex: List<Int>,
     override val runs: List<Int>,
     override val longRuns: Int
-) : BitStatistic, Comparable<BitStatisticSnapshot> {
-
-    override fun compareTo(other: BitStatisticSnapshot): Int = hashCode() - other.hashCode()
-
-}
+) : BitStatistic
 
 
 /**

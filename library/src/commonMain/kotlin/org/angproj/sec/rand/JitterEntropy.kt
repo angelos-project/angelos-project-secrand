@@ -61,7 +61,7 @@ public object JitterEntropy {
             val recent = start.elapsedNow()
             // Derive entropy from nanosecond and microsecond timing jitter
             val nano: Double = 1.0 / recent.inWholeNanoseconds
-            val micro: Double = 1.0 - ((count++).toDouble() / recent.inWholeMicroseconds)
+            val micro: Double = 1.0 - ((++count).toDouble() / recent.inWholeMicroseconds)
 
             // Apply trigonometric functions to introduce non-linearity
             val nanoBits: Long = sin(nano).toRawBits()

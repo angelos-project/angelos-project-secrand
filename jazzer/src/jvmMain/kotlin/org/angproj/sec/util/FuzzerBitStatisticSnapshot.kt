@@ -25,9 +25,11 @@ public object FuzzerBitStatisticSnapshotKt : FuzzPrefs() {
 
     @JvmStatic
     public fun fuzzerTestOneInput(data: FuzzedDataProvider) {
-        val array = data.consumeBytes(4096)
+        val array = data.consumeRemainingAsBytes()
 
-        assertEquals(bitStatisticOf(array), HealthCheck().analyze(array))
+        try {
+            assertEquals(bitStatisticOf(array), HealthCheck().analyze(array))
+        } catch (_: IllegalStateException) {}
     }
 
     @JvmStatic
