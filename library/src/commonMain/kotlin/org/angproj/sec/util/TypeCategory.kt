@@ -41,17 +41,17 @@ public enum class TypeCategory(public val byteSize: Int, public val bitSize: Int
          * @return The [TypeCategory] corresponding to the type instance.
          * @throws IllegalArgumentException If the type is unsupported.
          */
-        public fun<E: Any> fromType(type: E): TypeCategory = when (type) {
-            is Byte -> BYTE
-            is Short -> SHORT
-            is Int -> INT
-            is Long -> LONG
-            is Float -> FLOAT
-            is Double -> DOUBLE
-            is UByte -> U_BYTE
-            is UShort -> U_SHORT
-            is UInt -> U_INT
-            is ULong -> U_LONG
+        public fun<E: Any> ofType(type: E): TypeCategory = when (type) {
+            Byte, is Byte -> BYTE
+            Short, is Short -> SHORT
+            Int, is Int -> INT
+            Long, is Long -> LONG
+            Float, is Float -> FLOAT
+            Double, is Double -> DOUBLE
+            UByte, is UByte -> U_BYTE
+            UShort, is UShort -> U_SHORT
+            UInt, is UInt -> U_INT
+            ULong, is ULong -> U_LONG
             else -> error("Unsupported type: ${type::class}")
         }
     }

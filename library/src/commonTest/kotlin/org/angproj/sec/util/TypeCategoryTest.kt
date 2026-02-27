@@ -21,38 +21,99 @@ import kotlin.test.assertFailsWith
 class TypeCategoryTest {
 
     @Test
-    fun testBitSizeFunction() {
-        assertEquals(TypeCategory.fromType(1.toByte()).bitSize, TypeSize.bitSize(1.toByte()))
-        assertEquals(TypeCategory.fromType(2.toShort()).bitSize, TypeSize.bitSize(2.toShort()))
-        assertEquals(TypeCategory.fromType(3).bitSize, TypeSize.bitSize(3))
-        assertEquals(TypeCategory.fromType(4.toLong()).bitSize, TypeSize.bitSize(4.toLong()))
-        assertEquals(TypeCategory.fromType(5.toFloat()).bitSize, TypeSize.bitSize(5.toFloat()))
-        assertEquals(TypeCategory.fromType(6.0).bitSize, TypeSize.bitSize(6.0))
-        assertEquals(TypeCategory.fromType(7.toUByte()).bitSize, TypeSize.bitSize(7.toUByte()))
-        assertEquals(TypeCategory.fromType(8.toUShort()).bitSize, TypeSize.bitSize(8.toUShort()))
-        assertEquals(TypeCategory.fromType(9.toUInt()).bitSize, TypeSize.bitSize(9.toUInt()))
-        assertEquals(TypeCategory.fromType(10.toULong()).bitSize, TypeSize.bitSize(10.toULong()))
+    fun testByte() {
+        assertEquals(TypeCategory.BYTE.bitSize, TypeSize.byteBits)
+        assertEquals(TypeCategory.BYTE.byteSize, TypeSize.byteSize)
 
-        assertFailsWith<IllegalStateException> {
-            TypeCategory.fromType("Unsupported type")
-        }
+        assertEquals(TypeCategory.ofType(Byte), TypeCategory.BYTE)
+        assertEquals(TypeCategory.ofType(1.toByte()), TypeCategory.BYTE)
     }
 
     @Test
-    fun testByteSizeFunction() {
-        assertEquals(TypeCategory.fromType(1.toByte()).byteSize, TypeSize.byteSize(1.toByte()))
-        assertEquals(TypeCategory.fromType(2.toShort()).byteSize, TypeSize.byteSize(2.toShort()))
-        assertEquals(TypeCategory.fromType(3).byteSize, TypeSize.byteSize(3))
-        assertEquals(TypeCategory.fromType(4.toLong()).byteSize, TypeSize.byteSize(4.toLong()))
-        assertEquals(TypeCategory.fromType(5.toFloat()).byteSize, TypeSize.byteSize(5.toFloat()))
-        assertEquals(TypeCategory.fromType(6.0).byteSize, TypeSize.byteSize(6.0))
-        assertEquals(TypeCategory.fromType(7.toUByte()).byteSize, TypeSize.byteSize(7.toUByte()))
-        assertEquals(TypeCategory.fromType(8.toUShort()).byteSize, TypeSize.byteSize(8.toUShort()))
-        assertEquals(TypeCategory.fromType(9.toUInt()).byteSize, TypeSize.byteSize(9.toUInt()))
-        assertEquals(TypeCategory.fromType(10.toULong()).byteSize, TypeSize.byteSize(10.toULong()))
+    fun testShort() {
+        assertEquals(TypeCategory.SHORT.bitSize, TypeSize.shortBits)
+        assertEquals(TypeCategory.SHORT.byteSize, TypeSize.shortSize)
 
+        assertEquals(TypeCategory.ofType(Short), TypeCategory.SHORT)
+        assertEquals(TypeCategory.ofType(2.toShort()), TypeCategory.SHORT)
+    }
+
+    @Test
+    fun testInt() {
+        assertEquals(TypeCategory.INT.bitSize, TypeSize.intBits)
+        assertEquals(TypeCategory.INT.byteSize, TypeSize.intSize)
+
+        assertEquals(TypeCategory.ofType(Int), TypeCategory.INT)
+        assertEquals(TypeCategory.ofType(3.toInt()), TypeCategory.INT)
+    }
+
+    @Test
+    fun testLong() {
+        assertEquals(TypeCategory.LONG.bitSize, TypeSize.longBits)
+        assertEquals(TypeCategory.LONG.byteSize, TypeSize.longSize)
+
+        assertEquals(TypeCategory.ofType(Long), TypeCategory.LONG)
+        assertEquals(TypeCategory.ofType(4L), TypeCategory.LONG)
+    }
+
+    @Test
+    fun testFloat() {
+        assertEquals(TypeCategory.FLOAT.bitSize, TypeSize.floatBits)
+        assertEquals(TypeCategory.FLOAT.byteSize, TypeSize.floatSize)
+
+        assertEquals(TypeCategory.ofType(Float), TypeCategory.FLOAT)
+        assertEquals(TypeCategory.ofType(5f), TypeCategory.FLOAT)
+    }
+
+    @Test
+    fun testDouble() {
+        assertEquals(TypeCategory.DOUBLE.bitSize, TypeSize.doubleBits)
+        assertEquals(TypeCategory.DOUBLE.byteSize, TypeSize.doubleSize)
+
+        assertEquals(TypeCategory.ofType(Double), TypeCategory.DOUBLE)
+        assertEquals(TypeCategory.ofType(6.0), TypeCategory.DOUBLE)
+    }
+
+    @Test
+    fun testUByte() {
+        assertEquals(TypeCategory.U_BYTE.bitSize, TypeSize.uByteBits)
+        assertEquals(TypeCategory.U_BYTE.byteSize, TypeSize.uByteSize)
+
+        assertEquals(TypeCategory.ofType(UByte), TypeCategory.U_BYTE)
+        assertEquals(TypeCategory.ofType(7.toUByte()), TypeCategory.U_BYTE)
+    }
+
+    @Test
+    fun testUShort() {
+        assertEquals(TypeCategory.U_SHORT.bitSize, TypeSize.uShortBits)
+        assertEquals(TypeCategory.U_SHORT.byteSize, TypeSize.uShortSize)
+
+        assertEquals(TypeCategory.ofType(UShort), TypeCategory.U_SHORT)
+        assertEquals(TypeCategory.ofType(8.toUShort()), TypeCategory.U_SHORT)
+    }
+
+    @Test
+    fun testUInt() {
+        assertEquals(TypeCategory.U_INT.bitSize, TypeSize.intBits)
+        assertEquals(TypeCategory.U_INT.byteSize, TypeSize.intSize)
+
+        assertEquals(TypeCategory.ofType(UInt), TypeCategory.U_INT)
+        assertEquals(TypeCategory.ofType(9.toUInt()), TypeCategory.U_INT)
+    }
+
+    @Test
+    fun testULong() {
+        assertEquals(TypeCategory.U_LONG.bitSize, TypeSize.uLongBits)
+        assertEquals(TypeCategory.U_LONG.byteSize, TypeSize.uLongSize)
+
+        assertEquals(TypeCategory.ofType(ULong), TypeCategory.U_LONG)
+        assertEquals(TypeCategory.ofType(4uL), TypeCategory.U_LONG)
+    }
+
+    @Test
+    fun testUnsupportedType() {
         assertFailsWith<IllegalStateException> {
-            TypeCategory.fromType("Unsupported type")
+            TypeCategory.ofType("Unsupported type")
         }
     }
 }

@@ -136,32 +136,4 @@ public object TypeSize {
      * Total number of bytes in a Double is 8, which derives from `Double.SIZE_BYTES`.
      */
     public const val doubleSize: Int = Double.SIZE_BYTES
-
-    public fun<E> bitSize(type: E): Int = when (type) {
-        is Byte -> byteBits
-        is Short -> shortBits
-        is Int -> intBits
-        is Long -> longBits
-        is Float -> floatBits
-        is Double -> doubleBits
-        is UByte -> uByteBits
-        is UShort -> uShortBits
-        is UInt -> uIntBits
-        is ULong -> uLongBits
-        else -> error("Unsupported type: ${this::class}")
-    }
-
-    public fun <E> byteSize(type: E): Int = when (type) {
-        is Byte -> byteSize
-        is Short -> shortSize
-        is Int -> intSize
-        is Long -> longSize
-        is Float -> floatSize
-        is Double -> doubleSize
-        is UByte -> uByteSize
-        is UShort -> uShortSize
-        is UInt -> uIntSize
-        is ULong -> uLongSize
-        else -> error("Unsupported type: ${this::class}")
-    }
 }

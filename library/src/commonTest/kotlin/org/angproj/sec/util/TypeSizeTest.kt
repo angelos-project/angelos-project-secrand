@@ -16,7 +16,6 @@ package org.angproj.sec.util
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 class TypeSizeTest {
 
@@ -62,41 +61,5 @@ class TypeSizeTest {
     fun testFloatingPointBytes() {
         assertEquals(Float.SIZE_BYTES, TypeSize.floatSize)
         assertEquals(Double.SIZE_BYTES, TypeSize.doubleSize)
-    }
-
-    @Test
-    fun testBitSizeFunction() {
-        assertEquals(Byte.SIZE_BITS, TypeSize.bitSize(1.toByte()))
-        assertEquals(Short.SIZE_BITS, TypeSize.bitSize(2.toShort()))
-        assertEquals(Int.SIZE_BITS, TypeSize.bitSize(3))
-        assertEquals(Long.SIZE_BITS, TypeSize.bitSize(4.toLong()))
-        assertEquals(Float.SIZE_BITS, TypeSize.bitSize(5.toFloat()))
-        assertEquals(Double.SIZE_BITS, TypeSize.bitSize(6.0))
-        assertEquals(UByte.SIZE_BITS, TypeSize.bitSize(7.toUByte()))
-        assertEquals(UShort.SIZE_BITS, TypeSize.bitSize(8.toUShort()))
-        assertEquals(UInt.SIZE_BITS, TypeSize.bitSize(9.toUInt()))
-        assertEquals(ULong.SIZE_BITS, TypeSize.bitSize(10.toULong()))
-
-        assertFailsWith<IllegalStateException> {
-            TypeSize.bitSize("Unsupported type")
-        }
-    }
-
-    @Test
-    fun testByteSizeFunction() {
-        assertEquals(Byte.SIZE_BYTES, TypeSize.byteSize(1.toByte()))
-        assertEquals(Short.SIZE_BYTES, TypeSize.byteSize(2.toShort()))
-        assertEquals(Int.SIZE_BYTES, TypeSize.byteSize(3))
-        assertEquals(Long.SIZE_BYTES, TypeSize.byteSize(4.toLong()))
-        assertEquals(Float.SIZE_BYTES, TypeSize.byteSize(5.toFloat()))
-        assertEquals(Double.SIZE_BYTES, TypeSize.byteSize(6.0))
-        assertEquals(UByte.SIZE_BYTES, TypeSize.byteSize(7.toUByte()))
-        assertEquals(UShort.SIZE_BYTES, TypeSize.byteSize(8.toUShort()))
-        assertEquals(UInt.SIZE_BYTES, TypeSize.byteSize(9.toUInt()))
-        assertEquals(ULong.SIZE_BYTES, TypeSize.byteSize(10.toULong()))
-
-        assertFailsWith<IllegalStateException> {
-            TypeSize.byteSize("Unsupported type")
-        }
     }
 }
