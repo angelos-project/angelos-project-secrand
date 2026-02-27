@@ -19,6 +19,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
+import kotlin.test.assertFailsWith
 
 
 class GarbageGarblerTest {
@@ -69,11 +70,8 @@ class GarbageGarblerTest {
     fun testImportBytesRejectsZeroLength() {
         val garbler = GarbageGarbler()
         val data = ByteArray(10)
-        try {
+        assertFailsWith<IllegalArgumentException> {
             garbler.seedEntropy(data, 0, 0) { idx -> this[idx] }
-            assertTrue(false)
-        } catch (_: IllegalArgumentException) {
-            assertTrue(true)
         }
     }
 
