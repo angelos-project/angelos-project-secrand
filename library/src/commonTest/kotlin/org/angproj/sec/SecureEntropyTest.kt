@@ -14,8 +14,8 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.stat.bitStatisticOf
 import org.angproj.sec.stat.securityHealthCheck
+import org.angproj.sec.util.HealthCheck
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -63,11 +63,11 @@ class SecureEntropyTest {
     fun testSecurityHealth() {
         val result = ByteArray(1024).let {
             SecureEntropy.readBytes(it, 0, it.size) { idx, value -> this[idx] = value }
-            bitStatisticOf(it).securityHealthCheck()
+            HealthCheck().analyze(it).securityHealthCheck()
         }
         val result2 = ByteArray(1024).let {
             SecureEntropy.readBytes(it, 0, it.size) { idx, value -> this[idx] = value }
-            bitStatisticOf(it).securityHealthCheck()
+            HealthCheck().analyze(it).securityHealthCheck()
         }
 
         assertTrue{ result || result2 }

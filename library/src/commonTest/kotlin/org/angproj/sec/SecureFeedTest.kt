@@ -14,7 +14,7 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.stat.doubleHealthCheck
+import org.angproj.sec.util.HealthCheck
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -61,6 +61,6 @@ class SecureFeedTest {
 
     @Test
     fun testSecurityHealth() {
-        assertTrue{ doubleHealthCheck(SecureFeed) }
+        assertTrue{ HealthCheck.doubleHealthCheck(SecureFeed, true) }
     }
 }

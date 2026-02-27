@@ -14,7 +14,7 @@
  */
 package org.angproj.sec.rand
 
-import org.angproj.sec.stat.doubleHealthCheck
+import org.angproj.sec.util.HealthCheck
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -54,11 +54,6 @@ class JitterEntropyTest {
 
     @Test
     fun testSecurityHealth() {
-        /*val jitter = ByteArray(1024)
-        repeat(2) {
-            JitterEntropy.readBytes(jitter, 0, jitter.size) { idx, value -> this[idx] = value }
-            println(jitter.asHexSymbols())
-        }*/
-        assertTrue{ doubleHealthCheck(JitterEntropy.JitterEntropyState()) }
+        assertTrue{ HealthCheck.doubleHealthCheck(JitterEntropy.JitterEntropyState(), true) }
     }
 }

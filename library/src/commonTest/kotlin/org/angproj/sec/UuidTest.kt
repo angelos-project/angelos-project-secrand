@@ -15,8 +15,8 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.RandomBits
-import org.angproj.sec.stat.bitStatisticOf
 import org.angproj.sec.stat.securityHealthCheck
+import org.angproj.sec.util.HealthCheck
 import org.angproj.sec.util.Octet
 import kotlin.math.E
 import kotlin.math.PI
@@ -101,15 +101,15 @@ class UuidTest {
 
     @Test
     fun testUuidHealth() {
-        val result = bitStatisticOf(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
-        val result2 = bitStatisticOf(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
+        val result = HealthCheck().analyze(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
+        val result2 = HealthCheck().analyze(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
         assertTrue{ result || result2 }
     }
 
     @Test
     fun testUuid4Health() {
-        val result = bitStatisticOf(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
-        val result2 = bitStatisticOf(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
+        val result = HealthCheck().analyze(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
+        val result2 = HealthCheck().analyze(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
         assertTrue{ result || result2 }
     }
 }

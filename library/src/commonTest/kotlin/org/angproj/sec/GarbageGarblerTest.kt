@@ -14,7 +14,7 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.stat.doubleHealthCheck
+import org.angproj.sec.util.HealthCheck
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -182,6 +182,6 @@ class GarbageGarblerTest {
 
     @Test
     fun testSecurityHealth() {
-        assertTrue{ doubleHealthCheck(GarbageGarbler()) }
+        assertTrue{ HealthCheck.doubleHealthCheck(GarbageGarbler()) }
     }
 }

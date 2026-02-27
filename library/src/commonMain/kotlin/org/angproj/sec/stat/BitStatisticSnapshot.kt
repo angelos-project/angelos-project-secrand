@@ -43,19 +43,6 @@ public data class BitStatisticSnapshot(
 ) : BitStatistic
 
 
-/**
- * Computes the BitStatistic for a given byte array.
- *
- * This function analyzes the byte array to determine the total number of bits, the count of ones and zeros,
- * the distribution of hexadecimal digits, the distribution of runs of identical bits, and the count of long runs.
- *
- * @param entropy The byte array to analyze.
- * @return A BitStatistic object containing the computed statistics.
- */
-public fun bitStatisticOf(entropy: ByteArray): BitStatisticSnapshot = bitStatisticCollection(entropy, entropy.size) { idx ->
-    this[idx]
-}
-
 // Bit balance: |ones - n/2| < tolerance * sqrt(n/4)
 /**
  * Checks if the number of ones in the bit statistic is balanced around half of the total bits, within a specified tolerance.
@@ -162,38 +149,6 @@ public fun BitStatisticSnapshot.securityHealthCheck(): Boolean {
         total in (1024 * TypeSize.byteBits)..(32 * 1024 * TypeSize.byteBits)
     ) { SecureRandomException("Chunk size not between 1K and 32K bytes long.") }
     return checkBitBalance() && checkHexUniformity() && checkRunDistribution()
-}
-
-/**
- * Performs a double security health check on the random bits by sampling and analyzing the bit statistics twice.
- *
- * This function samples random bits into a byte array and computes the bit statistic for the sampled data. It then
- * performs a security health check on the computed bit statistic. If the first check fails, it samples again and
- * performs a second check. The double check is designed to reduce the likelihood of false positives, as a handful
- * of failures in 10000 samples is expected due to statistical variance.
- *
- * @param randomBits The source of random bits to sample from.
- * @return True if at least one of the two checks passes, false otherwise.
- */
-public fun doubleHealthCheck(randomBits: RandomBits): Boolean {
-    val sample = ByteArray(1024)
-    fun sampleBits(entropy: ByteArray): ByteArray {
-        repeat(sample.size / TypeSize.intSize) { idx ->
-            Octet.write(
-                randomBits.nextBits(TypeSize.intBits).toLong(),
-                entropy,
-                idx * TypeSize.intSize,
-                TypeSize.intSize
-            ) { idx2, value ->
-                entropy[idx2] = value
-            }
-        }
-        return entropy
-    }
-    return bitStatisticOf(
-        sampleBits(sample)).securityHealthCheck() ||
-            bitStatisticOf(
-                sampleBits(sample)).securityHealthCheck()
 }
 
 
