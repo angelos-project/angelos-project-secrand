@@ -43,6 +43,8 @@ public abstract class AbstractRandom<E>(
 
     protected fun innerFill(exporter: Octet.ExportLongs<E>, writeOctet: WriteOctet<E, Byte>) {
         require(size in 0..(32 * 1024)) { "Array size must be between 0 and 32768 bytes." }
+        if(size == 0) return
+
         var pos = 0
         var fails = 0
 

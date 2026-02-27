@@ -19,12 +19,37 @@ import kotlin.test.Test
 
 class ReseederTest {
     @Test
-    fun testReseedSecurity() {
+    fun testReseedJitterEntropy() {
+        Reseeder(object : AbstractSponge256() {}).reseed(JitterEntropy)
+    }
+
+    @Test
+    fun testReseedSecurity256() {
         Reseeder(object : AbstractSponge256() {}).reseed(SecureFeed)
     }
 
     @Test
-    fun testReseedJitterEntropy() {
-        Reseeder(object : AbstractSponge256() {}).reseed(JitterEntropy)
+    fun testReseedSecurity512() {
+        Reseeder(object : AbstractSponge512() {}).reseed(SecureFeed)
+    }
+
+    @Test
+    fun testReseedSecurity1024() {
+        Reseeder(object : AbstractSponge1024() {}).reseed(SecureFeed)
+    }
+
+    @Test
+    fun testReseedSecurity2256() {
+        Reseeder(object : AbstractSponge2256() {}).reseed(SecureFeed)
+    }
+
+    @Test
+    fun testReseedSecurity2512() {
+        Reseeder(object : AbstractSponge2512() {}).reseed(SecureFeed)
+    }
+
+    @Test
+    fun testReseedSecurity21024() {
+        Reseeder(object : AbstractSponge21024() {}).reseed(SecureFeed)
     }
 }

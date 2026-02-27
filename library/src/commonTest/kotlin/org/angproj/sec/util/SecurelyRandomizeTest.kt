@@ -17,6 +17,7 @@ package org.angproj.sec.util
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 class SecurelyRandomizeTest {
 
@@ -48,5 +49,22 @@ class SecurelyRandomizeTest {
         assertEquals(size, buffer2.size)
         // With high probability, two random arrays should not be equal
         assertNotEquals(buffer1.toList(), buffer2.toList())
+    }
+
+    @Test
+    fun testSecurelyRandomizeSmallSizes() {
+        repeat(32) {
+            val array = ByteArray(it+1).also { it.securelyRandomize() }
+            assertNotEquals(array.sum(), 0)
+        }
+    }
+
+    @Test
+    fun testSecurelyRandomizeZeroSize() {
+        try {
+            ByteArray(0).securelyRandomize()
+        } catch (_: Exception) {
+            assertTrue(false)
+        }
     }
 }

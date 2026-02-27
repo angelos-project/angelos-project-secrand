@@ -48,7 +48,7 @@ public interface BitStatistic {
      * @return A new BitStatisticSnapshot representing the difference between this BitStatistic and the other BitStatistic.
      */
     public fun diff(other: BitStatistic): BitStatisticSnapshot {
-        check(total > other.total) { "The current must be larger/newer than the other."}
+        check(total >= other.total) { "The current must be equal or larger/newer than the other."}
         return BitStatisticSnapshot(
             total = total - other.total,
             ones = ones - other.ones,
