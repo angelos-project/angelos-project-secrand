@@ -87,28 +87,25 @@ public class HealthCheck : BitStatisticCollector() {
         }
     }
 
-    /**
-     * Analyze bits from a RandomBits source and return a snapshot of the collected statistics.
-     *
-     * @param randomBits The RandomBits source to analyze.
-     * @return A snapshot of the collected bit statistics after analyzing the provided bits.
-     */
-    public fun analyze(randomBits: RandomBits, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
+    private inline fun<reified E: Any> useAnalyze(debug: ByteArray, valueGenerator: (Int) -> Long): BitStatisticSnapshot {
         require(debug.isEmpty() || debug.size == 1024) { "Debug sample must be exactly 1024 bytes: ${debug.size}" }
         repeat(128) { index ->
-            useValue<Unit>(index, RandomBits.nextBitsToLong(randomBits), debug)
+            useValue<Unit>(index, valueGenerator(index), debug)
         }
         finish()
         return snapshot().also { reset() }
     }
 
+    public fun analyze(randomBits: RandomBits, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
+        return useAnalyze<Unit>(debug) { RandomBits.nextBitsToLong(randomBits) }
+    }
+
     public fun analyze(sponge: Sponge, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
-        require(debug.isEmpty() || debug.size == 1024) { "Debug sample must be exactly 1024 bytes: ${debug.size}" }
-        repeat(128) { index ->
-            useValue<Unit>(index, sponge.squeeze(index % sponge.visibleSize), debug)
-        }
-        finish()
-        return snapshot().also { reset() }
+        return useAnalyze<Unit>(debug) { index -> sponge.squeeze(index % sponge.visibleSize) }
+    }
+
+    public fun analyze(iter: Iterator<Long>, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
+        return useAnalyze<Unit>(debug) { if(iter.hasNext()) iter.next() else 0L }
     }
 
     public fun analyze(exportLongs: Octet.ExportLongs<Long>, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
