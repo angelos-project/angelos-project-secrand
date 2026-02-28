@@ -15,6 +15,7 @@
 package org.angproj.sec.util
 
 import org.angproj.sec.rand.RandomBits
+import org.angproj.sec.rand.Sponge
 import org.angproj.sec.stat.BitStatisticCollector
 import org.angproj.sec.stat.BitStatisticSnapshot
 import org.angproj.sec.stat.securityHealthCheck
@@ -78,6 +79,14 @@ public class HealthCheck : BitStatisticCollector() {
 
     }
 
+    private inline fun<reified E: Any> useValue(index: Int, value: Long, debug: ByteArray) {
+        setFirst<Unit>(TypeSize.longBits, value)
+        consumeLong(value)
+        if(debug.isNotEmpty()) Octet.write(value, debug, index * 8, TypeSize.longSize) { idx, octet ->
+            debug[idx] = octet
+        }
+    }
+
     /**
      * Analyze bits from a RandomBits source and return a snapshot of the collected statistics.
      *
@@ -85,34 +94,34 @@ public class HealthCheck : BitStatisticCollector() {
      * @return A snapshot of the collected bit statistics after analyzing the provided bits.
      */
     public fun analyze(randomBits: RandomBits, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
-        require(debug.isEmpty() || debug.size == 1024)
+        require(debug.isEmpty() || debug.size == 1024) { "Debug sample must be exactly 1024 bytes: ${debug.size}" }
         repeat(128) { index ->
-            val value: Long = RandomBits.nextBitsToLong(randomBits)
-            setFirst<Unit>(TypeSize.longBits, value)
-            consumeLong(value)
-            if(debug.isNotEmpty()) Octet.write(value, debug, index * 8, TypeSize.longSize) { idx, octet ->
-                debug[idx] = octet
-            }
+            useValue<Unit>(index, RandomBits.nextBitsToLong(randomBits), debug)
+        }
+        finish()
+        return snapshot().also { reset() }
+    }
+
+    public fun analyze(sponge: Sponge, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
+        require(debug.isEmpty() || debug.size == 1024) { "Debug sample must be exactly 1024 bytes: ${debug.size}" }
+        repeat(128) { index ->
+            useValue<Unit>(index, sponge.squeeze(index % sponge.visibleSize), debug)
         }
         finish()
         return snapshot().also { reset() }
     }
 
     public fun analyze(exportLongs: Octet.ExportLongs<Long>, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
-        require(debug.isEmpty() || debug.size == 1024)
+        require(debug.isEmpty() || debug.size == 1024) { "Debug sample must be exactly 1024 bytes: ${debug.size}" }
         exportLongs.export(0L, 0, 128) { index, value ->
-            setFirst<Unit>(TypeSize.longBits, value)
-            consumeLong(value)
-            if(debug.isNotEmpty()) Octet.write(value, debug, index * 8, TypeSize.longSize) { idx, octet ->
-                debug[idx] = octet
-            }
+            useValue<Unit>(index, value, debug)
         }
         finish()
         return snapshot().also { reset() }
     }
 
     public fun analyze(exportBytes: Octet.ExportBytes<Byte>, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
-        require(debug.isEmpty() || debug.size == 1024)
+        require(debug.isEmpty() || debug.size == 1024) { "Debug sample must be exactly 1024 bytes: ${debug.size}" }
         val bitSize = TypeSize.byteBits
         exportBytes.export(0, 0, 1024) { index, value ->
             setFirst<Unit>(bitSize, value.toLong())
