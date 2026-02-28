@@ -73,41 +73,63 @@ public class HealthCheck : BitStatisticCollector() {
      */
     public fun analyze(src: ByteArray): BitStatisticSnapshot = analyze(src, src.size) { idx -> src[idx] }
 
+    private inline fun<reified E: Any> setFirst(bitSize: Int, value: Long) {
+        if(total == 0) setup(boolFromIndex<Unit>(0, boolMask<Unit>(bitSize), value))
+
+    }
+
     /**
      * Analyze bits from a RandomBits source and return a snapshot of the collected statistics.
      *
      * @param randomBits The RandomBits source to analyze.
      * @return A snapshot of the collected bit statistics after analyzing the provided bits.
      */
-    public fun analyze(randomBits: RandomBits, debug: Boolean = false): BitStatisticSnapshot {
-        val sample = ByteArray(if(debug) 1024 else 0)
-        var random = RandomBits.nextBitsToLong(randomBits)
-        setup(boolFromIndex<Unit>(0, boolMask<Unit>(TypeSize.longBits), random))
-        consumeLong(random)
-        if(debug) {
-            Octet.write(random, sample, 0, TypeSize.longSize) { idx, value ->
-                sample[idx] = value
-            }
-        }
-
-        repeat((1024 / TypeSize.longSize) - 1) {
-            random = RandomBits.nextBitsToLong(randomBits)
-            consumeLong(random)
-            if(debug) {
-                Octet.write(
-                    random,
-                    sample, (it + 1) * TypeSize.longSize,
-                    TypeSize.longSize)
-                { idx, value ->
-                    sample[idx] = value
-                }
+    public fun analyze(randomBits: RandomBits, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
+        require(debug.isEmpty() || debug.size == 1024)
+        repeat(128) { index ->
+            val value: Long = RandomBits.nextBitsToLong(randomBits)
+            setFirst<Unit>(TypeSize.longBits, value)
+            consumeLong(value)
+            if(debug.isNotEmpty()) Octet.write(value, debug, index * 8, TypeSize.longSize) { idx, octet ->
+                debug[idx] = octet
             }
         }
         finish()
+        return snapshot().also { reset() }
+    }
+
+    public fun analyze(exportLongs: Octet.ExportLongs<Long>, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
+        require(debug.isEmpty() || debug.size == 1024)
+        exportLongs.export(0L, 0, 128) { index, value ->
+            setFirst<Unit>(TypeSize.longBits, value)
+            consumeLong(value)
+            if(debug.isNotEmpty()) Octet.write(value, debug, index * 8, TypeSize.longSize) { idx, octet ->
+                debug[idx] = octet
+            }
+        }
+        finish()
+        return snapshot().also { reset() }
+    }
+
+    public fun analyze(exportBytes: Octet.ExportBytes<Byte>, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
+        require(debug.isEmpty() || debug.size == 1024)
+        val bitSize = TypeSize.byteBits
+        exportBytes.export(0, 0, 1024) { index, value ->
+            setFirst<Unit>(bitSize, value.toLong())
+            consume<Unit>(value.toLong(), bitSize)
+            if(debug.isNotEmpty()) debug[index] = value
+        }
+        finish()
+        return snapshot().also { reset() }
+    }
+
+    public fun analyze(randomBits: RandomBits, debug: Boolean = false): BitStatisticSnapshot {
+        val sample = ByteArray(if(debug) 1024 else 0)
+        val result = analyze(randomBits, sample)
         if(debug) {
             println("Sample: " + sample.asHexSymbols())
         }
-        return snapshot().also { reset() }
+        return result
     }
 
     public companion object {
