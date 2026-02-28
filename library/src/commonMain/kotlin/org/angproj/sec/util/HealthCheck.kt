@@ -140,30 +140,28 @@ public class HealthCheck : BitStatisticCollector() {
 
     public companion object {
 
-        /**
-         * Perform a health check on the provided RandomBits source by analyzing its bits and evaluating
-         * the security health check.
-         *
-         * @param randomBits The RandomBits source to perform the health check on.
-         * @return `true` if the security health check passes, `false` otherwise.
-         */
         public fun healthCheck(
-            randomBits: RandomBits, debug: Boolean = false
-        ): Boolean = HealthCheck().analyze(randomBits, debug).securityHealthCheck()
+            test: HealthCheck.() -> BitStatisticSnapshot
+        ): Boolean = HealthCheck().test().securityHealthCheck()
 
-        /**
-         * Perform a double health check on the provided RandomBits source by conducting two separate health
-         * checks and combining their results.
-         *
-         * @param randomBits The RandomBits source to perform the double health check on.
-         * @return `true` if at least one of the two health checks passes, `false` if both checks fail.
-         */
+        public fun healthCheck(
+            test: HealthCheck.(ByteArray) -> BitStatisticSnapshot
+        ): Boolean = HealthCheck().test(byteArrayOf()).securityHealthCheck()
+
         public fun doubleHealthCheck(
-            randomBits: RandomBits, debug: Boolean = false
-        ): Boolean {
-            val hc1 = healthCheck(randomBits, debug)
-            val hc2 = healthCheck(randomBits, debug)
-            return hc1 || hc2
+            test: HealthCheck.(ByteArray) -> BitStatisticSnapshot
+        ): Boolean = healthCheck(test) || healthCheck(test)
+
+        public fun healthCheckFailedSample(
+            test: HealthCheck.(ByteArray) -> BitStatisticSnapshot
+        ): Boolean = ByteArray(1024).let { sample ->
+            HealthCheck().test(sample).securityHealthCheck().also {
+                if(!it) println("Debug sample: ${sample.asHexSymbols()}")
+            }
         }
+
+        public fun doubleHealthCheckDebug(
+            test: HealthCheck.(ByteArray) -> BitStatisticSnapshot)
+        : Boolean = healthCheck(test) || healthCheckFailedSample(test)
     }
 }
