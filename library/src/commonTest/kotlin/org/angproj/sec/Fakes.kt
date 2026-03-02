@@ -40,17 +40,23 @@ object Fakes {
 
     fun safeSecRand() = object : Security() {
         override val sponge = Stubs.stubSucceedSqueezeSponge()
-        init { reseedImpl() }
+        init { reseed() }
         override fun checkReseedConditions(): Boolean = true
         override fun reseedImpl() { sponge.scramble() }
-        override fun checkExportConditions(length: Int): Boolean = true
+        override fun checkExportConditions(length: Int): Boolean {
+            reseed()
+            return true
+        }
     }
 
     fun unsafeSecRand() = object : Security() {
         override val sponge = Stubs.stubFailSqueezeSponge()
-        init { reseedImpl() }
+        init { reseed() }
         override fun checkReseedConditions(): Boolean = true
         override fun reseedImpl() { sponge.scramble() }
-        override fun checkExportConditions(length: Int): Boolean = true
+        override fun checkExportConditions(length: Int): Boolean {
+            reseed()
+            return true
+        }
     }
 }

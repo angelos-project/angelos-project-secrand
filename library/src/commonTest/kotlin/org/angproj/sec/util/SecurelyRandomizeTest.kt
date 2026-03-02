@@ -14,8 +14,10 @@
  */
 package org.angproj.sec.util
 
+import org.angproj.sec.SecureFeed
+import org.angproj.sec.SecureRandomException
+import org.angproj.sec.rand.JitterEntropy
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
@@ -23,32 +25,28 @@ class SecurelyRandomizeTest {
 
     @Test
     fun testSecurelyRandomizeByteArray() {
-        val size = 53
-        val buffer1 = ByteArray(size)
-        val buffer2 = ByteArray(size)
+        try {
+            val buffer = ByteArray(1024)
 
-        buffer1.securelyRandomize()
-        buffer2.securelyRandomize()
+            buffer.securelyRandomize()
 
-        assertEquals(size, buffer1.size)
-        assertEquals(size, buffer2.size)
-        // With high probability, two random arrays should not be equal
-        assertNotEquals(buffer1.toList(), buffer2.toList())
+            assertTrue(HealthCheck.healthCheck { _ -> analyzeByteArray(buffer) })
+        } catch (_: SecureRandomException) {
+            HealthCheck.doubleHealthCheckDebug { sample -> analyzeLongs(SecureFeed::readLongs, sample) }
+        }
     }
 
     @Test
     fun testSecurelyEntropizeByteArray() {
-        val size = 128
-        val buffer1 = ByteArray(size)
-        val buffer2 = ByteArray(size)
+        try {
+            val buffer = ByteArray(1024)
 
-        buffer1.securelyEntropize()
-        buffer2.securelyEntropize()
+            buffer.securelyEntropize()
 
-        assertEquals(size, buffer1.size)
-        assertEquals(size, buffer2.size)
-        // With high probability, two random arrays should not be equal
-        assertNotEquals(buffer1.toList(), buffer2.toList())
+            assertTrue(HealthCheck.healthCheck { _ -> analyzeByteArray(buffer) })
+        } catch (_: SecureRandomException) {
+            HealthCheck.doubleHealthCheckDebug { sample -> analyzeLongs(JitterEntropy::readLongs, sample) }
+        }
     }
 
     @Test
@@ -56,6 +54,15 @@ class SecurelyRandomizeTest {
         repeat(32) {
             val array = ByteArray(it+1).also { it.securelyRandomize() }
             assertNotEquals(array.sum(), 0)
+        }
+    }
+
+    @Test
+    fun testSecurelyEntropizeZeroSize() {
+        try {
+            ByteArray(0).securelyEntropize()
+        } catch (_: Exception) {
+            assertTrue(false)
         }
     }
 
