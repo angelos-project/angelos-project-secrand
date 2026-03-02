@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 by Kristoffer Paulsson <kristoffer.paulsson@talenten.se>.
+ * Copyright (c) 2026 by Kristoffer Paulsson <kristoffer.paulsson@talenten.se>.
  *
  * This software is available under the terms of the MIT license. Parts are licensed
  * under different terms if stated. The legal terms are attached to the LICENSE file
@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.util
 
+import org.angproj.sec.Fakes
 import org.angproj.sec.Stubs
 import org.angproj.sec.hash.squeezerOf
 import org.angproj.sec.rand.RandomBits
@@ -89,9 +90,27 @@ class HealthCheckTest {
     }
 
     @Test
+    fun testAnalyzeByteArrayFail() {
+        val sample = Fakes.failedSample()
+
+        val result = HealthCheck.healthCheck { _ -> analyzeByteArray(sample) }
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun testAnalyzeByteArraySucceed() {
+        val sample = Fakes.healthySample()
+
+        val result = HealthCheck.healthCheck { _ -> analyzeByteArray(sample) }
+
+        assertTrue(result)
+    }
+
+    @Test
     fun testAnalyze() {
         assertTrue {
-            HealthCheck().analyze(Random.nextBytes(1024)).total == 8192
+            HealthCheck().analyzeByteArray(Random.nextBytes(1024)).total == 8192
         }
     }
 

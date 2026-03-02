@@ -101,15 +101,15 @@ class UuidTest {
 
     @Test
     fun testUuidHealth() {
-        val result = HealthCheck().analyze(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
-        val result2 = HealthCheck().analyze(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
+        val result = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
+        val result2 = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
         assertTrue{ result || result2 }
     }
 
     @Test
     fun testUuid4Health() {
-        val result = HealthCheck().analyze(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
-        val result2 = HealthCheck().analyze(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
+        val result = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
+        val result2 = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
         assertTrue{ result || result2 }
     }
 }

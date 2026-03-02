@@ -40,7 +40,7 @@ public fun calculateBitRunDistributionAverage() {
 
         repeat(loops) {
             garbler.readBytes(entropy)
-            val bitStat = HealthCheck().analyze(entropy)//bitStatisticOf(entropy)
+            val bitStat = HealthCheck().analyzeByteArray(entropy)//bitStatisticOf(entropy)
 
             val logExp = log2(bitStat.total / 4.0)
             (0..logExp.toInt()).forEach { idx ->
@@ -82,7 +82,7 @@ public fun calculateBitPatternUniformityAverage() {
 
         repeat(loops) {
             garbler.readBytes(entropy)
-            val bitStat = HealthCheck().analyze(entropy)//bitStatisticOf(entropy)
+            val bitStat = HealthCheck().analyzeByteArray(entropy)//bitStatisticOf(entropy)
 
             val average = bitStat.hex.sum() / 16.0
             bitStat.hex.sorted().forEachIndexed { idx, value ->
@@ -125,7 +125,7 @@ public fun calculateBitBalanceAverage() {
 
         repeat(loops) {
             garbler.readBytes(entropy)
-            val bitStat = HealthCheck().analyze(entropy)//bitStatisticOf(entropy)
+            val bitStat = HealthCheck().analyzeByteArray(entropy)//bitStatisticOf(entropy)
 
             val average = bitStat.total / 2.0
             //val expectation = 2.0.pow(logExp - idx.toDouble())
@@ -174,7 +174,7 @@ public object BenchmarkBitStatistic {
             repeat(loops) {
                 garbler.readBytes(entropy)
                 //Random.nextBytes(entropy)
-                val bitStat = HealthCheck().analyze(entropy)//bitStatisticOf(entropy)
+                val bitStat = HealthCheck().analyzeByteArray(entropy)//bitStatisticOf(entropy)
 
                 if (!bitStat.checkBitBalance()) bitBalanceFails++
                 if (!bitStat.checkHexUniformity()) hexUniformityFails++

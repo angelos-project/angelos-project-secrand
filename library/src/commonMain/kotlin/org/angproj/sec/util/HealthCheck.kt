@@ -73,7 +73,7 @@ public class HealthCheck : BitStatisticCollector() {
      * @param src The ByteArray containing the bits to analyze.
      * @return A snapshot of the collected bit statistics after analyzing the provided bits.
      */
-    public fun analyze(src: ByteArray): BitStatisticSnapshot = analyze(src, src.size) { idx -> src[idx] }
+    public fun analyzeByteArray(src: ByteArray): BitStatisticSnapshot = analyze(src, src.size) { idx -> src[idx] }
 
     private inline fun<reified E: Any> setFirst(bitSize: Int, value: Long) {
         if(total == 0) setup(boolFromIndex<Unit>(0, boolMask<Unit>(bitSize), value))

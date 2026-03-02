@@ -23,17 +23,17 @@ class BitStaticTest {
     @Test
     fun testSecurityHealthCheck() {
         assertFailsWith<SecureRandomException> {
-            HealthCheck().analyze(ByteArray(100)).securityHealthCheck()
+            HealthCheck().analyzeByteArray(ByteArray(100)).securityHealthCheck()
         }
         assertFailsWith<SecureRandomException> {
-            HealthCheck().analyze((ByteArray(1024 * 32 + 1))).securityHealthCheck()
+            HealthCheck().analyzeByteArray((ByteArray(1024 * 32 + 1))).securityHealthCheck()
         }
     }
 
     @Test
     fun testCryptoHealthCheck() {
         assertFailsWith<SecureRandomException> {
-            HealthCheck().analyze((ByteArray(1024 * 32 + 1))).cryptoHealthCheck()
+            HealthCheck().analyzeByteArray((ByteArray(1024 * 32 + 1))).cryptoHealthCheck()
         }
     }
 }

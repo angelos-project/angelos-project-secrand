@@ -63,11 +63,11 @@ class SecureEntropyTest {
     fun testSecurityHealth() {
         val result = ByteArray(1024).let {
             SecureEntropy.readBytes(it, 0, it.size) { idx, value -> this[idx] = value }
-            HealthCheck().analyze(it).securityHealthCheck()
+            HealthCheck().analyzeByteArray(it).securityHealthCheck()
         }
         val result2 = ByteArray(1024).let {
             SecureEntropy.readBytes(it, 0, it.size) { idx, value -> this[idx] = value }
-            HealthCheck().analyze(it).securityHealthCheck()
+            HealthCheck().analyzeByteArray(it).securityHealthCheck()
         }
 
         assertTrue{ result || result2 }
