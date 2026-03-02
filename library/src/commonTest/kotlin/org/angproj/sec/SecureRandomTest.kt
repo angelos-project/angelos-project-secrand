@@ -114,8 +114,8 @@ class SecureRandomTest {
 
     @Test
     fun testSecurityHealth() {
-        assertTrue{ HealthCheck.doubleHealthCheck({ SecureRandom.readInt() })  }
-        assertFalse{ HealthCheck.doubleHealthCheck({ SecureRandom.readInt() and 0x1f_ff_ff_ff }) }
+        assertTrue{ HealthCheck.doubleHealthCheck { debug -> analyzeBits( { SecureRandom.readInt() }, debug)  } }
+        assertFalse{ HealthCheck.doubleHealthCheck { debug -> analyzeBits({ (SecureRandom.readInt() and 0x1f_ff_ff_ff) }, debug) } }
         // Statistically it looks like 3 out of 32 being distorted leads to double failures.
     }
 }

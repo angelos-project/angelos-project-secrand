@@ -14,7 +14,6 @@
  */
 package org.angproj.sec.util
 
-import org.angproj.sec.SecureRandom
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -30,6 +29,10 @@ class HealthCheckTest {
 
     @Test
     fun testDoubleHealthCheck() {
-        assertTrue{ HealthCheck.doubleHealthCheck({ SecureRandom.readInt() }, true) }
+        assertTrue{
+            HealthCheck.healthCheckFailedSample { debug ->
+                analyzeBits( { Random.nextBits(32) }, debug)
+            }
+        }
     }
 }

@@ -41,6 +41,7 @@ public enum class TypeCategory(public val byteSize: Int, public val bitSize: Int
          * @return The [TypeCategory] corresponding to the type instance.
          * @throws IllegalArgumentException If the type is unsupported.
          */
+
         public fun<E: Any> ofType(type: E): TypeCategory = when (type) {
             Byte, is Byte -> BYTE
             Short, is Short -> SHORT

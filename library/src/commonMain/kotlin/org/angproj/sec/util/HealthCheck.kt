@@ -96,19 +96,19 @@ public class HealthCheck : BitStatisticCollector() {
         return snapshot().also { reset() }
     }
 
-    public fun analyze(randomBits: RandomBits, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
+    public fun analyzeBits(randomBits: RandomBits, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
         return useAnalyze<Unit>(debug) { RandomBits.nextBitsToLong(randomBits) }
     }
 
-    public fun analyze(sponge: Sponge, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
+    public fun analyzeSponge(sponge: Sponge, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
         return useAnalyze<Unit>(debug) { index -> sponge.squeeze(index % sponge.visibleSize) }
     }
 
-    public fun analyze(iter: Iterator<Long>, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
+    public fun analyzeIter(iter: Iterator<Long>, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
         return useAnalyze<Unit>(debug) { if(iter.hasNext()) iter.next() else 0L }
     }
 
-    public fun analyze(exportLongs: Octet.ExportLongs<Long>, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
+    public fun analyzeLongs(exportLongs: Octet.ExportLongs<Long>, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
         require(debug.isEmpty() || debug.size == 1024) { "Debug sample must be exactly 1024 bytes: ${debug.size}" }
         exportLongs.export(0L, 0, 128) { index, value ->
             useValue<Unit>(index, value, debug)
@@ -117,7 +117,7 @@ public class HealthCheck : BitStatisticCollector() {
         return snapshot().also { reset() }
     }
 
-    public fun analyze(exportBytes: Octet.ExportBytes<Byte>, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
+    public fun analyzeBytes(exportBytes: Octet.ExportBytes<Byte>, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
         require(debug.isEmpty() || debug.size == 1024) { "Debug sample must be exactly 1024 bytes: ${debug.size}" }
         val bitSize = TypeSize.byteBits
         exportBytes.export(0, 0, 1024) { index, value ->
@@ -127,15 +127,6 @@ public class HealthCheck : BitStatisticCollector() {
         }
         finish()
         return snapshot().also { reset() }
-    }
-
-    public fun analyze(randomBits: RandomBits, debug: Boolean = false): BitStatisticSnapshot {
-        val sample = ByteArray(if(debug) 1024 else 0)
-        val result = analyze(randomBits, sample)
-        if(debug) {
-            println("Sample: " + sample.asHexSymbols())
-        }
-        return result
     }
 
     public companion object {
@@ -161,7 +152,7 @@ public class HealthCheck : BitStatisticCollector() {
         }
 
         public fun doubleHealthCheckDebug(
-            test: HealthCheck.(ByteArray) -> BitStatisticSnapshot)
-        : Boolean = healthCheck(test) || healthCheckFailedSample(test)
+            test: HealthCheck.(ByteArray) -> BitStatisticSnapshot
+        ): Boolean = healthCheck(test) || healthCheckFailedSample(test)
     }
 }
