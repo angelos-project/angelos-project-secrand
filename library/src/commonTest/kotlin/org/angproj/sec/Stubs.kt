@@ -48,7 +48,7 @@ object Stubs {
         }
 
         override fun squeeze(position: Int): Long {
-            return state xor (state xor InitializationVector.entries.get(position % visibleSize).iv)
+            return (counter++).inv().rotateLeft(31) xor state.rotateRight(47) xor InitializationVector.entries.get(position % visibleSize).iv
         }
     }
 

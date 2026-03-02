@@ -18,6 +18,7 @@ import org.angproj.sec.Fakes
 import org.angproj.sec.Stubs
 import org.angproj.sec.hash.squeezerOf
 import org.angproj.sec.rand.RandomBits
+import org.angproj.sec.util.Octet.asHexSymbols
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -108,6 +109,42 @@ class HealthCheckTest {
     }
 
     @Test
+    fun testAnalyzeLongsFail() {
+        val exporter = Fakes.unsafeSecRand()
+
+        val result = HealthCheck.healthCheck { debug -> analyzeLongs(exporter::readLongs, debug) }
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun testAnalyzeLongsSucceed() {
+        val exporter = Fakes.safeSecRand()
+
+        val result = HealthCheck.healthCheck { debug -> analyzeLongs(exporter::readLongs, debug) }
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun testAnalyzeBytesFail() {
+        val exporter = Fakes.unsafeSecRand()
+
+        val result = HealthCheck.healthCheck { debug -> analyzeBytes(exporter::readBytes, debug) }
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun testAnalyzeBytesSucceed() {
+        val exporter = Fakes.safeSecRand()
+
+        val result = HealthCheck.healthCheck { debug -> analyzeBytes(exporter::readBytes, debug) }
+
+        assertTrue(result)
+    }
+
+    @Test
     fun testAnalyze() {
         assertTrue {
             HealthCheck().analyzeByteArray(Random.nextBytes(1024)).total == 8192
@@ -121,5 +158,7 @@ class HealthCheckTest {
                 analyzeBits( { Random.nextBits(32) }, debug)
             }
         }
+
+        println(Fakes.failedSample().asHexSymbols())
     }
 }

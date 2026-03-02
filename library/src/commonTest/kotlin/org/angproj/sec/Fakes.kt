@@ -15,6 +15,7 @@
 package org.angproj.sec
 
 import org.angproj.sec.hash.squeezerOf
+import org.angproj.sec.rand.Security
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 
@@ -35,5 +36,21 @@ object Fakes {
                 this.set(index, value)
             }
         }
+    }
+
+    fun safeSecRand() = object : Security() {
+        override val sponge = Stubs.stubSucceedSqueezeSponge()
+        init { reseedImpl() }
+        override fun checkReseedConditions(): Boolean = true
+        override fun reseedImpl() { sponge.scramble() }
+        override fun checkExportConditions(length: Int): Boolean = true
+    }
+
+    fun unsafeSecRand() = object : Security() {
+        override val sponge = Stubs.stubFailSqueezeSponge()
+        init { reseedImpl() }
+        override fun checkReseedConditions(): Boolean = true
+        override fun reseedImpl() { sponge.scramble() }
+        override fun checkExportConditions(length: Int): Boolean = true
     }
 }
