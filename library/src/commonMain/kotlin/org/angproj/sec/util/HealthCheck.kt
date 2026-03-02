@@ -139,13 +139,13 @@ public class HealthCheck : BitStatisticCollector() {
             test: HealthCheck.() -> BitStatisticSnapshot
         ): Boolean = HealthCheck().test().securityHealthCheck()
 
-        public fun healthCheck(
+        public fun healthCheckWithSample(
             test: HealthCheck.(ByteArray) -> BitStatisticSnapshot
         ): Boolean = HealthCheck().test(byteArrayOf()).securityHealthCheck()
 
-        public fun doubleHealthCheck(
+        public fun doubleHealthCheckWithSample(
             test: HealthCheck.(ByteArray) -> BitStatisticSnapshot
-        ): Boolean = healthCheck(test) || healthCheck(test)
+        ): Boolean = healthCheckWithSample(test) || healthCheckWithSample(test)
 
         public fun healthCheckFailedSample(
             test: HealthCheck.(ByteArray) -> BitStatisticSnapshot
@@ -157,6 +157,6 @@ public class HealthCheck : BitStatisticCollector() {
 
         public fun doubleHealthCheckDebug(
             test: HealthCheck.(ByteArray) -> BitStatisticSnapshot
-        ): Boolean = healthCheck(test) || healthCheckFailedSample(test)
+        ): Boolean = healthCheckWithSample(test) || healthCheckFailedSample(test)
     }
 }
