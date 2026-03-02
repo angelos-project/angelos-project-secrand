@@ -101,7 +101,11 @@ public class HealthCheck : BitStatisticCollector() {
     }
 
     public fun analyzeSponge(sponge: Sponge, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
-        return useAnalyze<Unit>(debug) { index -> sponge.squeeze(index % sponge.visibleSize) }
+        return useAnalyze<Unit>(debug) { index ->
+            val pos = index % sponge.visibleSize
+            if(pos == sponge.visibleSize) sponge.round()
+            sponge.squeeze(pos)
+        }
     }
 
     public fun analyzeIter(iter: Iterator<Long>, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {

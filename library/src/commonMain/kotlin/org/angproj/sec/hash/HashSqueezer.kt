@@ -24,8 +24,7 @@ public class HashSqueezer(public val sponge: Sponge, private val hashHelper: Has
 }
 
 public fun Sponge.squeezerOf(position: Int = 0): () -> Long {
-    val helper = HashHelper(this, position)
+    val helper = HashHelper(this, position, HashHelper.HashMode.SQUEEZING)
     val squeezer = HashSqueezer(this, helper)
-    if(helper.mode == HashHelper.HashMode.ABSORBING) helper.switchMode()
     return { squeezer.squeeze() }
 }

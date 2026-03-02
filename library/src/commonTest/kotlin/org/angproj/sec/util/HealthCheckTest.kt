@@ -14,11 +14,34 @@
  */
 package org.angproj.sec.util
 
+import org.angproj.sec.Stubs
+import org.angproj.sec.hash.squeezerOf
+import org.angproj.sec.rand.RandomBits
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertTrue
+import kotlin.test.assertFalse
 
 class HealthCheckTest {
+
+    @Test
+    fun testAnalyzeBitsFail() {
+        val squeezer =  Stubs.stubFailSqueezeSponge().squeezerOf()
+        val bits = RandomBits { RandomBits.compactBitEntropy(TypeSize.intBits, squeezer()) }
+
+        val result = HealthCheck.healthCheck { debug -> analyzeBits(bits, debug) }
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun testAnalyzeSpongeFail() {
+        val sponge = Stubs.stubFailSqueezeSponge()
+
+        val result = HealthCheck.healthCheck { debug -> analyzeSponge(sponge, debug) }
+
+        assertFalse(result)
+    }
 
     @Test
     fun testAnalyze() {

@@ -16,7 +16,7 @@ package org.angproj.sec.hash
 
 import org.angproj.sec.rand.Sponge
 
-public class HashHelper(private val sponge: Sponge, position: Int = 0) {
+public class HashHelper(private val sponge: Sponge, position: Int = 0, mode: HashMode = HashMode.ABSORBING) {
 
     public enum class HashMode {
         SQUEEZING, ABSORBING
@@ -26,7 +26,7 @@ public class HashHelper(private val sponge: Sponge, position: Int = 0) {
     public val position: Int
         get() = _position
 
-    private var _mode: HashMode = HashMode.ABSORBING
+    private var _mode: HashMode = mode
     public val mode: HashMode
         get() = _mode
 

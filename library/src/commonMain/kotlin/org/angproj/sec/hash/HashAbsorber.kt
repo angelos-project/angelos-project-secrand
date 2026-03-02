@@ -24,9 +24,8 @@ public class HashAbsorber(private val sponge: Sponge, private val hashHelper: Ha
 }
 
 public fun Sponge.absorberOf(position: Int = 0, slurp: () -> Long): () -> Int {
-    val helper = HashHelper(this, position)
+    val helper = HashHelper(this, position, HashHelper.HashMode.ABSORBING)
     val absorber = HashAbsorber(this, helper)
-    if(helper.mode == HashHelper.HashMode.SQUEEZING) helper.switchMode()
     return {
         absorber.absorb(slurp())
         helper.position
