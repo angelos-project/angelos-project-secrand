@@ -159,21 +159,24 @@ class HealthCheckTest {
     }
 
     @Test
-    fun testAnalyze() {
-        assertTrue {
-            HealthCheck().analyzeByteArray(Random.nextBytes(1024)).total == 8192
-        }
+    fun testHealthCheck() {
+        val sample = Fakes.healthySample()
+
+        val result = HealthCheck.healthCheck { analyzeByteArray(sample) }
+
+        assertTrue(result)
     }
 
     @Test
-    fun testDoubleHealthCheck() {
-        assertTrue{
-            HealthCheck.healthCheckFailedSample { debug ->
-                analyzeBits( { Random.nextBits(32) }, debug)
-            }
-        }
+    fun testDoubleHealthCheckWithSample() {
+        val exporter = Fakes.safeSecRand()
+        val sample = ByteArray(1024)
 
-        println(Fakes.failedSample().asHexSymbols())
+        // A sample from a random generator can be taken for closer lookup
+        val result = HealthCheck.doubleHealthCheckWithSample { _ -> analyzeLongs(exporter::readLongs, sample) }
+
+        assertTrue(result)
+        //println(sample.asHexSymbols())
     }
 
     @Test
