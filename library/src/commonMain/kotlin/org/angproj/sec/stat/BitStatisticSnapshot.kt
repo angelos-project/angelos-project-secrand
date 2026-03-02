@@ -15,10 +15,7 @@
 package org.angproj.sec.stat
 
 import org.angproj.sec.SecureRandomException
-import org.angproj.sec.rand.RandomBits
-import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
-import org.angproj.sec.util.bitStatisticCollection
 import org.angproj.sec.util.ensure
 import kotlin.math.*
 
