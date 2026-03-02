@@ -35,12 +35,57 @@ class HealthCheckTest {
     }
 
     @Test
+    fun testAnalyzeBitsSucceed() {
+        val squeezer =  Stubs.stubSucceedSqueezeSponge().squeezerOf()
+        val bits = RandomBits { RandomBits.compactBitEntropy(TypeSize.intBits, squeezer()) }
+
+        val result = HealthCheck.healthCheck { debug -> analyzeBits(bits, debug) }
+
+        assertTrue(result)
+    }
+
+    @Test
     fun testAnalyzeSpongeFail() {
         val sponge = Stubs.stubFailSqueezeSponge()
 
         val result = HealthCheck.healthCheck { debug -> analyzeSponge(sponge, debug) }
 
         assertFalse(result)
+    }
+
+    @Test
+    fun testAnalyzeSpongeSucceed() {
+        val sponge = Stubs.stubSucceedSqueezeSponge()
+
+        val result = HealthCheck.healthCheck { debug -> analyzeSponge(sponge, debug) }
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun testAnalyzeIterFail() {
+        val iter = object : Iterator<Long> {
+            private var squeezer = Stubs.stubFailSqueezeSponge().squeezerOf()
+            override fun next(): Long = squeezer()
+            override fun hasNext(): Boolean = true
+        }
+
+        val result = HealthCheck.healthCheck { debug -> analyzeIter(iter, debug) }
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun testAnalyzeIterSucceed() {
+        val iter = object : Iterator<Long> {
+            private var squeezer = Stubs.stubSucceedSqueezeSponge().squeezerOf()
+            override fun next(): Long = squeezer()
+            override fun hasNext(): Boolean = true
+        }
+
+        val result = HealthCheck.healthCheck { debug -> analyzeIter(iter, debug) }
+
+        assertTrue(result)
     }
 
     @Test

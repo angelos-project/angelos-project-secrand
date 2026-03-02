@@ -14,6 +14,7 @@
  */
 package org.angproj.sec
 
+import org.angproj.sec.rand.AbstractSponge2256
 import org.angproj.sec.rand.InitializationVector
 import org.angproj.sec.rand.Sponge
 import org.angproj.sec.util.TypeSize
@@ -21,7 +22,7 @@ import kotlin.math.E
 import kotlin.math.PI
 
 object Stubs {
-    public fun stubFailSqueezeSponge(seed: Long = 0): Sponge = object : Sponge {
+    fun stubFailSqueezeSponge(seed: Long = 0): Sponge = object : Sponge {
         override val spongeSize: Int = 4
         override val visibleSize: Int = 4
         override val byteSize: Int = visibleSize * TypeSize.longSize
@@ -38,7 +39,7 @@ object Stubs {
             state = state xor (
                     InitializationVector.entries.get((counter * PI).toInt() % ivSize).iv xor
                             InitializationVector.entries.get((counter * E).toInt() % ivSize).iv
-            )
+                    )
             counter++
         }
 
@@ -48,6 +49,13 @@ object Stubs {
 
         override fun squeeze(position: Int): Long {
             return state xor (state xor InitializationVector.entries.get(position % visibleSize).iv)
+        }
+    }
+
+    fun stubSucceedSqueezeSponge(seed: Long = 0): Sponge = object : AbstractSponge2256() {
+        init {
+            absorb(seed, 0)
+            scramble()
         }
     }
 }

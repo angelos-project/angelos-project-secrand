@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.util
 
+import org.angproj.sec.hash.squeezerOf
 import org.angproj.sec.rand.RandomBits
 import org.angproj.sec.rand.Sponge
 import org.angproj.sec.stat.BitStatisticCollector
@@ -101,10 +102,9 @@ public class HealthCheck : BitStatisticCollector() {
     }
 
     public fun analyzeSponge(sponge: Sponge, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
-        return useAnalyze<Unit>(debug) { index ->
-            val pos = index % sponge.visibleSize
-            if(pos == sponge.visibleSize) sponge.round()
-            sponge.squeeze(pos)
+        val squeezer = sponge.squeezerOf()
+        return useAnalyze<Unit>(debug) {
+            squeezer()
         }
     }
 
