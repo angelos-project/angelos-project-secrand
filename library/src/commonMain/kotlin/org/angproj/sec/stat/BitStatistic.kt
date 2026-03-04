@@ -16,6 +16,16 @@ package org.angproj.sec.stat
 
 
 public interface BitStatistic {
+    // Also implement ChiSquare, sources:
+    // https://www.allresearchjournal.com/archives/2024/vol10issue8/PartA/10-7-53-474.pdf
+    // https://courses.physics.illinois.edu/phys598aem/fa2014/Software/Critical_Values_of_the_Chi-Squared_Distribution.pdf
+    // https://www.cs.bu.edu/fac/snyder/cs237/Handouts%20and%20Web%20Documents/Handouts/Appendix%20B.pdf
+    // https://users.sussex.ac.uk/~grahamh/RM1web/ChiSquareTable2005.pdf
+    // https://www.medcalc.org/en/manual/chi-square-table.php
+    // https://di-mgt.com.au/chisquare-table.html
+    //
+    // https://www.itl.nist.gov/div898/handbook/eda/section3/eda3674.htm
+
     public val total: Int
     public val ones: Int
     public val zeros: Int
