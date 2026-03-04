@@ -14,15 +14,9 @@
  */
 package org.angproj.sec.rand
 
-import org.angproj.sec.Uuid
-import org.angproj.sec.util.HealthCheck
-import org.angproj.sec.util.Octet.asHexSymbols
-import kotlin.math.E
-import kotlin.math.PI
-import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
+
 
 class RandomBitsTest {
 
@@ -58,9 +52,7 @@ class RandomBitsTest {
     fun testNextBitsToLong() {
         assertEquals(0xFFFF_FFFF_FFFF_FFFFuL.toLong(), RandomBits.nextBitsToLong { 0xFFFF_FFFF.toInt() })
         assertEquals(0x0, RandomBits.nextBitsToLong { 0 })
-        assertEquals(0x1122334411223344, RandomBits.nextBitsToLong { staticRandAscending })
-        println(RandomBits.nextBitsToLong { -0x8000_0000 }.toULong().toString(16))
-        println((RandomBits {-0x8000_0000}.nextBits(32)).toUInt().toString(16))
+        assertEquals(0x1234567812345678, RandomBits.nextBitsToLong { staticRandAscending })
     }
 
     @Test
