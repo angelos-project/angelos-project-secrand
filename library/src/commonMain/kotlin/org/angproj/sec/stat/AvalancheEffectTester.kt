@@ -38,7 +38,6 @@ public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
     samples: Long, obj: E
 ) : BenchmarkTester<B, E>(samples, 16, obj) {
 
-    private var totalTakenSamples: Long = 0
     private val stats = IntArray(obj.sampleByteSize * TypeSize.byteBits)
     private var lastSample: ByteArray = byteArrayOf()
     private var currentSample: ByteArray = byteArrayOf()

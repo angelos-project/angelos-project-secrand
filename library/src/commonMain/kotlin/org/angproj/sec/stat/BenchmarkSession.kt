@@ -21,7 +21,7 @@ import org.angproj.sec.util.RunState
  *
  * @param B The type of the object being benchmarked.
  * @param E The type of the BenchmarkObject wrapper.
- * @property sampleCount The total number of samples to be collected during the session.
+ * @property samplesAsked The total number of samples to be collected during the session.
  * @property subSampleByteSize The size of each sub-sample in bytes.
  * @property obj The benchmark object instance to be tested.
  *
@@ -29,7 +29,7 @@ import org.angproj.sec.util.RunState
  * collecting samples, and finalizing the collection to retrieve statistical results.
  */
 public class BenchmarkSession<B, E: BenchmarkObject<B>>(
-    public val sampleCount: Long,
+    public val samplesAsked: Long,
     public val subSampleByteSize: Int,
     private val obj: E
 ) {
@@ -39,6 +39,9 @@ public class BenchmarkSession<B, E: BenchmarkObject<B>>(
     private var state = RunState.INITIALIZE
 
     private val registry: MutableMap<String, BenchmarkTester<B, E>> = mutableMapOf()
+
+    public val satisfied: Boolean
+        get() = registry.entries.all { it.value.samplesTaken >= it.value.samplesAsked }
 
     /**
      * Registers a new tester for the benchmarking session.
@@ -57,7 +60,7 @@ public class BenchmarkSession<B, E: BenchmarkObject<B>>(
 
     init {
         require(obj.sampleByteSize % subSampleByteSize == 0) { "Sub sample size must be divisible with sample byte size" }
-        require(sampleCount > 0) { "Samples taken must be set above one" }
+        require(samplesAsked > 0) { "Samples taken must be set above one" }
     }
 
     /**
@@ -68,12 +71,16 @@ public class BenchmarkSession<B, E: BenchmarkObject<B>>(
     public fun collectSample() {
         check(state == RunState.RUNNING) { "Benchmarking must be in RUNNING state." }
         val sample = obj.nextSample()
-        if (numSubSamples > 1) repeat(numSubSamples) {
+        if (numSubSamples > 1) repeat(numSubSamples) { it ->
             val startIdx = it * subSampleByteSize
             val subSample = sample.copyOfRange(startIdx, startIdx + subSampleByteSize)
-            registry.forEach { t -> t.value.calculateSample(subSample) }
+            registry.forEach { t ->
+                if(t.value.samplesTaken < samplesAsked) t.value.calculateSample(subSample)
+            }
         } else {
-            registry.forEach { it.value.calculateSample(sample) }
+            registry.forEach {
+                if(it.value.samplesTaken < samplesAsked) it.value.calculateSample(sample)
+            }
         }
     }
 

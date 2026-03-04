@@ -23,20 +23,27 @@ import kotlin.time.TimeSource
  *
  * @param B The type of the object being benchmarked.
  * @param E The type of the BenchmarkObject wrapper.
- * @property samples The number of samples to collect during benchmarking.
+ * @property samplesAsked The number of samples to collect during benchmarking.
  * @property obj The benchmark object instance, created by the provided config function.
  *
  * Extend this class to implement specific benchmarking logic.
  * Use the config function to initialize the object to be benchmarked.
  */
 public abstract class BenchmarkTester<B, E: BenchmarkObject<B>>(
-    public val samples: Long,
+    public val samplesAsked: Long,
     public val atomicSampleByteSize: Int,
     protected val obj: E
 ) {
 
     protected lateinit var startTime: TimeMark
     protected var duration: Duration = Duration.INFINITE
+
+    protected var totalTakenSamples: Long = 0
+    public val samplesTaken: Long
+        get() = totalTakenSamples
+
+    public val neededSampleDataByteSize: Long
+        get() = samplesAsked * atomicSampleByteSize
 
     /**
      * Starts the benchmark timer.

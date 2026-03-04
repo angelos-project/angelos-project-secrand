@@ -43,7 +43,6 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
         MODE_32_BIT(TypeSize.intSize * 2), MODE_64_BIT(TypeSize.longSize * 2)
     }
 
-    private var totalTakenSamples: Long = 0
     private var insideCircle: Long = 0
 
     /**

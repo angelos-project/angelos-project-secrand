@@ -23,7 +23,7 @@ public class BenchmarkSuite<B>(
     private lateinit var results: Map<String, Statistical>
 
     // TODO
-    private val samplesNeeded = MonteCarloTester.Mode.MODE_64_BIT.size * suiteBuilder.samples / benchmarkObject.sampleByteSize
+    private val samplesNeeded = suiteBuilder.samples //MonteCarloTester.Mode.MODE_64_BIT.size * suiteBuilder.samples / benchmarkObject.sampleByteSize
 
 
     init {
@@ -46,7 +46,7 @@ public class BenchmarkSuite<B>(
 
     public fun runBlocking() {
         benchmarkSession.startRun()
-        repeat(samplesNeeded.toInt()) {
+        while(!benchmarkSession.satisfied) {
             benchmarkSession.collectSample()
         }
         benchmarkSession.stopRun()
