@@ -18,6 +18,14 @@ import org.angproj.sec.rand.Sponge
 
 public class HashHelper(private val sponge: Sponge, position: Int = 0, mode: HashMode = HashMode.ABSORBING) {
 
+    private val _absorber by lazy { HashAbsorber(sponge, this) }
+    public val absorber: HashAbsorber
+        get() = _absorber
+
+    private val _squeezer by lazy { HashSqueezer(sponge, this) }
+    public val squeezer: HashSqueezer
+        get() = _squeezer
+
     public enum class HashMode {
         SQUEEZING, ABSORBING
     }
@@ -38,8 +46,20 @@ public class HashHelper(private val sponge: Sponge, position: Int = 0, mode: Has
         }
     }
 
+    public fun reset(): Unit = reset(_mode)
+
+    public fun reset(mode: HashMode) {
+        sponge.reset()
+        _mode = mode
+        _position = 0
+    }
+
     public fun switchMode(): HashMode = when(_mode) {
         HashMode.SQUEEZING -> HashMode.ABSORBING
         HashMode.ABSORBING -> HashMode.SQUEEZING
-    }.also { sponge.scramble() }
+    }.also {
+        _mode = it
+        _position = 0
+        sponge.scramble()
+    }
 }

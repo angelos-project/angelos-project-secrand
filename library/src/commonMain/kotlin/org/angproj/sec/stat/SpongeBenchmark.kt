@@ -14,6 +14,8 @@
  */
 package org.angproj.sec.stat
 
+import org.angproj.sec.hash.HashHelper
+import org.angproj.sec.hash.HashHelper.HashMode
 import org.angproj.sec.rand.Sponge
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
@@ -25,30 +27,65 @@ import org.angproj.sec.util.TypeSize
  * to benchmark a Sponge instance. It initializes the Sponge by scrambling it
  * and provides methods to retrieve sample byte size and generate the next sample.
  *
- * @param obj The Sponge instance to be benchmarked.
+ * @param article The Sponge instance to be benchmarked.
  */
-public class SpongeBenchmark(obj: Sponge): BenchmarkArticle<Sponge>(obj) {
+public class SpongeBenchmark(article: Sponge, private val generatorMode: GeneratorMode = GeneratorMode.BIT_GEN): BenchmarkArticle<Sponge>(article) {
+
+    public enum class GeneratorMode {
+        BIT_GEN, HASH_GEN
+    }
+
+    private var counter = 0L
+
+    private val hashHelper = HashHelper(article)
 
     init {
-        obj.scramble()
+        when (generatorMode) {
+            GeneratorMode.BIT_GEN -> hashHelper.switchMode()
+            GeneratorMode.HASH_GEN -> {}
+        }
     }
 
     override val sampleByteSize: Int
         get() = article.byteSize
 
-    override fun nextSample(): ByteArray {
-        val sample = allocSampleArray()
-        repeat(sampleByteSize / TypeSize.longSize) {
+    private fun nextBitGen(sample: ByteArray) {
+        repeat(article.visibleSize) {
             Octet.write(
                 article.squeeze(it),
                 sample,
                 it * TypeSize.longSize,
                 TypeSize.longSize
-             ) { index, value ->
+            ) { index, value ->
                 sample[index] = value
             }
         }
         article.round()
-        return sample
+    }
+
+    private fun nextHashGen(sample: ByteArray) {
+        hashHelper.reset(HashMode.ABSORBING)
+        hashHelper.absorber.absorb(counter++)
+        hashHelper.switchMode()
+        val squeezer = hashHelper.squeezer
+        repeat(article.visibleSize) {
+            Octet.write(
+                squeezer.squeeze(),
+                sample,
+                it * TypeSize.longSize,
+                TypeSize.longSize
+            ) { index, value ->
+                sample[index] = value
+            }
+        }
+    }
+
+    override fun nextSample(): ByteArray {
+        return allocSampleArray().apply {
+            when (generatorMode) {
+                GeneratorMode.BIT_GEN -> nextBitGen(this)
+                GeneratorMode.HASH_GEN -> nextHashGen(this)
+            }
+        }
     }
 }

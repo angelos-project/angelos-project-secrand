@@ -15,20 +15,16 @@
 package org.angproj.sec.stat
 
 import org.angproj.sec.rand.AbstractSponge21024
-import org.angproj.sec.rand.AbstractSponge256
-import org.angproj.sec.rand.JitterEntropy
-import org.angproj.sec.rand.Reseeder
 import kotlin.test.Test
 
 class BenchmarkSuiteBuilderTest {
     @Test
     fun testCreateTestSuite() {
         val sponge = object : AbstractSponge21024() {}
-        Reseeder(sponge).reseed(JitterEntropy)
 
         val suite = BenchmarkSuiteBuilder.build {
             samples { 10_000_000 }
-            article { SpongeBenchmark(sponge) }
+            article { SpongeBenchmark(sponge, SpongeBenchmark.GeneratorMode.BIT_GEN) }
             register { MonteCarloTester(samples, MonteCarloTester.Mode.MODE_64_BIT, article) }
             register { AvalancheEffectTester(samples, article) }
         }

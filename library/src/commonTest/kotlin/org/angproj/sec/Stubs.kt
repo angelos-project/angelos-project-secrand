@@ -26,6 +26,7 @@ object Stubs {
         override val spongeSize: Int = 4
         override val visibleSize: Int = 4
         override val byteSize: Int = visibleSize * TypeSize.longSize
+        override val bitSize: Int = visibleSize * TypeSize.longBits
 
         private val ivSize = InitializationVector.entries.size
         private var counter: Long = 1
