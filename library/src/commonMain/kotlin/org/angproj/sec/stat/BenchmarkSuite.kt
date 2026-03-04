@@ -36,12 +36,10 @@ public class BenchmarkSuite<B>(
         suiteBuilder.testers.forEach { tester ->
             testersByName.add(benchmarkSession.registerTester(tester))
         }
-
-        //return !(abs(0.5 - results[avalancheEffect]!!.keyValue) > 0.01 ||
-        //        abs(PI - results[monteCarlo]!!.keyValue) > 0.01)
     }
 
-    public fun run() {
+    public suspend fun run() {
+        runBlocking()
     }
 
     public fun runBlocking() {
@@ -52,6 +50,11 @@ public class BenchmarkSuite<B>(
         benchmarkSession.stopRun()
 
         results = benchmarkSession.finalizeCollecting()
+    }
+
+    public fun collectResults(): Map<String, Statistical> {
+        check(this::results.isInitialized) { "Data sampling not finished" }
+        return results
     }
 
     override fun toString(): String {
