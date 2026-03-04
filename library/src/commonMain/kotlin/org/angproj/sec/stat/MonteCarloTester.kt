@@ -112,6 +112,7 @@ public class MonteCarloTester<B, E: BenchmarkObject<B>>(
             totalTakenSamples,
             evaluateSampleData(),
             duration,
+            totalTakenSamples * atomicSampleByteSize,
             toString()
         )
     }

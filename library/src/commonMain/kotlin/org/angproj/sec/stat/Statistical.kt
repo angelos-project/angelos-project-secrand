@@ -28,5 +28,6 @@ public data class Statistical(
     val sampleCount: Long,
     val keyValue: Double,
     val duration: Duration,
+    val dataSize: Long,
     val report: String
 )

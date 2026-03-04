@@ -36,7 +36,7 @@ import kotlin.math.abs
  */
 public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
     samples: Long, obj: E
-) : BenchmarkTester<B, E>(samples, 16, obj) {
+) : BenchmarkTester<B, E>(samples, obj.sampleByteSize, obj) {
 
     private val stats = IntArray(obj.sampleByteSize * TypeSize.byteBits)
     private var lastSample: ByteArray = byteArrayOf()
@@ -85,6 +85,7 @@ public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
             totalTakenSamples,
             evaluateSampleData(),
             duration,
+            totalTakenSamples * atomicSampleByteSize,
             toString()
         )
     }
