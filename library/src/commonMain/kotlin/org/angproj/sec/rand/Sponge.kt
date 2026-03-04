@@ -39,6 +39,11 @@ public interface Sponge {
     public val byteSize: Int
 
     /**
+     * Size in bits of the visible portion of the state.
+     * */
+    public val bitSize: Int
+
+    /**
      * Resets the sponge to its initial state.
      */
     public fun reset()
