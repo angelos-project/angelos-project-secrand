@@ -50,9 +50,10 @@ public class SpongeBenchmark(article: Sponge, private val generatorMode: Generat
         get() = article.byteSize
 
     private fun nextBitGen(sample: ByteArray) {
+        val squeezer = hashHelper.squeezer
         repeat(article.visibleSize) {
             Octet.write(
-                article.squeeze(it),
+                squeezer.squeeze(),
                 sample,
                 it * TypeSize.longSize,
                 TypeSize.longSize
