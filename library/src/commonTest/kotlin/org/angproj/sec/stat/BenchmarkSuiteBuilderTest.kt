@@ -14,22 +14,34 @@
  */
 package org.angproj.sec.stat
 
-import org.angproj.sec.rand.AbstractSponge21024
+import org.angproj.sec.rand.AbstractSponge256
+import kotlin.math.PI
+import kotlin.math.sqrt
 import kotlin.test.Test
 
 class BenchmarkSuiteBuilderTest {
     @Test
     fun testCreateTestSuite() {
-        val sponge = object : AbstractSponge21024() {}
+        val sponge = object : AbstractSponge256() {}
 
         val suite = BenchmarkSuiteBuilder.build {
             samples { 10_000_000 }
             article { SpongeBenchmark(sponge, SpongeBenchmark.GeneratorMode.BIT_GEN) }
             register { MonteCarloTester(samples, MonteCarloTester.Mode.MODE_64_BIT, article) }
             register { AvalancheEffectTester(samples, article) }
+            register { ChiSquareTester(samples, article) }
         }
         suite.runBlocking()
 
         println(suite)
+        println(1.0 / sqrt(10000000.0))
+        println(PI - (1.0 / sqrt(10000000.0)))
+        println(PI + (1.0 / sqrt(10000000.0)))
+
+    }
+
+    @Test
+    fun fixAndTrix() {
+        println(PI - (1.0 / sqrt(10000000.0)))
     }
 }
