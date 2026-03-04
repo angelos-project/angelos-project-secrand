@@ -26,7 +26,7 @@ import org.angproj.sec.util.TypeSize
  *
  * @param obj The RandomBits instance to be benchmarked.
  */
-public class RandomBitsBenchmark(obj: RandomBits): BenchmarkObject<RandomBits>(obj) {
+public class RandomBitsBenchmark(obj: RandomBits): BenchmarkArticle<RandomBits>(obj) {
 
     override val sampleByteSize: Int
         get() = 16
@@ -35,7 +35,7 @@ public class RandomBitsBenchmark(obj: RandomBits): BenchmarkObject<RandomBits>(o
         val sample = allocSampleArray()
         repeat(sampleByteSize / TypeSize.intSize) {
             Octet.write(
-                obj.nextBits(TypeSize.intBits).toLong(),
+                article.nextBits(TypeSize.intBits).toLong(),
                 sample,
                 it * TypeSize.intSize,
                 TypeSize.intSize

@@ -35,7 +35,7 @@ import kotlin.math.abs
  * @property mode The mode of operation, determining the size of each sample (32-bit or 64-bit).
  * @property obj The benchmark object that provides the random data for the test.
  */
-public class MonteCarloTester<B, E: BenchmarkObject<B>>(
+public class MonteCarloTester<B, E: BenchmarkArticle<B>>(
     samples: Long, mode: Mode, obj: E
 ) : BenchmarkTester<B, E>(samples, mode.size, obj) {
 

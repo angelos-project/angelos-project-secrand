@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.stat
 
+import org.angproj.sec.rand.AbstractSponge21024
 import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.JitterEntropy
 import org.angproj.sec.rand.Reseeder
@@ -22,7 +23,7 @@ import kotlin.test.Test
 class BenchmarkSuiteBuilderTest {
     @Test
     fun testCreateTestSuite() {
-        val sponge = object : AbstractSponge256() {}
+        val sponge = object : AbstractSponge21024() {}
         Reseeder(sponge).reseed(JitterEntropy)
 
         val suite = BenchmarkSuiteBuilder.build {

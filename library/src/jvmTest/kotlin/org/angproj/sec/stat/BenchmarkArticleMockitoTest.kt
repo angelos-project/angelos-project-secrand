@@ -22,25 +22,25 @@ import kotlin.test.assertEquals
 
 class MockObject
 
-class BenchmarkObjectMockitoTest {
+class BenchmarkArticleMockitoTest {
 
-    private lateinit var benchmarkObject: BenchmarkObject<MockObject>
+    private lateinit var benchmarkArticle: BenchmarkArticle<MockObject>
 
     @BeforeTest
     fun setup() {
-        benchmarkObject = mock()
+        benchmarkArticle = mock()
     }
 
     @Test
     fun testSampleByteSize() {
-        whenever(benchmarkObject.sampleByteSize).thenReturn(16)
-        assertEquals(benchmarkObject.sampleByteSize, 16)
+        whenever(benchmarkArticle.sampleByteSize).thenReturn(16)
+        assertEquals(benchmarkArticle.sampleByteSize, 16)
     }
 
     @Test
     fun testNextSample() {
         val sample = byteArrayOf(0x11, 0x11, 0x11, 0x11,0x11, 0x11, 0x11, 0x11,0x11, 0x11, 0x11, 0x11,0x11, 0x11, 0x11, 0x11)
-        whenever(benchmarkObject.nextSample()).thenReturn(sample)
-        assertEquals(benchmarkObject.nextSample(), sample)
+        whenever(benchmarkArticle.nextSample()).thenReturn(sample)
+        assertEquals(benchmarkArticle.nextSample(), sample)
     }
 }

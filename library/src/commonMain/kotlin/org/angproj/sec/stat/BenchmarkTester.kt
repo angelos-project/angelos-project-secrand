@@ -29,7 +29,7 @@ import kotlin.time.TimeSource
  * Extend this class to implement specific benchmarking logic.
  * Use the config function to initialize the object to be benchmarked.
  */
-public abstract class BenchmarkTester<B, E: BenchmarkObject<B>>(
+public abstract class BenchmarkTester<B, E: BenchmarkArticle<B>>(
     public val samplesAsked: Long,
     public val atomicSampleByteSize: Int,
     protected val obj: E

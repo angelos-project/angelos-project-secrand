@@ -27,20 +27,20 @@ import org.angproj.sec.util.TypeSize
  *
  * @param obj The Sponge instance to be benchmarked.
  */
-public class SpongeBenchmark(obj: Sponge): BenchmarkObject<Sponge>(obj) {
+public class SpongeBenchmark(obj: Sponge): BenchmarkArticle<Sponge>(obj) {
 
     init {
         obj.scramble()
     }
 
     override val sampleByteSize: Int
-        get() = obj.byteSize
+        get() = article.byteSize
 
     override fun nextSample(): ByteArray {
         val sample = allocSampleArray()
         repeat(sampleByteSize / TypeSize.longSize) {
             Octet.write(
-                obj.squeeze(it),
+                article.squeeze(it),
                 sample,
                 it * TypeSize.longSize,
                 TypeSize.longSize
@@ -48,7 +48,7 @@ public class SpongeBenchmark(obj: Sponge): BenchmarkObject<Sponge>(obj) {
                 sample[index] = value
             }
         }
-        obj.round()
+        article.round()
         return sample
     }
 }

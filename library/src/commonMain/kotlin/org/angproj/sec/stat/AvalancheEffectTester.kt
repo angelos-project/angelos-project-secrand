@@ -34,7 +34,7 @@ import kotlin.math.abs
  * @property samples The number of samples to collect for the test.
  * @property obj The benchmark object that provides the cryptographic function to be tested.
  */
-public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
+public class AvalancheEffectTester<B, E: BenchmarkArticle<B>>(
     samples: Long, obj: E
 ) : BenchmarkTester<B, E>(samples, obj.sampleByteSize, obj) {
 

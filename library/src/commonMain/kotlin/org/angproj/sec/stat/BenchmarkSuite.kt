@@ -15,10 +15,10 @@
 package org.angproj.sec.stat
 
 public class BenchmarkSuite<B>(
-    suiteBuilder: BenchmarkSuiteBuilder<B, BenchmarkObject<B>>) {
+    suiteBuilder: BenchmarkSuiteBuilder<B, BenchmarkArticle<B>>) {
 
     private val benchmarkObject = suiteBuilder.article
-    private var benchmarkSession: BenchmarkSession<B, BenchmarkObject<B>>
+    private var benchmarkSession: BenchmarkSession<B, BenchmarkArticle<B>>
     private val testersByName: MutableList<String> = mutableListOf()
     private lateinit var results: Map<String, Statistical>
 

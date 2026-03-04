@@ -16,7 +16,7 @@ package org.angproj.sec.stat
 
 import org.angproj.sec.rand.Sponge
 
-public class BenchmarkSuiteBuilder<B, E: BenchmarkObject<B>> {
+public class BenchmarkSuiteBuilder<B, E: BenchmarkArticle<B>> {
 
     private var samplesToTake: Long = -1L
     public val samples: Long
@@ -29,15 +29,15 @@ public class BenchmarkSuiteBuilder<B, E: BenchmarkObject<B>> {
         samplesToTake = block().toLong()
     }
 
-    private lateinit var benchmarkObject: BenchmarkObject<B>
-    public val article: BenchmarkObject<B>
+    private lateinit var benchmarkArticle: BenchmarkArticle<B>
+    public val article: BenchmarkArticle<B>
         get() {
-            check(this::benchmarkObject.isInitialized) { "Samples not set" }
-            return benchmarkObject
+            check(this::benchmarkArticle.isInitialized) { "Samples not set" }
+            return benchmarkArticle
         }
-    public fun article(block: () -> BenchmarkObject<B>) {
-        check(!this::benchmarkObject.isInitialized) { "Benchmark test article already set" }
-        benchmarkObject = block()
+    public fun article(block: () -> BenchmarkArticle<B>) {
+        check(!this::benchmarkArticle.isInitialized) { "Benchmark test article already set" }
+        benchmarkArticle = block()
     }
 
     internal val testers: MutableSet<(E) -> BenchmarkTester<B, E>> = mutableSetOf()
@@ -47,8 +47,8 @@ public class BenchmarkSuiteBuilder<B, E: BenchmarkObject<B>> {
     }
 
     public companion object {
-        public fun<B, E: BenchmarkObject<B>> build(block: BenchmarkSuiteBuilder<B, BenchmarkObject<B>>.() -> Unit): BenchmarkSuite<B> {
-            val suiteBuilder = BenchmarkSuiteBuilder<B, BenchmarkObject<B>>().apply { block() }
+        public fun<B, E: BenchmarkArticle<B>> build(block: BenchmarkSuiteBuilder<B, BenchmarkArticle<B>>.() -> Unit): BenchmarkSuite<B> {
+            val suiteBuilder = BenchmarkSuiteBuilder<B, BenchmarkArticle<B>>().apply { block() }
             return BenchmarkSuite(suiteBuilder)
         }
 

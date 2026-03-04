@@ -28,7 +28,7 @@ import org.angproj.sec.util.RunState
  * This class allows registering multiple testers, starting and stopping the benchmarking run,
  * collecting samples, and finalizing the collection to retrieve statistical results.
  */
-public class BenchmarkSession<B, E: BenchmarkObject<B>>(
+public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
     public val samplesAsked: Long,
     public val subSampleByteSize: Int,
     private val obj: E
