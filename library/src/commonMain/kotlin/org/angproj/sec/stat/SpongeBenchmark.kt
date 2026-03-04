@@ -64,7 +64,7 @@ public class SpongeBenchmark(article: Sponge, private val generatorMode: Generat
     }
 
     private fun nextHashGen(sample: ByteArray) {
-        hashHelper.reset(HashMode.ABSORBING)
+        hashHelper.reset()
         hashHelper.absorber.absorb(counter++)
         hashHelper.switchMode()
         val squeezer = hashHelper.squeezer

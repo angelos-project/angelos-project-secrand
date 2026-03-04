@@ -38,7 +38,7 @@ public class HashHelper(private val sponge: Sponge, position: Int = 0, mode: Has
     public val mode: HashMode
         get() = _mode
 
-    public fun forward() {
+    internal fun forward() {
         _position++
         if(_position == sponge.visibleSize) {
             _position = 0
@@ -46,7 +46,7 @@ public class HashHelper(private val sponge: Sponge, position: Int = 0, mode: Has
         }
     }
 
-    public fun reset(): Unit = reset(_mode)
+    public fun reset(): Unit = reset(HashMode.ABSORBING)
 
     public fun reset(mode: HashMode) {
         sponge.reset()
@@ -58,8 +58,8 @@ public class HashHelper(private val sponge: Sponge, position: Int = 0, mode: Has
         HashMode.SQUEEZING -> HashMode.ABSORBING
         HashMode.ABSORBING -> HashMode.SQUEEZING
     }.also {
+        sponge.scramble()
         _mode = it
         _position = 0
-        sponge.scramble()
     }
 }
