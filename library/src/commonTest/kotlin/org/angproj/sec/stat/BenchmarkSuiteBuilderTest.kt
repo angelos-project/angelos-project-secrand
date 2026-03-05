@@ -14,34 +14,76 @@
  */
 package org.angproj.sec.stat
 
-import org.angproj.sec.rand.AbstractSponge256
-import kotlin.math.PI
-import kotlin.math.sqrt
+import org.angproj.sec.Stubs
+
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class BenchmarkSuiteBuilderTest {
-    @Test
-    fun testCreateTestSuite() {
-        val sponge = object : AbstractSponge256() {}
 
+    @Test
+    fun testBenchmarkTesterMock() {
         val suite = BenchmarkSuiteBuilder.build {
-            samples { 10_000_000 }
-            article { SpongeBenchmark(sponge, SpongeBenchmark.GeneratorMode.BIT_GEN) }
-            register { MonteCarloTester(samples, MonteCarloTester.Mode.MODE_64_BIT, article) }
-            register { AvalancheEffectTester(samples, article) }
-            register { ChiSquareTester(samples, article) }
+            samples { 1 }
+            article { Stubs.stubBenchmarkArticle() }
+            register { Stubs.stubBenchmarkTester(samples, article) }
         }
+
         suite.runBlocking()
 
-        println(suite)
-        println(1.0 / sqrt(10000000.0))
-        println(PI - (1.0 / sqrt(10000000.0)))
-        println(PI + (1.0 / sqrt(10000000.0)))
-
+        // THe stub is an object, that's why classname "null"
+        assertEquals(1, suite.collectResults()["null"]!!.sampleCount)
     }
 
     @Test
-    fun fixAndTrix() {
-        println(PI - (1.0 / sqrt(10000000.0)))
+    fun testMonteCarlo32BitModeMock() {
+        val suite = BenchmarkSuiteBuilder.build {
+            samples { 20 }
+            article { Stubs.stubBenchmarkArticle() }
+            register { MonteCarloTester(samples, MonteCarloTester.Mode.MODE_32_BIT, article) }
+        }
+
+        suite.runBlocking()
+
+        assertEquals(20, suite.collectResults()["MonteCarloTester"]!!.sampleCount)
+    }
+
+    @Test
+    fun testMonteCarlo64BitModeMock() {
+        val suite = BenchmarkSuiteBuilder.build {
+            samples { 20 }
+            article { Stubs.stubBenchmarkArticle() }
+            register { MonteCarloTester(samples, MonteCarloTester.Mode.MODE_64_BIT, article) }
+        }
+
+        suite.runBlocking()
+
+        assertEquals(20, suite.collectResults()["MonteCarloTester"]!!.sampleCount)
+    }
+
+    @Test
+    fun testAvalancheEffectMock() {
+        val suite = BenchmarkSuiteBuilder.build {
+            samples { 1 }
+            article { Stubs.stubBenchmarkArticle() }
+            register { AvalancheEffectTester(samples, article) }
+        }
+
+        suite.runBlocking()
+
+        assertEquals(1, suite.collectResults()["AvalancheEffectTester"]!!.sampleCount)
+    }
+
+    @Test
+    fun testChiSquareMock() {
+        val suite = BenchmarkSuiteBuilder.build {
+            samples { 1 }
+            article { Stubs.stubBenchmarkArticle() }
+            register { ChiSquareTester(samples, article) }
+        }
+
+        suite.runBlocking()
+
+        assertEquals(1, suite.collectResults()["ChiSquareTester"]!!.sampleCount)
     }
 }

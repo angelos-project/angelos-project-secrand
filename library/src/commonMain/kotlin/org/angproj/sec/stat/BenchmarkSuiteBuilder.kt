@@ -14,7 +14,6 @@
  */
 package org.angproj.sec.stat
 
-import org.angproj.sec.rand.Sponge
 
 public class BenchmarkSuiteBuilder<B, E: BenchmarkArticle<B>> {
 
@@ -50,15 +49,6 @@ public class BenchmarkSuiteBuilder<B, E: BenchmarkArticle<B>> {
         public fun<B, E: BenchmarkArticle<B>> build(block: BenchmarkSuiteBuilder<B, BenchmarkArticle<B>>.() -> Unit): BenchmarkSuite<B> {
             val suiteBuilder = BenchmarkSuiteBuilder<B, BenchmarkArticle<B>>().apply { block() }
             return BenchmarkSuite(suiteBuilder)
-        }
-
-        public fun spongeBenchmarkSuite(sponge: Sponge): BenchmarkSuite<Sponge> {
-            return build {
-                samples { 10_000_000 }
-                article { SpongeBenchmark(sponge) }
-                register { MonteCarloTester(samples, MonteCarloTester.Mode.MODE_64_BIT, article) }
-                register { AvalancheEffectTester(samples, article) }
-            }
         }
     }
 }

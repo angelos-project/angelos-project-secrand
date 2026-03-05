@@ -17,9 +17,13 @@ package org.angproj.sec
 import org.angproj.sec.rand.AbstractSponge2256
 import org.angproj.sec.rand.InitializationVector
 import org.angproj.sec.rand.Sponge
+import org.angproj.sec.stat.BenchmarkArticle
+import org.angproj.sec.stat.BenchmarkTester
+import org.angproj.sec.stat.Statistical
 import org.angproj.sec.util.TypeSize
 import kotlin.math.E
 import kotlin.math.PI
+import kotlin.random.Random
 
 object Stubs {
     fun stubFailSqueezeSponge(seed: Long = 0): Sponge = object : Sponge {
@@ -58,5 +62,27 @@ object Stubs {
             absorb(seed, 0)
             scramble()
         }
+    }
+
+    fun<B> stubBenchmarkTester(samplesAsked: Long, article: BenchmarkArticle<B>): BenchmarkTester<B, BenchmarkArticle<B>> = object : BenchmarkTester<B, BenchmarkArticle<B>>(
+        samplesAsked, 16, article) {
+        override fun calculateSampleImpl(sample: ByteArray) { totalTakenSamples++ }
+        private fun evaluateSampleData(): Double { return totalTakenSamples.toDouble() }
+        override fun collectStatsImpl(): Statistical {
+            return Statistical(
+                totalTakenSamples,
+                evaluateSampleData(),
+                duration,
+                totalTakenSamples * atomicSampleByteSize,
+                toString()
+            )
+        }
+
+        override fun toString(): String = buildString { append(evaluateSampleData()) }
+    }
+
+    fun stubBenchmarkArticle(): BenchmarkArticle<Random> = object: BenchmarkArticle<Random>(Random) {
+        override val sampleByteSize: Int = 16
+        override fun nextSample(): ByteArray = article.nextBytes(sampleByteSize)
     }
 }
