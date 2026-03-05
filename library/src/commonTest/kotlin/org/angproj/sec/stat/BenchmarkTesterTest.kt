@@ -25,6 +25,20 @@ import kotlin.test.assertFailsWith
 class BenchmarkTesterTest {
 
     @Test
+    fun testSamplesAsked() {
+        assertFailsWith<IllegalArgumentException> {
+            Mocks.mockBenchmarkTester(0, 16, Stubs.stubBenchmarkArticle())
+        }
+    }
+
+    @Test
+    fun testAtomicSampleByteSize() {
+        assertFailsWith<IllegalArgumentException> {
+            Mocks.mockBenchmarkTester(1, 0, Stubs.stubBenchmarkArticle())
+        }
+    }
+
+    @Test
     fun testCalculateSampleSamplesTaken() {
         val tester = Mocks.mockBenchmarkTester(1, 16, Stubs.stubBenchmarkArticle())
 
