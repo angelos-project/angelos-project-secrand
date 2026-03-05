@@ -33,11 +33,11 @@ import kotlin.math.abs
  * @param E The type of the benchmark object, which must extend BenchmarkObject<B>.
  * @property samples The number of samples to collect for the test.
  * @property mode The mode of operation, determining the size of each sample (32-bit or 64-bit).
- * @property obj The benchmark object that provides the random data for the test.
+ * @property benchmarkArticle The benchmark object that provides the random data for the test.
  */
 public class MonteCarloTester<B, E: BenchmarkArticle<B>>(
-    samples: Long, mode: Mode, obj: E
-) : BenchmarkTester<B, E>(samples, mode.size, obj) {
+    samples: Long, mode: Mode, benchmarkArticle: E
+) : BenchmarkTester<B, E>(samples, mode.size, benchmarkArticle) {
 
     public enum class Mode(public val size: Int) {
         MODE_32_BIT(TypeSize.intSize * 2), MODE_64_BIT(TypeSize.longSize * 2)

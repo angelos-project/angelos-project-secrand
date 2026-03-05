@@ -20,6 +20,7 @@ import org.angproj.sec.Stubs
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotEquals
 
 
 class BenchmarkTesterTest {
@@ -87,5 +88,22 @@ class BenchmarkTesterTest {
         assertEquals(1.0, stats.keyValue)
         assertEquals(Duration.INFINITE, stats.duration)
         assertEquals(16, stats.dataSize)
+    }
+
+    @Test
+    fun testStartStop() {
+        val tester = Mocks.mockBenchmarkTester(1, 16, Stubs.stubBenchmarkArticle())
+
+        tester.start()
+        tester.stop()
+
+        assertNotEquals(Duration.INFINITE, tester.collectStats().duration)
+    }
+
+    @Test
+    fun testToString() {
+        val tester = Mocks.mockBenchmarkTester(1, 16, Stubs.stubBenchmarkArticle())
+
+        assertNotEquals("", tester.toString())
     }
 }

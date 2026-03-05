@@ -24,7 +24,7 @@ import kotlin.time.TimeSource
  * @param B The type of the object being benchmarked.
  * @param E The type of the BenchmarkObject wrapper.
  * @property samplesAsked The number of samples to collect during benchmarking.
- * @property obj The benchmark object instance, created by the provided config function.
+ * @property benchmarkArticle The benchmark object instance, created by the provided config function.
  *
  * Extend this class to implement specific benchmarking logic.
  * Use the config function to initialize the object to be benchmarked.
@@ -32,7 +32,7 @@ import kotlin.time.TimeSource
 public abstract class BenchmarkTester<B, E: BenchmarkArticle<B>>(
     public val samplesAsked: Long,
     public val atomicSampleByteSize: Int,
-    protected val obj: E
+    protected val benchmarkArticle: E
 ) {
 
     init {
@@ -64,6 +64,9 @@ public abstract class BenchmarkTester<B, E: BenchmarkArticle<B>>(
         duration = startTime.elapsedNow() // Duration in nanoseconds
     }
 
+    /**
+     * Samples should be counted by their atomic size
+     * */
     protected abstract fun calculateSampleImpl(sample: ByteArray)
 
     /**

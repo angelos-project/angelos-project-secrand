@@ -32,19 +32,19 @@ import kotlin.math.abs
  * @param B The type of the benchmark result.
  * @param E The type of the benchmark object, which must extend BenchmarkObject<B>.
  * @property samples The number of samples to collect for the test.
- * @property obj The benchmark object that provides the cryptographic function to be tested.
+ * @property benchmarkArticle The benchmark object that provides the cryptographic function to be tested.
  */
 public class AvalancheEffectTester<B, E: BenchmarkArticle<B>>(
-    samples: Long, obj: E
-) : BenchmarkTester<B, E>(samples, obj.sampleByteSize, obj) {
+    samples: Long, benchmarkArticle: E
+) : BenchmarkTester<B, E>(samples, benchmarkArticle.sampleByteSize, benchmarkArticle) {
 
-    private val stats = IntArray(obj.sampleByteSize * TypeSize.byteBits)
+    private val stats = IntArray(benchmarkArticle.sampleByteSize * TypeSize.byteBits)
     private var lastSample: ByteArray = byteArrayOf()
     private var currentSample: ByteArray = byteArrayOf()
 
     private fun accumulateSample() {
         var total = 0
-        repeat(obj.sampleByteSize / TypeSize.longSize) { idx ->
+        repeat(benchmarkArticle.sampleByteSize / TypeSize.longSize) { idx ->
             val offset = idx * TypeSize.longSize
 
             val last = Octet.read(lastSample, offset, TypeSize.longSize) { index ->
@@ -61,9 +61,9 @@ public class AvalancheEffectTester<B, E: BenchmarkArticle<B>>(
     }
 
     override fun calculateSampleImpl(sample: ByteArray) {
-        if(currentSample.size + sample.size == obj.sampleByteSize) {
+        if(currentSample.size + sample.size == benchmarkArticle.sampleByteSize) {
             currentSample += sample
-            if(lastSample.size == obj.sampleByteSize) {
+            if(lastSample.size == benchmarkArticle.sampleByteSize) {
                 accumulateSample()
             }
             lastSample = currentSample
@@ -77,7 +77,7 @@ public class AvalancheEffectTester<B, E: BenchmarkArticle<B>>(
         val sum = stats.sum()
         var total = 0L
         stats.forEachIndexed { index, value -> total += index * value }
-        return total / sum.toDouble() / (obj.sampleByteSize * TypeSize.byteBits)
+        return total / sum.toDouble() / (benchmarkArticle.sampleByteSize * TypeSize.byteBits)
     }
 
     override fun collectStatsImpl(): Statistical {

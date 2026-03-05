@@ -21,11 +21,11 @@ package org.angproj.sec.stat
  * @param B The type of the benchmark result.
  * @param E The type of the benchmark object, which must extend BenchmarkObject<B>.
  * @property samples The number of samples to collect for the test.
- * @property obj The benchmark object that provides the cryptographic function to be tested.
+ * @property benchmarkArticle The benchmark object that provides the cryptographic function to be tested.
  */
 public class ChiSquareTester<B, E: BenchmarkArticle<B>>(
-    samples: Long, obj: E
-) : BenchmarkTester<B, E>(samples, obj.sampleByteSize, obj) {
+    samples: Long, benchmarkArticle: E
+) : BenchmarkTester<B, E>(samples, benchmarkArticle.sampleByteSize, benchmarkArticle) {
 
     private val observed = DoubleArray(256)
 
