@@ -30,6 +30,6 @@ class AvalancheEffectTesterTest {
 
        suite.runBlocking()
 
-       assertEquals(1, suite.collectResults()["AvalancheEffectTester"]!!.sampleCount)
+       assertEquals(1, suite.collectResults()[AvalancheEffectTester::class.simpleName]!!.sampleCount)
    }
 }

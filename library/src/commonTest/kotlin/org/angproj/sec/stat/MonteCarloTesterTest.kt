@@ -30,9 +30,7 @@ class MonteCarloTesterTest {
 
         suite.runBlocking()
 
-        println(suite.collectResults()["MonteCarloTester"]!!.sampleCount)
-
-        assertEquals(1, suite.collectResults()["MonteCarloTester"]!!.sampleCount)
+        assertEquals(1, suite.collectResults()[MonteCarloTester::class.simpleName]!!.sampleCount)
     }
 
     @Test
@@ -45,6 +43,6 @@ class MonteCarloTesterTest {
 
         suite.runBlocking()
 
-        assertEquals(1, suite.collectResults()["MonteCarloTester"]!!.sampleCount)
+        assertEquals(1, suite.collectResults()[MonteCarloTester::class.simpleName]!!.sampleCount)
     }
 }

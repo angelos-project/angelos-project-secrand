@@ -66,7 +66,7 @@ public class MonteCarloTester<B, E: BenchmarkArticle<B>>(
     }
 
     private fun atomicMode32(sample: ByteArray) {
-        repeat(sample.size / atomicSampleByteSize) {
+        repeat(maxLoops(sample.size)) {
             val offset = it * atomicSampleByteSize
 
             val x = Octet.read(sample, offset, TypeSize.intSize) { index ->
@@ -81,7 +81,7 @@ public class MonteCarloTester<B, E: BenchmarkArticle<B>>(
     }
 
     private fun atomicMode64(sample: ByteArray) {
-        repeat(sample.size / atomicSampleByteSize) {
+        repeat(maxLoops(sample.size)) {
             val offset = it * atomicSampleByteSize
 
             val x = Octet.read(sample, offset, TypeSize.longSize) { index ->

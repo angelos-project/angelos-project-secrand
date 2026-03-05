@@ -49,6 +49,15 @@ class BenchmarkTesterTest {
     }
 
     @Test
+    fun testSamplesLeft() {
+        val tester = Mocks.mockBenchmarkTester(1, 16, Stubs.stubBenchmarkArticle())
+
+        tester.calculateSample(ByteArray(32))
+
+        assertEquals(0L, tester.samplesLeft)
+    }
+
+    @Test
     fun testCalculateSampleFail() {
         val tester = Mocks.mockBenchmarkTester(1, 16, Stubs.stubBenchmarkArticle())
 

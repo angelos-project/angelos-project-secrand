@@ -24,7 +24,7 @@ object Mocks {
     fun<B> mockBenchmarkTester(samplesAsked: Long, atomicSampleByteSize: Int, article: BenchmarkArticle<B>): BenchmarkTester<B, BenchmarkArticle<B>> = object : BenchmarkTester<B, BenchmarkArticle<B>>(
         samplesAsked, atomicSampleByteSize, article) {
         override fun calculateSampleImpl(sample: ByteArray) {
-            totalTakenSamples = min(sample.size / atomicSampleByteSize + totalTakenSamples, samplesAsked)
+            totalTakenSamples += min(sample.size.toLong() / atomicSampleByteSize, samplesLeft)
         }
         private fun evaluateSampleData(): Double { return totalTakenSamples.toDouble() }
         override fun collectStatsImpl(): Statistical {

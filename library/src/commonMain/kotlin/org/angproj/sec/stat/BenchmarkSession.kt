@@ -41,7 +41,7 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
     private val registry: MutableMap<String, BenchmarkTester<B, E>> = mutableMapOf()
 
     public val satisfied: Boolean
-        get() = registry.entries.all { it.value.samplesTaken >= it.value.samplesAsked }
+        get() = registry.entries.all { it.value.samplesLeft <= 0 }
 
     /**
      * Registers a new tester for the benchmarking session.

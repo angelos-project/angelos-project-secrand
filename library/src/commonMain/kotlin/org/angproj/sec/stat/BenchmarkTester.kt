@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.stat
 
+import kotlin.math.min
 import kotlin.time.Duration
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
@@ -49,6 +50,11 @@ public abstract class BenchmarkTester<B, E: BenchmarkArticle<B>>(
 
     public val neededSampleDataByteSize: Long
         get() = samplesAsked * atomicSampleByteSize
+
+    public val samplesLeft: Long
+        get() = samplesAsked - samplesTaken
+
+    protected fun maxLoops(sampleSize: Int): Int = min(sampleSize.toLong() / atomicSampleByteSize, samplesLeft).toInt()
 
     /**
      * Starts the benchmark timer.
