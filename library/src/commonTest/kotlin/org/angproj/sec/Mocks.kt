@@ -18,6 +18,7 @@ import org.angproj.sec.stat.BenchmarkArticle
 import org.angproj.sec.stat.BenchmarkTester
 import org.angproj.sec.stat.Statistical
 import kotlin.math.min
+import kotlin.random.Random
 
 object Mocks {
     fun<B> mockBenchmarkTester(samplesAsked: Long, atomicSampleByteSize: Int, article: BenchmarkArticle<B>): BenchmarkTester<B, BenchmarkArticle<B>> = object : BenchmarkTester<B, BenchmarkArticle<B>>(
@@ -37,5 +38,10 @@ object Mocks {
         }
 
         override fun toString(): String = buildString { append(evaluateSampleData()) }
+    }
+
+    fun mockBenchmarkArticle(sampleByteSize: Int): BenchmarkArticle<Random> = object: BenchmarkArticle<Random>(Random) {
+        override val sampleByteSize: Int = sampleByteSize
+        override fun nextSample(): ByteArray = article.nextBytes(sampleByteSize)
     }
 }

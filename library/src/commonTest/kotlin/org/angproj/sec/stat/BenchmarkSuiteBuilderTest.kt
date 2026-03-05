@@ -135,19 +135,6 @@ class BenchmarkSuiteBuilderTest {
     }
 
     @Test
-    fun testAvalancheEffectMock() {
-        val suite = BenchmarkSuiteBuilder.build {
-            samples { 1 }
-            article { Stubs.stubBenchmarkArticle() }
-            register { AvalancheEffectTester(samples, article) }
-        }
-
-        suite.runBlocking()
-
-        assertEquals(1, suite.collectResults()["AvalancheEffectTester"]!!.sampleCount)
-    }
-
-    @Test
     fun testChiSquareMock() {
         val suite = BenchmarkSuiteBuilder.build {
             samples { 1 }

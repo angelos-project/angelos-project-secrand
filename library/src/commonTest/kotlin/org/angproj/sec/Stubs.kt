@@ -68,8 +68,5 @@ object Stubs {
         samplesAsked: Long, article: BenchmarkArticle<B>
     ): BenchmarkTester<B, BenchmarkArticle<B>> = Mocks.mockBenchmarkTester(samplesAsked, 16, article)
 
-    fun stubBenchmarkArticle(): BenchmarkArticle<Random> = object: BenchmarkArticle<Random>(Random) {
-        override val sampleByteSize: Int = 16
-        override fun nextSample(): ByteArray = article.nextBytes(sampleByteSize)
-    }
+    fun stubBenchmarkArticle(): BenchmarkArticle<Random> = Mocks.mockBenchmarkArticle(16)
 }

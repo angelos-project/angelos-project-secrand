@@ -61,16 +61,12 @@ public class AvalancheEffectTester<B, E: BenchmarkArticle<B>>(
     }
 
     override fun calculateSampleImpl(sample: ByteArray) {
-        if(currentSample.size + sample.size == benchmarkArticle.sampleByteSize) {
-            currentSample += sample
-            if(lastSample.size == benchmarkArticle.sampleByteSize) {
-                accumulateSample()
-            }
-            lastSample = currentSample
-            currentSample = byteArrayOf()
-        } else {
-            currentSample += sample
+        currentSample = sample
+        if(lastSample.size == benchmarkArticle.sampleByteSize) {
+            accumulateSample()
         }
+        lastSample = currentSample
+        currentSample = byteArrayOf()
     }
 
     private fun evaluateSampleData(): Double {
