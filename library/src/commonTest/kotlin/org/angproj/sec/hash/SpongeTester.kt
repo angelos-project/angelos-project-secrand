@@ -14,9 +14,6 @@
  */
 package org.angproj.sec.hash
 
-import org.angproj.sec.rand.Sponge
-import org.angproj.sec.util.Octet
-
 
 interface SpongeTester {
 
