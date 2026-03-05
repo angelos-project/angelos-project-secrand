@@ -15,19 +15,10 @@
 package org.angproj.sec.hash
 
 import org.angproj.sec.rand.Sponge
+import org.angproj.sec.util.Octet
 
 
 interface SpongeTester {
-
-    class Hash(sponge: Sponge) {
-        fun update(data: ByteArray) {
-
-        }
-
-        fun final(): ByteArray {
-            return byteArrayOf()
-        }
-    }
 
     val emptyHash: String
     val singleAHash: String

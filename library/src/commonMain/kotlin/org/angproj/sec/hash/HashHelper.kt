@@ -58,6 +58,7 @@ public class HashHelper(private val sponge: Sponge, position: Int = 0, mode: Has
         HashMode.SQUEEZING -> HashMode.ABSORBING
         HashMode.ABSORBING -> HashMode.SQUEEZING
     }.also {
+        if(_position != 0) sponge.round()
         sponge.scramble()
         _mode = it
         _position = 0
