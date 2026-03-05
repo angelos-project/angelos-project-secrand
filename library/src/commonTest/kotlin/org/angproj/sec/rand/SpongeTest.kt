@@ -168,43 +168,4 @@ class HashTestGenerator {
     private fun<E: Sponge> millionATest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
         this.update(Sampler.millionASample())
     }
-
-    public fun numGenerator(): String {
-        val sb = StringBuilder()
-        (48 .. 57).forEach { sb.append(it.toChar()) }
-        return sb.toString()
-    }
-
-    public fun aToZGenerator(): String {
-        val sb = StringBuilder()
-        (97 .. 122).forEach { sb.append(it.toChar()) }
-        return sb.toString()
-    }
-
-    public fun nopqGenerator(): String {
-        val sb = StringBuilder()
-        val alphabet = aToZGenerator()
-        (0 .. (110 - 97)).forEach {
-            sb.append(alphabet.substring(it, it + 4))
-        }
-        return sb.toString()
-    }
-}
-
-class TestGenTest {
-
-    @Test
-    fun testNumGenerator() {
-        assertEquals(HashTestGenerator().numGenerator(), "0123456789")
-    }
-
-    @Test
-    fun testAtoZ2Generator() {
-        assertEquals(HashTestGenerator().aToZGenerator(), "abcdefghijklmnopqrstuvwxyz")
-    }
-
-    @Test
-    fun testNopqGenerator() {
-        assertEquals(HashTestGenerator().nopqGenerator(), "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq")
-    }
 }
