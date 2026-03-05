@@ -20,11 +20,8 @@ public class BenchmarkSuite<B>(
     private val benchmarkObject = suiteBuilder.article
     private var benchmarkSession: BenchmarkSession<B, BenchmarkArticle<B>>
     private val testersByName: MutableList<String> = mutableListOf()
+    private val samplesNeeded = suiteBuilder.samples
     private lateinit var results: Map<String, Statistical>
-
-    // TODO
-    private val samplesNeeded = suiteBuilder.samples //MonteCarloTester.Mode.MODE_64_BIT.size * suiteBuilder.samples / benchmarkObject.sampleByteSize
-
 
     init {
         benchmarkSession = BenchmarkSession(

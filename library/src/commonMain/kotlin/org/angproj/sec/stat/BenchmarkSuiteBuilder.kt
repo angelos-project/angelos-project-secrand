@@ -25,24 +25,25 @@ public class BenchmarkSuiteBuilder<B, E: BenchmarkArticle<B>> {
         }
 
     public fun samples(block: () -> Int) {
+        check(samplesToTake == -1L) { "Samples already set" }
         samplesToTake = block().toLong()
     }
 
     private lateinit var benchmarkArticle: BenchmarkArticle<B>
     public val article: BenchmarkArticle<B>
         get() {
-            check(this::benchmarkArticle.isInitialized) { "Samples not set" }
+            check(this::benchmarkArticle.isInitialized) { "Article not set" }
             return benchmarkArticle
         }
     public fun article(block: () -> BenchmarkArticle<B>) {
-        check(!this::benchmarkArticle.isInitialized) { "Benchmark test article already set" }
+        check(!this::benchmarkArticle.isInitialized) { "Benchmark article already set" }
         benchmarkArticle = block()
     }
 
     internal val testers: MutableSet<(E) -> BenchmarkTester<B, E>> = mutableSetOf()
 
     public fun register(builder: (E) -> BenchmarkTester<B, E>) {
-        check(testers.add(builder)) { "Tester already registered" }
+        testers.add(builder)
     }
 
     public companion object {

@@ -54,6 +54,7 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
         check(state == RunState.INITIALIZE) { "Can't register new state after INITIALIZE state." }
         val tester = builder(obj)
         val token  = tester::class.simpleName.toString()
+        check(!registry.contains(token)) { "Tester already registered" }
         registry[token] = tester
         return token
     }
