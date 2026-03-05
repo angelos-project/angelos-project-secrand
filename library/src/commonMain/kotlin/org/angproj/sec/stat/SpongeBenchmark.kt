@@ -46,8 +46,7 @@ public class SpongeBenchmark(article: Sponge, private val generatorMode: Generat
         }
     }
 
-    override val sampleByteSize: Int
-        get() = article.byteSize
+    override fun byteSizeImpl(): Int = article.byteSize
 
     private fun nextBitGen(sample: ByteArray) {
         val squeezer = hashHelper.squeezer

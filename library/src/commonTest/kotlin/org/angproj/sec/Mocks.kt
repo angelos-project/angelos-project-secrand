@@ -41,7 +41,7 @@ object Mocks {
     }
 
     fun mockBenchmarkArticle(sampleByteSize: Int): BenchmarkArticle<Random> = object: BenchmarkArticle<Random>(Random) {
-        override val sampleByteSize: Int = sampleByteSize
-        override fun nextSample(): ByteArray = article.nextBytes(sampleByteSize)
+        override fun byteSizeImpl(): Int = sampleByteSize
+        override fun nextSample(): ByteArray = allocSampleArray().apply { article.nextBytes(this) }
     }
 }

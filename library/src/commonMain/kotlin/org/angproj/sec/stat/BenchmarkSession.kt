@@ -15,7 +15,6 @@
 package org.angproj.sec.stat
 
 import org.angproj.sec.util.RunState
-import kotlin.math.max
 
 /**
  * Manages a benchmarking session for a given benchmark object and its testers.
@@ -23,7 +22,6 @@ import kotlin.math.max
  * @param B The type of the object being benchmarked.
  * @param E The type of the BenchmarkObject wrapper.
  * @property samplesAsked The total number of samples to be collected during the session.
- * @property subSampleByteSize The size of each sub-sample in bytes.
  * @property benchmarkArticle The benchmark object instance to be tested.
  *
  * This class allows registering multiple testers, starting and stopping the benchmarking run,
@@ -33,10 +31,6 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
     public val samplesAsked: Long,
     private val benchmarkArticle: E
 ) {
-
-    private var subSampleByteSize: Int = benchmarkArticle.sampleByteSize
-
-    private val numSubSamples: Int = benchmarkArticle.sampleByteSize / subSampleByteSize
 
     private var state = RunState.INITIALIZE
 
@@ -73,24 +67,9 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
     public fun collectSample() {
         check(state == RunState.RUNNING) { "Benchmarking must be in RUNNING state." }
         val sample = benchmarkArticle.nextSample()
-        if (numSubSamples > 1) repeat(numSubSamples) { it ->
-            val startIdx = it * subSampleByteSize
-            val subSample = sample.copyOfRange(startIdx, startIdx + subSampleByteSize)
-            registry.forEach { t ->
-                if(t.value.samplesLeft > 0) t.value.calculateSample(subSample)
-            }
-        } else {
-            registry.forEach {
-                if(it.value.samplesLeft > 0) it.value.calculateSample(sample)
-            }
-        }
-    }
-
-    private fun calculateSubSampleByteSize() {
         registry.forEach {
-            subSampleByteSize = max(it.value.atomicSampleByteSize, subSampleByteSize)
+            if(it.value.samplesLeft > 0) it.value.calculateSample(sample)
         }
-        check(benchmarkArticle.sampleByteSize % subSampleByteSize == 0) { "Sub sample size must be divisible with sample byte size" }
     }
 
     /**
@@ -102,8 +81,6 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
     public fun startRun() {
         check(state == RunState.INITIALIZE)
         check(registry.isNotEmpty()) { "Testers registry must not be empty" }
-
-        calculateSubSampleByteSize()
 
         state = RunState.RUNNING
         registry.forEach { it.value.start() }
