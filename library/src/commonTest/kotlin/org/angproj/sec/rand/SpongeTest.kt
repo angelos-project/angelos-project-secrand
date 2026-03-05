@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.Sampler
 import org.angproj.sec.util.Hash
 import org.angproj.sec.util.Octet.asHexSymbols
 import org.angproj.sec.util.hashDigestOf
@@ -133,45 +134,39 @@ class HashTestGenerator {
     }.asHexSymbols()
 
     private fun<E: Sponge> emptyTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update(byteArrayOf())
+        update(Sampler.emptySample())
     }
 
     private fun<E: Sponge> singleATest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update("a".encodeToByteArray())
+        update(Sampler.singleASample())
     }
 
     private fun<E: Sponge> abcTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update("abc".encodeToByteArray())
+        update(Sampler.abcSample())
     }
 
     private fun<E: Sponge> mdTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update("message digest".encodeToByteArray())
+        update(Sampler.messageDigestSample())
     }
 
     private fun<E: Sponge> aToZTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update(aToZGenerator().encodeToByteArray())
+        update(Sampler.aToZSample())
     }
 
     private fun<E: Sponge> nopqTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update(nopqGenerator().encodeToByteArray())
+        update(Sampler.nopqSample())
     }
 
     private fun<E: Sponge> alphaNumTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update((aToZGenerator().uppercase() + aToZGenerator() + numGenerator()).encodeToByteArray())
+        update(Sampler.alphaNumSample())
     }
 
     private fun<E: Sponge> eightNumTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        val num = numGenerator().encodeToByteArray()
-        repeat(8) {
-            update(num)
-        }
+        update(Sampler.eightNumSample())
     }
 
     private fun<E: Sponge> millionATest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        val num = "a".repeat(100).encodeToByteArray()
-        repeat(10_000) {
-            this.update(num)
-        }
+        this.update(Sampler.millionASample())
     }
 
     public fun numGenerator(): String {
