@@ -14,29 +14,10 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.hash.squeezerOf
 import org.angproj.sec.rand.Security
-import org.angproj.sec.util.Octet
-import org.angproj.sec.util.TypeSize
+
 
 object Fakes {
-    fun failedSample() = ByteArray(1024).apply {
-        val failer = Stubs.stubFailSqueezeSponge().squeezerOf()
-        repeat(128) {
-            Octet.write(failer(), this, it * TypeSize.longSize, TypeSize.longSize) { index, value ->
-                this.set(index, value)
-            }
-        }
-    }
-
-    fun healthySample() = ByteArray(1024).apply {
-        val failer = Stubs.stubSucceedSqueezeSponge().squeezerOf()
-        repeat(128) {
-            Octet.write(failer(), this, it * TypeSize.longSize, TypeSize.longSize) { index, value ->
-                this.set(index, value)
-            }
-        }
-    }
 
     fun safeSecRand() = object : Security() {
         override val sponge = Stubs.stubSucceedSqueezeSponge()

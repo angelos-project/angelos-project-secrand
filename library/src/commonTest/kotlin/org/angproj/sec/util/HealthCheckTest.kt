@@ -15,12 +15,11 @@
 package org.angproj.sec.util
 
 import org.angproj.sec.Fakes
+import org.angproj.sec.Sampler
 import org.angproj.sec.Stubs
 import org.angproj.sec.hash.squeezerOf
 import org.angproj.sec.rand.RandomBits
 import org.angproj.sec.stat.securityHealthCheck
-import org.angproj.sec.util.Octet.asHexSymbols
-import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse
@@ -100,7 +99,7 @@ class HealthCheckTest {
 
     @Test
     fun testAnalyzeByteArrayFail() {
-        val sample = Fakes.failedSample()
+        val sample = Sampler.failedSample()
 
         //val result = HealthCheck.healthCheckWithSample { _ -> analyzeByteArray(sample) }
         val result = HealthCheck().analyzeByteArray(sample).securityHealthCheck()
@@ -110,7 +109,7 @@ class HealthCheckTest {
 
     @Test
     fun testAnalyzeByteArraySucceed() {
-        val sample = Fakes.healthySample()
+        val sample = Sampler.healthySample()
 
         //val result = HealthCheck.healthCheckWithSample { _ -> analyzeByteArray(sample) }
         val result = HealthCheck().analyzeByteArray(sample).securityHealthCheck()
@@ -160,7 +159,7 @@ class HealthCheckTest {
 
     @Test
     fun testHealthCheck() {
-        val sample = Fakes.healthySample()
+        val sample = Sampler.healthySample()
 
         val result = HealthCheck.healthCheck { analyzeByteArray(sample) }
 
