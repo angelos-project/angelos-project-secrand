@@ -14,6 +14,28 @@
  */
 package org.angproj.sec
 
-object Mocks {
+import org.angproj.sec.stat.BenchmarkArticle
+import org.angproj.sec.stat.BenchmarkTester
+import org.angproj.sec.stat.Statistical
+import kotlin.math.min
 
+object Mocks {
+    fun<B> mockBenchmarkTester(samplesAsked: Long, atomicSampleByteSize: Int, article: BenchmarkArticle<B>): BenchmarkTester<B, BenchmarkArticle<B>> = object : BenchmarkTester<B, BenchmarkArticle<B>>(
+        samplesAsked, atomicSampleByteSize, article) {
+        override fun calculateSampleImpl(sample: ByteArray) {
+            totalTakenSamples = min(sample.size / atomicSampleByteSize + totalTakenSamples, samplesAsked)
+        }
+        private fun evaluateSampleData(): Double { return totalTakenSamples.toDouble() }
+        override fun collectStatsImpl(): Statistical {
+            return Statistical(
+                totalTakenSamples,
+                evaluateSampleData(),
+                duration,
+                totalTakenSamples * atomicSampleByteSize,
+                toString()
+            )
+        }
+
+        override fun toString(): String = buildString { append(evaluateSampleData()) }
+    }
 }

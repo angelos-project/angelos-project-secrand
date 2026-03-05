@@ -35,6 +35,11 @@ public abstract class BenchmarkTester<B, E: BenchmarkArticle<B>>(
     protected val obj: E
 ) {
 
+    init {
+        require(samplesAsked > 0) { "At least one sample is asked for" }
+        require(atomicSampleByteSize > 0) { "Atomic size has to be above 0" }
+    }
+
     protected lateinit var startTime: TimeMark
     protected var duration: Duration = Duration.INFINITE
 

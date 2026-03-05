@@ -64,22 +64,9 @@ object Stubs {
         }
     }
 
-    fun<B> stubBenchmarkTester(samplesAsked: Long, article: BenchmarkArticle<B>): BenchmarkTester<B, BenchmarkArticle<B>> = object : BenchmarkTester<B, BenchmarkArticle<B>>(
-        samplesAsked, 16, article) {
-        override fun calculateSampleImpl(sample: ByteArray) { totalTakenSamples++ }
-        private fun evaluateSampleData(): Double { return totalTakenSamples.toDouble() }
-        override fun collectStatsImpl(): Statistical {
-            return Statistical(
-                totalTakenSamples,
-                evaluateSampleData(),
-                duration,
-                totalTakenSamples * atomicSampleByteSize,
-                toString()
-            )
-        }
-
-        override fun toString(): String = buildString { append(evaluateSampleData()) }
-    }
+    fun<B> stubBenchmarkTester(
+        samplesAsked: Long, article: BenchmarkArticle<B>
+    ): BenchmarkTester<B, BenchmarkArticle<B>> = Mocks.mockBenchmarkTester(samplesAsked, 16, article)
 
     fun stubBenchmarkArticle(): BenchmarkArticle<Random> = object: BenchmarkArticle<Random>(Random) {
         override val sampleByteSize: Int = 16
