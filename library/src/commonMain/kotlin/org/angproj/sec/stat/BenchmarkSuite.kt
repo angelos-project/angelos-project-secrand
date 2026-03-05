@@ -26,7 +26,6 @@ public class BenchmarkSuite<B>(
     init {
         benchmarkSession = BenchmarkSession(
             samplesNeeded,
-            benchmarkObject.sampleByteSize,
             benchmarkObject
         )
 

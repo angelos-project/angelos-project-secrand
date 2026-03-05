@@ -17,6 +17,7 @@ package org.angproj.sec.stat
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 import kotlin.math.abs
+import kotlin.math.max
 
 /**
  * Tester for the Avalanche Effect of a cryptographic function.
@@ -36,7 +37,7 @@ import kotlin.math.abs
  */
 public class AvalancheEffectTester<B, E: BenchmarkArticle<B>>(
     samples: Long, benchmarkArticle: E
-) : BenchmarkTester<B, E>(samples, benchmarkArticle.sampleByteSize, benchmarkArticle) {
+) : BenchmarkTester<B, E>(samples, max(benchmarkArticle.sampleByteSize, TypeSize.longSize), benchmarkArticle) {
 
     private val stats = IntArray(benchmarkArticle.sampleByteSize * TypeSize.byteBits)
     private var lastSample: ByteArray = byteArrayOf()

@@ -154,7 +154,7 @@ public abstract class Security {
         val objectSponge = SpongeBenchmark(sponge)
         val samplesNeeded = MonteCarloTester.Mode.MODE_64_BIT.size * 10_000_000L / objectSponge.sampleByteSize
 
-        val session = BenchmarkSession(samplesNeeded, objectSponge.sampleByteSize, objectSponge)
+        val session = BenchmarkSession(samplesNeeded, objectSponge)
         val monteCarlo = session.registerTester { MonteCarloTester(10_000_000, MonteCarloTester.Mode.MODE_64_BIT, it) }
 
         session.startRun()

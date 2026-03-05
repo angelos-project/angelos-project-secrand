@@ -14,6 +14,10 @@
  */
 package org.angproj.sec.stat
 
+import org.angproj.sec.util.TypeSize
+import kotlin.math.max
+
+
 /**
  * Tester for Chi Square of a cryptographic function.
 
@@ -25,7 +29,7 @@ package org.angproj.sec.stat
  */
 public class ChiSquareTester<B, E: BenchmarkArticle<B>>(
     samples: Long, benchmarkArticle: E
-) : BenchmarkTester<B, E>(samples, benchmarkArticle.sampleByteSize, benchmarkArticle) {
+) : BenchmarkTester<B, E>(samples, max(benchmarkArticle.sampleByteSize, TypeSize.longSize), benchmarkArticle) {
 
     private val observed = DoubleArray(256)
 

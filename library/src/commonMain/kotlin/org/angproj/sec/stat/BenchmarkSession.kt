@@ -15,6 +15,7 @@
 package org.angproj.sec.stat
 
 import org.angproj.sec.util.RunState
+import kotlin.math.max
 
 /**
  * Manages a benchmarking session for a given benchmark object and its testers.
@@ -23,18 +24,19 @@ import org.angproj.sec.util.RunState
  * @param E The type of the BenchmarkObject wrapper.
  * @property samplesAsked The total number of samples to be collected during the session.
  * @property subSampleByteSize The size of each sub-sample in bytes.
- * @property obj The benchmark object instance to be tested.
+ * @property benchmarkArticle The benchmark object instance to be tested.
  *
  * This class allows registering multiple testers, starting and stopping the benchmarking run,
  * collecting samples, and finalizing the collection to retrieve statistical results.
  */
 public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
     public val samplesAsked: Long,
-    public val subSampleByteSize: Int,
-    private val obj: E
+    private val benchmarkArticle: E
 ) {
 
-    private val numSubSamples: Int = obj.sampleByteSize / subSampleByteSize
+    private var subSampleByteSize: Int = benchmarkArticle.sampleByteSize
+
+    private val numSubSamples: Int = benchmarkArticle.sampleByteSize / subSampleByteSize
 
     private var state = RunState.INITIALIZE
 
@@ -52,7 +54,7 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
      */
     public fun registerTester(builder: (E) -> BenchmarkTester<B, E>): String {
         check(state == RunState.INITIALIZE) { "Can't register new state after INITIALIZE state." }
-        val tester = builder(obj)
+        val tester = builder(benchmarkArticle)
         val token  = tester::class.simpleName.toString()
         check(!registry.contains(token)) { "Tester already registered" }
         registry[token] = tester
@@ -60,7 +62,6 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
     }
 
     init {
-        require(obj.sampleByteSize % subSampleByteSize == 0) { "Sub sample size must be divisible with sample byte size" }
         require(samplesAsked > 0) { "Samples taken must be set above one" }
     }
 
@@ -71,18 +72,25 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
      */
     public fun collectSample() {
         check(state == RunState.RUNNING) { "Benchmarking must be in RUNNING state." }
-        val sample = obj.nextSample()
+        val sample = benchmarkArticle.nextSample()
         if (numSubSamples > 1) repeat(numSubSamples) { it ->
             val startIdx = it * subSampleByteSize
             val subSample = sample.copyOfRange(startIdx, startIdx + subSampleByteSize)
             registry.forEach { t ->
-                if(t.value.samplesTaken < samplesAsked) t.value.calculateSample(subSample)
+                if(t.value.samplesLeft > 0) t.value.calculateSample(subSample)
             }
         } else {
             registry.forEach {
-                if(it.value.samplesTaken < samplesAsked) it.value.calculateSample(sample)
+                if(it.value.samplesLeft > 0) it.value.calculateSample(sample)
             }
         }
+    }
+
+    private fun calculateSubSampleByteSize() {
+        registry.forEach {
+            subSampleByteSize = max(it.value.atomicSampleByteSize, subSampleByteSize)
+        }
+        check(benchmarkArticle.sampleByteSize % subSampleByteSize == 0) { "Sub sample size must be divisible with sample byte size" }
     }
 
     /**
@@ -94,6 +102,9 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
     public fun startRun() {
         check(state == RunState.INITIALIZE)
         check(registry.isNotEmpty()) { "Testers registry must not be empty" }
+
+        calculateSubSampleByteSize()
+
         state = RunState.RUNNING
         registry.forEach { it.value.start() }
     }

@@ -52,7 +52,7 @@ public fun interface RandomBits {
             val objectRand = RandomBitsBenchmark(randomBits)
             val samplesNeeded = MonteCarloTester.Mode.MODE_32_BIT.size * 10_000_000L / objectRand.sampleByteSize
 
-            val session = BenchmarkSession(samplesNeeded, objectRand.sampleByteSize, objectRand)
+            val session = BenchmarkSession(samplesNeeded, objectRand)
             val monteCarlo = session.registerTester { MonteCarloTester(10_000_000, MonteCarloTester.Mode.MODE_32_BIT, it) }
 
             session.startRun()

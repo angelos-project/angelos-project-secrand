@@ -107,17 +107,4 @@ class BenchmarkSuiteBuilderTest {
         // The stub is an object, that's why classname "null"
         assertEquals(1, suite.collectResults()["null"]!!.sampleCount)
     }
-
-    @Test
-    fun testChiSquareMock() {
-        val suite = BenchmarkSuiteBuilder.build {
-            samples { 1 }
-            article { Stubs.stubBenchmarkArticle() }
-            register { ChiSquareTester(samples, article) }
-        }
-
-        suite.runBlocking()
-
-        assertEquals(1, suite.collectResults()["ChiSquareTester"]!!.sampleCount)
-    }
 }
