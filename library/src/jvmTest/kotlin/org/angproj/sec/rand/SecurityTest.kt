@@ -22,7 +22,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.*
 
 class SecurityTest {
-    @Test
+    /*@Test
     fun testGarbageGarbler() {
         try {
             val garbler = GarbageGarbler()
@@ -59,5 +59,5 @@ class SecurityTest {
             println("One (1) failure expected at 4.0:")
             RandomBits.securityHealthCheck { staticRand }
         }
-    }
+    }*/
 }

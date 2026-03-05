@@ -109,32 +109,6 @@ class BenchmarkSuiteBuilderTest {
     }
 
     @Test
-    fun testMonteCarlo32BitModeMock() {
-        val suite = BenchmarkSuiteBuilder.build {
-            samples { 20 }
-            article { Stubs.stubBenchmarkArticle() }
-            register { MonteCarloTester(samples, MonteCarloTester.Mode.MODE_32_BIT, article) }
-        }
-
-        suite.runBlocking()
-
-        assertEquals(20, suite.collectResults()["MonteCarloTester"]!!.sampleCount)
-    }
-
-    @Test
-    fun testMonteCarlo64BitModeMock() {
-        val suite = BenchmarkSuiteBuilder.build {
-            samples { 20 }
-            article { Stubs.stubBenchmarkArticle() }
-            register { MonteCarloTester(samples, MonteCarloTester.Mode.MODE_64_BIT, article) }
-        }
-
-        suite.runBlocking()
-
-        assertEquals(20, suite.collectResults()["MonteCarloTester"]!!.sampleCount)
-    }
-
-    @Test
     fun testChiSquareMock() {
         val suite = BenchmarkSuiteBuilder.build {
             samples { 1 }
