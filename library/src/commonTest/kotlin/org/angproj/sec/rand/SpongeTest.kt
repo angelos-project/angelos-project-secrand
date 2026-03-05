@@ -21,7 +21,7 @@ import org.angproj.sec.util.hashDigestOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-abstract class SpongeTest<S: Sponge> {
+abstract class SpongeTest {
 
     protected abstract val emptyHash: String
     protected abstract val singleAHash: String
@@ -33,7 +33,7 @@ abstract class SpongeTest<S: Sponge> {
     protected abstract val eightNumHash: String
     protected abstract val millionAHash: String
 
-    protected abstract fun getHashInstance(): Hash<S>
+    protected abstract fun getHashInstance(): Hash
 
     protected fun printDebug(output: String) {
         if(debug) println(output)
@@ -121,7 +121,7 @@ class HashTestGenerator {
         TEST_MILLION_A
     }
 
-    fun<E: Sponge> runTest(name: NamedTest, hash: Hash<E>): String = when(name) {
+    fun runTest(name: NamedTest, hash: Hash): String = when(name) {
         NamedTest.TEST_EMPTY -> emptyTest(hash)
         NamedTest.TEST_A -> singleATest(hash)
         NamedTest.TEST_ABC -> abcTest(hash)
@@ -133,39 +133,39 @@ class HashTestGenerator {
         NamedTest.TEST_MILLION_A -> millionATest(hash)
     }.asHexSymbols()
 
-    private fun<E: Sponge> emptyTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
+    private fun emptyTest(hash: Hash): ByteArray = hashDigestOf(hash) {
         update(Sampler.emptySample())
     }
 
-    private fun<E: Sponge> singleATest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
+    private fun singleATest(hash: Hash): ByteArray = hashDigestOf(hash) {
         update(Sampler.singleASample())
     }
 
-    private fun<E: Sponge> abcTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
+    private fun abcTest(hash: Hash): ByteArray = hashDigestOf(hash) {
         update(Sampler.abcSample())
     }
 
-    private fun<E: Sponge> mdTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
+    private fun mdTest(hash: Hash): ByteArray = hashDigestOf(hash) {
         update(Sampler.messageDigestSample())
     }
 
-    private fun<E: Sponge> aToZTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
+    private fun aToZTest(hash: Hash): ByteArray = hashDigestOf(hash) {
         update(Sampler.aToZSample())
     }
 
-    private fun<E: Sponge> nopqTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
+    private fun nopqTest(hash: Hash): ByteArray = hashDigestOf(hash) {
         update(Sampler.nopqSample())
     }
 
-    private fun<E: Sponge> alphaNumTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
+    private fun alphaNumTest(hash: Hash): ByteArray = hashDigestOf(hash) {
         update(Sampler.alphaNumSample())
     }
 
-    private fun<E: Sponge> eightNumTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
+    private fun eightNumTest(hash: Hash): ByteArray = hashDigestOf(hash) {
         update(Sampler.eightNumSample())
     }
 
-    private fun<E: Sponge> millionATest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
+    private fun millionATest(hash: Hash): ByteArray = hashDigestOf(hash) {
         this.update(Sampler.millionASample())
     }
 }

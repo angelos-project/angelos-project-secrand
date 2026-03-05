@@ -31,11 +31,10 @@ import org.angproj.sec.util.Octet.importBytes
  * @param E The type of sponge used in the hash function, must implement the Sponge interface.
  * @property sponge The sponge instance used for hashing.
  */
-public abstract class Hash<E: Sponge>(sponge: E) {
+public abstract class Hash(private val sponge: Sponge) {
 
     private val hashHelper = HashHelper(sponge)
     private var state = RunState.INITIALIZE
-    private val sponge: E = sponge
     private var remainder: ByteArray = byteArrayOf()
     private var offset = 0
 
