@@ -25,6 +25,7 @@ import org.angproj.sec.rand.Reseeder
 import org.angproj.sec.rand.Sponge
 import org.angproj.sec.stat.AvalancheEffectTester
 import org.angproj.sec.stat.BenchmarkSuiteBuilder
+import org.angproj.sec.stat.ChiSquareTester
 import org.angproj.sec.stat.MonteCarloTester
 import org.angproj.sec.stat.SpongeBenchmark
 import kotlin.jvm.JvmStatic
@@ -40,6 +41,7 @@ public fun healthCheck(sponge: Sponge): Boolean {
         article { SpongeBenchmark(sponge) }
         register { MonteCarloTester(samples, MonteCarloTester.Mode.MODE_64_BIT, article) }
         register { AvalancheEffectTester(samples, article) }
+        register { ChiSquareTester(samples, article) }
     }
     suite.runBlocking()
 
