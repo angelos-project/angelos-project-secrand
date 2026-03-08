@@ -83,9 +83,13 @@ public abstract class AbstractRandom<E>(
                 satisfied = false
             }
             reset()
-        } while (!satisfied && fails <= 2)
-        if(fails >= 2) ensure<SecureRandomException> {
-            SecureRandomException("Catastrophic failure: 2 consecutive failed secure health check attempts.")
+        } while (!satisfied && fails <= MAX_ALLOWED_TRIALS)
+        if(fails >= MAX_ALLOWED_TRIALS) ensure<SecureRandomException> {
+            SecureRandomException("Catastrophic failure: $MAX_ALLOWED_TRIALS consecutive failed secure health check attempts.")
         }
+    }
+
+    public companion object {
+        public const val MAX_ALLOWED_TRIALS: Int = 2
     }
 }

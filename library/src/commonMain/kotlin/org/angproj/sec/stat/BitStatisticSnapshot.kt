@@ -126,6 +126,21 @@ public fun BitStatisticSnapshot.checkLongRuns(): Boolean = longRuns == 0
 
 
 /**
+ * 15 degrees of freedom at significance level of 0.05 gives critical value 24.996.
+ * */
+public fun BitStatisticSnapshot.checkChiSquare(): Boolean {
+    val sum = hex.sum()
+    val expectedAverage = sum / hex.size.toDouble()
+    var chiSquare = 0.0
+    hex.forEach {
+        val difference: Double = it - expectedAverage
+        chiSquare += (difference * difference) / expectedAverage
+    }
+    return chiSquare < 24.996
+}
+
+
+/**
  * Performs a security health check on the bit statistic by validating the total number of bits and checking various
  * statistical properties.
  *
@@ -145,7 +160,7 @@ public fun BitStatisticSnapshot.securityHealthCheck(): Boolean {
     ensure<SecureRandomException>(
         total in (1024 * TypeSize.byteBits)..(32 * 1024 * TypeSize.byteBits)
     ) { SecureRandomException("Chunk size not between 1K and 32K bytes long.") }
-    return checkBitBalance() && checkHexUniformity() && checkRunDistribution()
+    return checkBitBalance() && checkHexUniformity() && checkRunDistribution() && checkChiSquare()
 }
 
 
@@ -163,5 +178,5 @@ public fun BitStatisticSnapshot.cryptoHealthCheck(): Boolean {
     ensure<SecureRandomException>(
         total in 0..(32 * 1024 * TypeSize.byteBits)
     ) { SecureRandomException("Chunk size not between 0 and 32K bytes long.") }
-    return checkLongRuns()
+    return checkLongRuns() && checkChiSquare()
 }
