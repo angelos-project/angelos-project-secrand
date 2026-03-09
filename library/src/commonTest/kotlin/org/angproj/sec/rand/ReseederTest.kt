@@ -14,7 +14,7 @@
  */
 package org.angproj.sec.rand
 
-import org.angproj.sec.SecureFeed
+import org.angproj.sec.Fakes
 import kotlin.test.Test
 
 class ReseederTest {
@@ -25,31 +25,31 @@ class ReseederTest {
 
     @Test
     fun testReseedSecurity256() {
-        Reseeder(object : AbstractSponge256() {}).reseed(SecureFeed)
+        Reseeder(object : AbstractSponge256() {}).reseed(Fakes.safeSecRand())
     }
 
     @Test
     fun testReseedSecurity512() {
-        Reseeder(object : AbstractSponge512() {}).reseed(SecureFeed)
+        Reseeder(object : AbstractSponge512() {}).reseed(Fakes.safeSecRand())
     }
 
     @Test
     fun testReseedSecurity1024() {
-        Reseeder(object : AbstractSponge1024() {}).reseed(SecureFeed)
+        Reseeder(object : AbstractSponge1024() {}).reseed(Fakes.safeSecRand())
     }
 
     @Test
     fun testReseedSecurity2256() {
-        Reseeder(object : AbstractSponge2256() {}).reseed(SecureFeed)
+        Reseeder(object : AbstractSponge2256() {}).reseed(Fakes.safeSecRand())
     }
 
     @Test
     fun testReseedSecurity2512() {
-        Reseeder(object : AbstractSponge2512() {}).reseed(SecureFeed)
+        Reseeder(object : AbstractSponge2512() {}).reseed(Fakes.safeSecRand())
     }
 
     @Test
     fun testReseedSecurity21024() {
-        Reseeder(object : AbstractSponge21024() {}).reseed(SecureFeed)
+        Reseeder(object : AbstractSponge21024() {}).reseed(Fakes.safeSecRand())
     }
 }

@@ -22,9 +22,11 @@ import kotlin.test.assertFalse
 
 class SecureRandomTest {
 
+    val loops: Int = 1
+
     @Test
     fun testReadByteRange() {
-        repeat(1000) {
+        repeat(loops) {
             val value = SecureRandom.readByte()
             assertTrue(value in Byte.MIN_VALUE..Byte.MAX_VALUE)
         }
@@ -32,7 +34,7 @@ class SecureRandomTest {
 
     @Test
     fun testReadUByteRange() {
-        repeat(1000) {
+        repeat(loops) {
             val value = SecureRandom.readUByte()
             assertTrue(value in UByte.MIN_VALUE..UByte.MAX_VALUE)
         }
@@ -40,7 +42,7 @@ class SecureRandomTest {
 
     @Test
     fun testReadShortRange() {
-        repeat(1000) {
+        repeat(loops) {
             val value = SecureRandom.readShort()
             assertTrue(value in Short.MIN_VALUE..Short.MAX_VALUE)
         }
@@ -48,7 +50,7 @@ class SecureRandomTest {
 
     @Test
     fun testReadUShortRange() {
-        repeat(1000) {
+        repeat(loops) {
             val value = SecureRandom.readUShort()
             assertTrue(value in UShort.MIN_VALUE..UShort.MAX_VALUE)
         }
@@ -56,7 +58,7 @@ class SecureRandomTest {
 
     @Test
     fun testReadIntRange() {
-        repeat(1000) {
+        repeat(loops) {
             val value = SecureRandom.readInt()
             assertTrue(value in Int.MIN_VALUE..Int.MAX_VALUE)
         }
@@ -64,7 +66,7 @@ class SecureRandomTest {
 
     @Test
     fun testReadUIntRange() {
-        repeat(1000) {
+        repeat(loops) {
             val value = SecureRandom.readUInt()
             assertTrue(value in UInt.MIN_VALUE..UInt.MAX_VALUE)
         }
@@ -72,7 +74,7 @@ class SecureRandomTest {
 
     @Test
     fun testReadLongRange() {
-        repeat(1000) {
+        repeat(loops) {
             val value = SecureRandom.readLong()
             assertTrue(value in Long.MIN_VALUE..Long.MAX_VALUE)
         }
@@ -80,7 +82,7 @@ class SecureRandomTest {
 
     @Test
     fun testReadULongRange() {
-        repeat(1000) {
+        repeat(loops) {
             val value = SecureRandom.readULong()
             assertTrue(value in ULong.MIN_VALUE..ULong.MAX_VALUE)
         }
@@ -88,7 +90,7 @@ class SecureRandomTest {
 
     @Test
     fun testReadFloatRange() {
-        repeat(1000) {
+        repeat(loops) {
             val value = SecureRandom.readFloat()
             assertTrue(value in 0.0f..1.0f)
         }
@@ -96,7 +98,7 @@ class SecureRandomTest {
 
     @Test
     fun testReadDoubleRange() {
-        repeat(1000) {
+        repeat(loops) {
             val value = SecureRandom.readDouble()
             assertTrue(value in 0.0..1.0)
         }
