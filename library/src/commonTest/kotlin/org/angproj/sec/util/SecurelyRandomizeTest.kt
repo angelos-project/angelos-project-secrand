@@ -31,7 +31,7 @@ class SecurelyRandomizeTest {
 
             assertTrue(HealthCheck.healthCheckWithSample { _ -> analyzeByteArray(buffer) })
         } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckDebug { sample -> analyzeLongs(SecureFeed::exportLongs, sample) }
+            HealthCheck.doubleHealthCheckDebug { sample -> analyzeSecurity(SecureFeed, sample) }
         }
     }
 

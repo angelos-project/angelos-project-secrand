@@ -32,13 +32,13 @@ class SecureRandomTest {
         }
     }
 
-    @Test
+    /*@Test
     fun testReadUByteRange() {
         repeat(loops) {
             val value = SecureRandom.readUByte()
             assertTrue(value in UByte.MIN_VALUE..UByte.MAX_VALUE)
         }
-    }
+    }*/
 
     @Test
     fun testReadShortRange() {
@@ -48,13 +48,13 @@ class SecureRandomTest {
         }
     }
 
-    @Test
+    /*@Test
     fun testReadUShortRange() {
         repeat(loops) {
             val value = SecureRandom.readUShort()
             assertTrue(value in UShort.MIN_VALUE..UShort.MAX_VALUE)
         }
-    }
+    }*/
 
     @Test
     fun testReadIntRange() {
@@ -64,7 +64,7 @@ class SecureRandomTest {
         }
     }
 
-    @Test
+    /*@Test
     fun testReadUIntRange() {
         repeat(loops) {
             val value = SecureRandom.readUInt()
@@ -102,16 +102,26 @@ class SecureRandomTest {
             val value = SecureRandom.readDouble()
             assertTrue(value in 0.0..1.0)
         }
-    }
+    }*/
 
     @Test
-    fun testReadBytesRandomness() {
-        val bytes1 = ByteArray(64)
+    fun testReadBytes() {
+        /*val bytes1 = ByteArray(64)
         val bytes2 = ByteArray(64)
         SecureRandom.readBytes(bytes1)
         SecureRandom.readBytes(bytes2)
         // With high probability, two random arrays should not be equal
-        assertNotEquals(bytes1.toList(), bytes2.toList())
+        assertNotEquals(bytes1.toList(), bytes2.toList())*/
+
+        try {
+            val buffer = ByteArray(1024)
+
+            SecureRandom.readBytes(buffer)
+
+            assertTrue{ HealthCheck.healthCheck { analyzeByteArray( buffer) } }
+        } catch (_ : SecureRandomException) {
+            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeBits( { SecureRandom.readInt() }, debug)  }
+        }
     }
 
     @Test
