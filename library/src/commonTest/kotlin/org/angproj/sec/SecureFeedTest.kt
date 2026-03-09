@@ -18,9 +18,21 @@ import org.angproj.sec.util.HealthCheck
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import kotlin.test.assertFalse
 
 
 class SecureFeedTest {
+
+    @Test
+    fun testNextBits() {
+        try {
+            SecureFeed.nextBits(21).countLeadingZeroBits()
+        } catch (_: SecureRandomException) {
+            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeSecurity( SecureFeed , debug) }
+        } catch (_: Exception) {
+            assertFalse(true)
+        }
+    }
 
     @Test
     fun testNextBitsToMuch() {
@@ -28,10 +40,12 @@ class SecureFeedTest {
             assertFailsWith<IllegalArgumentException>{
                 SecureFeed.nextBits(33)
             }
+            assertFailsWith<IllegalArgumentException>{
+                SecureFeed.nextBits(-1)
+            }
         } catch (_: SecureRandomException) {
             HealthCheck.doubleHealthCheckWithSample { debug -> analyzeSecurity( SecureFeed , debug) }
         }
-
     }
 
     @Test
