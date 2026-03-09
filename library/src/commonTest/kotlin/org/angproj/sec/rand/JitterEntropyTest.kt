@@ -54,6 +54,6 @@ class JitterEntropyTest {
 
     @Test
     fun testSecurityHealth() {
-        assertTrue{ HealthCheck.doubleHealthCheckDebug{ debug -> analyzeLongs(JitterEntropy::exportLongs, debug) } }
+        assertTrue{ HealthCheck.doubleHealthCheckWithSample{ debug -> analyzeLongs(JitterEntropy::exportLongs, debug) } }
     }
 }

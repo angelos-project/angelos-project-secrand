@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.WriteOctet
 
@@ -39,11 +40,7 @@ public class Reseeder(sponge: Sponge) : AbstractRandom<Sponge>(sponge, sponge.vi
         obj.scramble()
     }
 
-    public fun reseed(entropySource: Security) {
-        innerFill(entropySource::exportLongs) { _, _ -> }
-    }
-
-    public fun reseed(entropySource: JitterEntropy) {
+    public fun reseed(entropySource: Octet.Producer) {
         innerFill(entropySource::exportLongs) { _, _ -> }
     }
 }
