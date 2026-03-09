@@ -15,6 +15,9 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.RandomBits
+import org.angproj.sec.stat.checkBitBalance
+import org.angproj.sec.stat.checkHexUniformity
+import org.angproj.sec.stat.checkRunDistribution
 import org.angproj.sec.stat.securityHealthCheck
 import org.angproj.sec.util.HealthCheck
 import org.angproj.sec.util.Octet
@@ -108,8 +111,13 @@ class UuidTest {
 
     @Test
     fun testUuid4Health() {
-        val result = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
-        val result2 = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
-        assertTrue{ result || result2 }
+        // Chi Square is not used here due to the UUIDv4 enforced 4 which faults secure crypto
+        val snapshot1 = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid.uuid4()})
+        val snapshot2 = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid.uuid4()})
+
+        assertTrue {
+            (snapshot1.checkRunDistribution() && snapshot1.checkBitBalance() && snapshot1.checkHexUniformity()) ||
+            (snapshot2.checkRunDistribution() && snapshot2.checkBitBalance() && snapshot2.checkHexUniformity())
+        }
     }
 }
