@@ -51,7 +51,7 @@ class SecureFeedTest {
     @Test
     fun testSecurityHealth() {
         assertTrue{
-            HealthCheck.doubleHealthCheckDebug { debug ->
+            HealthCheck.doubleHealthCheckWithSample { debug ->
                 analyzeSecurity(SecureFeed, debug)
             }
         }

@@ -19,7 +19,6 @@ import org.angproj.sec.rand.InitializationVector
 import org.angproj.sec.rand.Sponge
 import org.angproj.sec.stat.BenchmarkArticle
 import org.angproj.sec.stat.BenchmarkTester
-import org.angproj.sec.stat.Statistical
 import org.angproj.sec.util.TypeSize
 import kotlin.math.E
 import kotlin.math.PI

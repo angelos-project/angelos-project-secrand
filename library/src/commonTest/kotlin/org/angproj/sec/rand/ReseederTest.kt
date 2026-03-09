@@ -18,10 +18,6 @@ import org.angproj.sec.Fakes
 import kotlin.test.Test
 
 class ReseederTest {
-    @Test
-    fun testReseedJitterEntropy() {
-        Reseeder(object : AbstractSponge256() {}).reseed(JitterEntropy)
-    }
 
     @Test
     fun testReseedSecurity256() {

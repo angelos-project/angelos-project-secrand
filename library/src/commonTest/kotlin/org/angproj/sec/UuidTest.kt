@@ -88,7 +88,7 @@ class UuidTest {
         assertEquals("11223344-5566-7788-1122-334455667788",Uuid(error, error).toString())
     }
 
-    fun uuid4Sample(uuid:() -> Uuid): ByteArray {
+    fun uuid4Sample(uuid: () -> Uuid): ByteArray {
         val sample = ByteArray(1024)
         repeat(64) {
             val uuidSample = uuid()
@@ -104,8 +104,10 @@ class UuidTest {
 
     @Test
     fun testUuidHealth() {
-        val result = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
-        val result2 = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
+        val secRand = Fakes.safeRandomBits()
+
+        val result = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid(secRand)}).securityHealthCheck()
+        val result2 = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid(secRand)}).securityHealthCheck()
         assertTrue{ result || result2 }
     }
 

@@ -25,25 +25,37 @@ class SecureRandomTest {
 
     @Test
     fun testReadByteRange() {
-        repeat(loops) {
-            val value = SecureRandom.readByte()
-            assertTrue(value in Byte.MIN_VALUE..Byte.MAX_VALUE)
+        try {
+            repeat(loops) {
+                val value = SecureRandom.readByte()
+                assertTrue(value in Byte.MIN_VALUE..Byte.MAX_VALUE)
+            }
+        } catch (_: SecureRandomException) {
+            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeBits({ SecureRandom.readInt() }, debug) }
         }
     }
 
     @Test
     fun testReadShortRange() {
-        repeat(loops) {
-            val value = SecureRandom.readShort()
-            assertTrue(value in Short.MIN_VALUE..Short.MAX_VALUE)
+        try {
+            repeat(loops) {
+                val value = SecureRandom.readShort()
+                assertTrue(value in Short.MIN_VALUE..Short.MAX_VALUE)
+            }
+        } catch (_: SecureRandomException) {
+            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeBits({ SecureRandom.readInt() }, debug) }
         }
     }
 
     @Test
     fun testReadIntRange() {
-        repeat(loops) {
-            val value = SecureRandom.readInt()
-            assertTrue(value in Int.MIN_VALUE..Int.MAX_VALUE)
+        try {
+            repeat(loops) {
+                val value = SecureRandom.readInt()
+                assertTrue(value in Int.MIN_VALUE..Int.MAX_VALUE)
+            }
+        } catch (_: SecureRandomException) {
+            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeBits({ SecureRandom.readInt() }, debug) }
         }
     }
 

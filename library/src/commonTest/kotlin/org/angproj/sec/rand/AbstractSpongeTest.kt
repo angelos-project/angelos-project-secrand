@@ -13,3 +13,26 @@
  *      Kristoffer Paulsson - initial implementation
  */
 package org.angproj.sec.rand
+
+import kotlin.test.Test
+import kotlin.test.assertFailsWith
+import kotlin.test.assertEquals
+
+class AbstractSpongeTest {
+    @Test
+    fun testInitializeWrongVisibleSize() {
+        assertFailsWith<IllegalArgumentException> {
+            object : AbstractSponge(1, 2) {
+                override fun round() {  /* Empty */ }
+            }
+        }
+    }
+
+    @Test
+    fun testPrivateAccessToPrimes() {
+        val sponge = object : AbstractSponge(2, 1) {
+            override fun round() { assertEquals(export.size, 16) }
+        }
+        sponge.round()
+    }
+}

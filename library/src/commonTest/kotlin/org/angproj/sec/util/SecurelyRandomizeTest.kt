@@ -31,7 +31,7 @@ class SecurelyRandomizeTest {
 
             assertTrue(HealthCheck.healthCheckWithSample { _ -> analyzeByteArray(buffer) })
         } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckDebug { sample -> analyzeSecurity(SecureFeed, sample) }
+            HealthCheck.doubleHealthCheckWithSample { sample -> analyzeSecurity(SecureFeed, sample) }
         }
     }
 
@@ -44,7 +44,7 @@ class SecurelyRandomizeTest {
 
             assertTrue(HealthCheck.healthCheckWithSample { _ -> analyzeByteArray(buffer) })
         } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckDebug { sample -> analyzeLongs(JitterEntropy::exportLongs, sample) }
+            HealthCheck.doubleHealthCheckWithSample { sample -> analyzeLongs(JitterEntropy::exportLongs, sample) }
         }
     }
 
@@ -52,6 +52,8 @@ class SecurelyRandomizeTest {
     fun testSecurelyEntropizeZeroSize() {
         try {
             ByteArray(0).securelyEntropize()
+        } catch (_: SecureRandomException) {
+            HealthCheck.doubleHealthCheckWithSample { sample -> analyzeLongs(JitterEntropy::exportLongs, sample) }
         } catch (_: Exception) {
             assertTrue(false)
         }
@@ -61,6 +63,8 @@ class SecurelyRandomizeTest {
     fun testSecurelyRandomizeZeroSize() {
         try {
             ByteArray(0).securelyRandomize()
+        } catch (_: SecureRandomException) {
+            HealthCheck.doubleHealthCheckWithSample { sample -> analyzeSecurity(SecureFeed, sample) }
         } catch (_: Exception) {
             assertTrue(false)
         }

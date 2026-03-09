@@ -14,6 +14,8 @@
  */
 package org.angproj.sec
 
+import org.angproj.sec.hash.HashHelper
+import org.angproj.sec.rand.RandomBits
 import org.angproj.sec.rand.Security
 
 
@@ -39,5 +41,10 @@ object Fakes {
             reseed()
             return true
         }
+    }
+
+    fun safeRandomBits(): RandomBits {
+        val squeezer = HashHelper(Stubs.stubSucceedSqueezeSponge(), 0,HashHelper.HashMode.SQUEEZING).squeezer
+        return RandomBits { RandomBits.compactBitEntropy(it, squeezer.squeeze()) }
     }
 }
