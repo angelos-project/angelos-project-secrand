@@ -184,8 +184,10 @@ class GarbageGarblerTest {
 
     @Test
     fun testSecurityHealth() {
-        assertTrue{ HealthCheck.doubleHealthCheckWithSample { debug ->
-            analyzeBits(GarbageGarbler(Fakes.safeSecRand()), debug)
-        } }
+        assertTrue{
+            HealthCheck.doubleHealthCheckWithSample { debug ->
+                analyzeSecurity(GarbageGarbler(Fakes.safeSecRand()), debug)
+            }
+        }
     }
 }

@@ -63,7 +63,7 @@ class SecureFeedTest {
     fun testSecurityHealth() {
         assertTrue{
             HealthCheck.doubleHealthCheckDebug { debug ->
-                analyzeBits(SecureFeed, debug)
+                analyzeSecurity(SecureFeed, debug)
             }
         }
     }

@@ -61,15 +61,10 @@ class SecureEntropyTest {
 
     @Test
     fun testSecurityHealth() {
-        val result = ByteArray(1024).let {
-            SecureEntropy.exportBytes(it, 0, it.size) { idx, value -> this[idx] = value }
-            HealthCheck().analyzeByteArray(it).securityHealthCheck()
+        assertTrue{
+            HealthCheck.doubleHealthCheckWithSample { debug ->
+                analyzeSecurity(SecureEntropy, debug)
+            }
         }
-        val result2 = ByteArray(1024).let {
-            SecureEntropy.exportBytes(it, 0, it.size) { idx, value -> this[idx] = value }
-            HealthCheck().analyzeByteArray(it).securityHealthCheck()
-        }
-
-        assertTrue{ result || result2 }
     }
 }
