@@ -16,48 +16,23 @@ package org.angproj.sec
 
 import org.angproj.sec.util.HealthCheck
 import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 
 class SecureFeedTest {
 
-    /*@Test
-    fun testExportBytesLengthAndRandomness() {
-        val size = 34
-        val buffer1 = ByteArray(size)
-        val buffer2 = ByteArray(size)
-
-        SecureFeed.exportBytes(buffer1, 0, size) { idx, value -> this[idx] = value }
-        SecureFeed.exportBytes(buffer2, 0, size) { idx, value -> this[idx] = value }
-
-        assertEquals(size, buffer1.size)
-        assertEquals(size, buffer2.size)
-        // With high probability, two random arrays should not be equal
-        assertNotEquals(buffer1, buffer2)
-    }
-
     @Test
-    fun testExportLongsLengthAndRandomness() {
-        val size = 10
-        val buffer1 = LongArray(size)
-        val buffer2 = LongArray(size)
+    fun testNextBitsToMuch() {
+        try {
+            assertFailsWith<IllegalArgumentException>{
+                SecureFeed.nextBits(33)
+            }
+        } catch (_: SecureRandomException) {
+            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeSecurity( SecureFeed , debug) }
+        }
 
-        SecureFeed.exportLongs(buffer1, 0, size) { idx, value -> this[idx] = value }
-        SecureFeed.exportLongs(buffer2, 0, size) { idx, value -> this[idx] = value }
-
-        assertEquals(size, buffer1.size)
-        assertEquals(size, buffer2.size)
-        // With high probability, two random arrays should not be equal
-        assertNotEquals(buffer1, buffer2)
     }
-
-    @Test
-    fun testTotalBits() {
-        SecureFeed.nextBits(21)
-        assertNotEquals(0, SecureFeed.totalBits)
-    }*/
 
     @Test
     fun testSecurityHealth() {

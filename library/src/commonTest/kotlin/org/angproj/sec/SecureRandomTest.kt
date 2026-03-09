@@ -16,7 +16,6 @@ package org.angproj.sec
 
 import org.angproj.sec.util.HealthCheck
 import kotlin.test.Test
-import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse
 
@@ -32,14 +31,6 @@ class SecureRandomTest {
         }
     }
 
-    /*@Test
-    fun testReadUByteRange() {
-        repeat(loops) {
-            val value = SecureRandom.readUByte()
-            assertTrue(value in UByte.MIN_VALUE..UByte.MAX_VALUE)
-        }
-    }*/
-
     @Test
     fun testReadShortRange() {
         repeat(loops) {
@@ -47,14 +38,6 @@ class SecureRandomTest {
             assertTrue(value in Short.MIN_VALUE..Short.MAX_VALUE)
         }
     }
-
-    /*@Test
-    fun testReadUShortRange() {
-        repeat(loops) {
-            val value = SecureRandom.readUShort()
-            assertTrue(value in UShort.MIN_VALUE..UShort.MAX_VALUE)
-        }
-    }*/
 
     @Test
     fun testReadIntRange() {
@@ -64,63 +47,16 @@ class SecureRandomTest {
         }
     }
 
-    /*@Test
-    fun testReadUIntRange() {
-        repeat(loops) {
-            val value = SecureRandom.readUInt()
-            assertTrue(value in UInt.MIN_VALUE..UInt.MAX_VALUE)
-        }
-    }
-
-    @Test
-    fun testReadLongRange() {
-        repeat(loops) {
-            val value = SecureRandom.readLong()
-            assertTrue(value in Long.MIN_VALUE..Long.MAX_VALUE)
-        }
-    }
-
-    @Test
-    fun testReadULongRange() {
-        repeat(loops) {
-            val value = SecureRandom.readULong()
-            assertTrue(value in ULong.MIN_VALUE..ULong.MAX_VALUE)
-        }
-    }
-
-    @Test
-    fun testReadFloatRange() {
-        repeat(loops) {
-            val value = SecureRandom.readFloat()
-            assertTrue(value in 0.0f..1.0f)
-        }
-    }
-
-    @Test
-    fun testReadDoubleRange() {
-        repeat(loops) {
-            val value = SecureRandom.readDouble()
-            assertTrue(value in 0.0..1.0)
-        }
-    }*/
-
     @Test
     fun testReadBytes() {
-        /*val bytes1 = ByteArray(64)
-        val bytes2 = ByteArray(64)
-        SecureRandom.readBytes(bytes1)
-        SecureRandom.readBytes(bytes2)
-        // With high probability, two random arrays should not be equal
-        assertNotEquals(bytes1.toList(), bytes2.toList())*/
-
         try {
             val buffer = ByteArray(1024)
 
             SecureRandom.readBytes(buffer)
 
-            assertTrue{ HealthCheck.healthCheck { analyzeByteArray( buffer) } }
-        } catch (_ : SecureRandomException) {
-            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeBits( { SecureRandom.readInt() }, debug)  }
+            assertTrue { HealthCheck.healthCheck { analyzeByteArray(buffer) } }
+        } catch (_: SecureRandomException) {
+            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeBits({ SecureRandom.readInt() }, debug) }
         }
     }
 
