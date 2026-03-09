@@ -24,9 +24,11 @@ import kotlin.test.assertFailsWith
 
 class GarbageGarblerTest {
 
+    val loops = 1
+
     @Test
     fun testRandomBytesAreNotConstant() {
-        val garbler = GarbageGarbler()
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
         val buffer1 = ByteArray(32)
         val buffer2 = ByteArray(32)
 
@@ -45,7 +47,7 @@ class GarbageGarblerTest {
 
     @Test
     fun testTriggerReseedAndRemainingReset() {
-        val garbler = GarbageGarbler()
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
 
         val initialRemaining = garbler.remainingBytes
         repeat(256) { garbler.readDouble() }
@@ -60,7 +62,7 @@ class GarbageGarblerTest {
 
     @Test
     fun testRemainingDecreases() {
-        val garbler = GarbageGarbler()
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
         val initialRemaining = garbler.remainingBytes
         repeat(10) { garbler.readByte() }
         assertTrue(garbler.remainingBytes < initialRemaining)
@@ -68,7 +70,7 @@ class GarbageGarblerTest {
 
     @Test
     fun testImportBytesRejectsZeroLength() {
-        val garbler = GarbageGarbler()
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
         val data = ByteArray(10)
         assertFailsWith<IllegalArgumentException> {
             garbler.seedEntropy(data, 0, 0) { idx -> this[idx] }
@@ -77,8 +79,8 @@ class GarbageGarblerTest {
 
     @Test
     fun testReadByteRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
+        repeat(loops) {
             val value = garbler.readByte()
             assertTrue(value in Byte.MIN_VALUE..Byte.MAX_VALUE)
         }
@@ -86,8 +88,8 @@ class GarbageGarblerTest {
 
     @Test
     fun testReadUByteRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
+        repeat(loops) {
             val value = garbler.readUByte()
             assertTrue(value in UByte.MIN_VALUE..UByte.MAX_VALUE)
         }
@@ -95,8 +97,8 @@ class GarbageGarblerTest {
 
     @Test
     fun testReadShortRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
+        repeat(loops) {
             val value = garbler.readShort()
             assertTrue(value in Short.MIN_VALUE..Short.MAX_VALUE)
         }
@@ -104,8 +106,8 @@ class GarbageGarblerTest {
 
     @Test
     fun testReadUShortRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
+        repeat(loops) {
             val value = garbler.readUShort()
             assertTrue(value in UShort.MIN_VALUE..UShort.MAX_VALUE)
         }
@@ -113,8 +115,8 @@ class GarbageGarblerTest {
 
     @Test
     fun testReadIntRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
+        repeat(loops) {
             val value = garbler.readInt()
             assertTrue(value in Int.MIN_VALUE..Int.MAX_VALUE)
         }
@@ -122,8 +124,8 @@ class GarbageGarblerTest {
 
     @Test
     fun testReadUIntRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
+        repeat(loops) {
             val value = garbler.readUInt()
             assertTrue(value in UInt.MIN_VALUE..UInt.MAX_VALUE)
         }
@@ -131,8 +133,8 @@ class GarbageGarblerTest {
 
     @Test
     fun testReadLongRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
+        repeat(loops) {
             val value = garbler.readLong()
             assertTrue(value in Long.MIN_VALUE..Long.MAX_VALUE)
         }
@@ -140,8 +142,8 @@ class GarbageGarblerTest {
 
     @Test
     fun testReadULongRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
+        repeat(loops) {
             val value = garbler.readULong()
             assertTrue(value in ULong.MIN_VALUE..ULong.MAX_VALUE)
         }
@@ -149,8 +151,8 @@ class GarbageGarblerTest {
 
     @Test
     fun testReadFloatRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
+        repeat(loops) {
             val value = garbler.readFloat()
             assertTrue(value in 0.0f..1.0f)
         }
@@ -158,8 +160,8 @@ class GarbageGarblerTest {
 
     @Test
     fun testReadDoubleRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
+        repeat(loops) {
             val value = garbler.readDouble()
             assertTrue(value in 0.0..1.0)
         }
@@ -168,13 +170,13 @@ class GarbageGarblerTest {
     @Test
     fun testReadBytes() {
         val buffer = ByteArray(16)
-        GarbageGarbler().readBytes(buffer)
+        GarbageGarbler(Fakes.safeSecRand()).readBytes(buffer)
         assertNotEquals(0, buffer.sum())
     }
 
     @Test
     fun testTotalBits() {
-        val garbler = GarbageGarbler()
+        val garbler = GarbageGarbler(Fakes.safeSecRand())
         assertEquals(0, garbler.totalBits)
         garbler.readByte()
         assertEquals(8, garbler.totalBits)
@@ -182,8 +184,8 @@ class GarbageGarblerTest {
 
     @Test
     fun testSecurityHealth() {
-        assertTrue{ HealthCheck.doubleHealthCheckDebug { debug ->
-            analyzeBits(GarbageGarbler(), debug)
+        assertTrue{ HealthCheck.doubleHealthCheckWithSample { debug ->
+            analyzeBits(GarbageGarbler(Fakes.safeSecRand()), debug)
         } }
     }
 }

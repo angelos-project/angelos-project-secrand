@@ -38,7 +38,7 @@ import kotlin.math.min
  *
  * @constructor Creates a new instance of GarbageGarbler with an initialized sponge and entropy pool.
  */
-public class GarbageGarbler: Security(), RandomBits, Randomness {
+public class GarbageGarbler(entropySource: Octet.Producer = JitterEntropy): Security(), RandomBits, Randomness {
 
     override val sponge: AbstractSponge1024 = object : AbstractSponge1024() {}
 
@@ -59,11 +59,7 @@ public class GarbageGarbler: Security(), RandomBits, Randomness {
 
     init {
         // Seed the sponge
-        /*JitterEntropy.readLongs(sponge, 0, sponge.visibleSize) { index, value ->
-            sponge.absorb(value, index)
-        }
-        sponge.scramble()*/
-        Reseeder(sponge).reseed(JitterEntropy)
+        Reseeder(sponge).reseed(entropySource)
     }
 
     override fun checkReseedConditions(): Boolean {
