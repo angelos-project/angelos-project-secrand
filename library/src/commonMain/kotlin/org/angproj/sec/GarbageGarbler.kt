@@ -151,7 +151,7 @@ public class GarbageGarbler: Security(), RandomBits, Randomness {
      * @throws IllegalStateException if the GarbageGarbler is depleted.
      */
     override fun readBytes(data: ByteArray, offset: Int, size: Int) {
-        readBytes(data, offset, size) { index, value ->
+        exportBytes(data, offset, size) { index, value ->
             this[index] = value
         }
     }

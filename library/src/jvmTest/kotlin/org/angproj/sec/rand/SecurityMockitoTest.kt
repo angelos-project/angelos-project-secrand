@@ -46,8 +46,8 @@ class SecurityMockitoTest {
         val writeOctet: WriteOctet<LongArray, Long> =  { index, value ->
             data[index] = value
         }
-        doNothing().whenever(security).readLongs(data, 0, data.size, writeOctet)
-        assertEquals(security.readLongs(data, 0, data.size, writeOctet), Unit)
+        doNothing().whenever(security).exportLongs(data, 0, data.size, writeOctet)
+        assertEquals(security.exportLongs(data, 0, data.size, writeOctet), Unit)
     }
 
     @Test
@@ -56,8 +56,8 @@ class SecurityMockitoTest {
         val writeOctet: WriteOctet<ByteArray, Byte> =  { index, value ->
             data[index] = value
         }
-        doNothing().whenever(security).readBytes(data, 0, data.size, writeOctet)
-        assertEquals(security.readBytes(data, 0, data.size, writeOctet), Unit)
+        doNothing().whenever(security).exportBytes(data, 0, data.size, writeOctet)
+        assertEquals(security.exportBytes(data, 0, data.size, writeOctet), Unit)
     }
 
     @Test

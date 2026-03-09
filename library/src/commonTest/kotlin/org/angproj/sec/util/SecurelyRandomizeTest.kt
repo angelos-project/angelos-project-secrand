@@ -31,7 +31,7 @@ class SecurelyRandomizeTest {
 
             assertTrue(HealthCheck.healthCheckWithSample { _ -> analyzeByteArray(buffer) })
         } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckDebug { sample -> analyzeLongs(SecureFeed::readLongs, sample) }
+            HealthCheck.doubleHealthCheckDebug { sample -> analyzeLongs(SecureFeed::exportLongs, sample) }
         }
     }
 
@@ -44,7 +44,7 @@ class SecurelyRandomizeTest {
 
             assertTrue(HealthCheck.healthCheckWithSample { _ -> analyzeByteArray(buffer) })
         } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckDebug { sample -> analyzeLongs(JitterEntropy::readLongs, sample) }
+            HealthCheck.doubleHealthCheckDebug { sample -> analyzeLongs(JitterEntropy::exportLongs, sample) }
         }
     }
 

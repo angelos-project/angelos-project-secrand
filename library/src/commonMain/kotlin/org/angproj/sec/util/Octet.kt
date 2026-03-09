@@ -77,6 +77,11 @@ public object Octet {
         )
     }
 
+    public interface Producer {
+        public fun<E> exportLongs(dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Long>)
+        public fun<E> exportBytes(dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Byte>)
+    }
+
     /**
      * @param E The type of the source to read bytes from.
      */

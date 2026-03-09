@@ -29,8 +29,8 @@ class SecureEntropyTest {
         val buffer1 = ByteArray(size)
         val buffer2 = ByteArray(size)
 
-        SecureEntropy.readBytes(buffer1, 0, size) { idx, value -> this[idx] = value }
-        SecureEntropy.readBytes(buffer2, 0, size) { idx, value -> this[idx] = value }
+        SecureEntropy.exportBytes(buffer1, 0, size) { idx, value -> this[idx] = value }
+        SecureEntropy.exportBytes(buffer2, 0, size) { idx, value -> this[idx] = value }
 
         assertEquals(size, buffer1.size)
         assertEquals(size, buffer2.size)
@@ -44,8 +44,8 @@ class SecureEntropyTest {
         val buffer1 = LongArray(size)
         val buffer2 = LongArray(size)
 
-        SecureEntropy.readLongs(buffer1, 0, size) { idx, value -> this[idx] = value }
-        SecureEntropy.readLongs(buffer2, 0, size) { idx, value -> this[idx] = value }
+        SecureEntropy.exportLongs(buffer1, 0, size) { idx, value -> this[idx] = value }
+        SecureEntropy.exportLongs(buffer2, 0, size) { idx, value -> this[idx] = value }
 
         assertEquals(size, buffer1.size)
         assertEquals(size, buffer2.size)
@@ -55,18 +55,18 @@ class SecureEntropyTest {
 
     @Test
     fun testTotalBits() {
-        SecureEntropy.readLongs(LongArray(2), 0, 2) { idx, value -> this[idx] = value }
+        SecureEntropy.exportLongs(LongArray(2), 0, 2) { idx, value -> this[idx] = value }
         assertNotEquals(0, SecureEntropy.totalBits)
     }
 
     @Test
     fun testSecurityHealth() {
         val result = ByteArray(1024).let {
-            SecureEntropy.readBytes(it, 0, it.size) { idx, value -> this[idx] = value }
+            SecureEntropy.exportBytes(it, 0, it.size) { idx, value -> this[idx] = value }
             HealthCheck().analyzeByteArray(it).securityHealthCheck()
         }
         val result2 = ByteArray(1024).let {
-            SecureEntropy.readBytes(it, 0, it.size) { idx, value -> this[idx] = value }
+            SecureEntropy.exportBytes(it, 0, it.size) { idx, value -> this[idx] = value }
             HealthCheck().analyzeByteArray(it).securityHealthCheck()
         }
 

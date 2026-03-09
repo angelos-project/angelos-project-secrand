@@ -87,6 +87,6 @@ object Mocks {
             obj.absorb(value, pos).also { digestMockCount++ } }
         override fun whenSatisfied() { obj.scramble().also { whenSatisfiedMockCount++ } }
         public fun fillup(entropySource: Security) {
-            (innerFill(entropySource::readLongs) { _, _ -> }).also { reseedSecurityMockCount++ } }
+            (innerFill(entropySource::exportLongs) { _, _ -> }).also { reseedSecurityMockCount++ } }
     }
 }

@@ -42,11 +42,11 @@ public abstract class SecurelyRandomize<E>(obj: E, size: Int) : AbstractRandom<E
     }
 
     public fun randomize(entropySource: Security, writeOctet: WriteOctet<E, Byte>) {
-        innerFill(entropySource::readLongs, writeOctet)
+        innerFill(entropySource::exportLongs, writeOctet)
     }
 
     public fun randomize(entropySource: JitterEntropy, writeOctet: WriteOctet<E, Byte>) {
-        innerFill(entropySource::readLongs, writeOctet)
+        innerFill(entropySource::exportLongs, writeOctet)
     }
 }
 

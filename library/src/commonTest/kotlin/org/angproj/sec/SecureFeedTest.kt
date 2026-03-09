@@ -29,8 +29,8 @@ class SecureFeedTest {
         val buffer1 = ByteArray(size)
         val buffer2 = ByteArray(size)
 
-        SecureFeed.readBytes(buffer1, 0, size) { idx, value -> this[idx] = value }
-        SecureFeed.readBytes(buffer2, 0, size) { idx, value -> this[idx] = value }
+        SecureFeed.exportBytes(buffer1, 0, size) { idx, value -> this[idx] = value }
+        SecureFeed.exportBytes(buffer2, 0, size) { idx, value -> this[idx] = value }
 
         assertEquals(size, buffer1.size)
         assertEquals(size, buffer2.size)
@@ -44,8 +44,8 @@ class SecureFeedTest {
         val buffer1 = LongArray(size)
         val buffer2 = LongArray(size)
 
-        SecureFeed.readLongs(buffer1, 0, size) { idx, value -> this[idx] = value }
-        SecureFeed.readLongs(buffer2, 0, size) { idx, value -> this[idx] = value }
+        SecureFeed.exportLongs(buffer1, 0, size) { idx, value -> this[idx] = value }
+        SecureFeed.exportLongs(buffer2, 0, size) { idx, value -> this[idx] = value }
 
         assertEquals(size, buffer1.size)
         assertEquals(size, buffer2.size)

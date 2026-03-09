@@ -122,7 +122,7 @@ class HealthCheckTest {
         val exporter = Fakes.unsafeSecRand()
 
         //val result = HealthCheck.healthCheckWithSample { debug -> analyzeLongs(exporter::readLongs, debug) }
-        val result = HealthCheck().analyzeLongs(exporter::readLongs).securityHealthCheck()
+        val result = HealthCheck().analyzeLongs(exporter::exportLongs).securityHealthCheck()
 
         assertFalse(result)
     }
@@ -132,7 +132,7 @@ class HealthCheckTest {
         val exporter = Fakes.safeSecRand()
 
         //val result = HealthCheck.healthCheckWithSample { debug -> analyzeLongs(exporter::readLongs, debug) }
-        val result = HealthCheck().analyzeLongs(exporter::readLongs).securityHealthCheck()
+        val result = HealthCheck().analyzeLongs(exporter::exportLongs).securityHealthCheck()
 
         assertTrue(result)
     }
@@ -142,7 +142,7 @@ class HealthCheckTest {
         val exporter = Fakes.unsafeSecRand()
 
         //val result = HealthCheck.healthCheckWithSample { debug -> analyzeBytes(exporter::readBytes, debug) }
-        val result = HealthCheck().analyzeBytes(exporter::readBytes).securityHealthCheck()
+        val result = HealthCheck().analyzeBytes(exporter::exportBytes).securityHealthCheck()
 
         assertFalse(result)
     }
@@ -152,7 +152,7 @@ class HealthCheckTest {
         val exporter = Fakes.safeSecRand()
 
         //val result = HealthCheck.healthCheckWithSample { debug -> analyzeBytes(exporter::readBytes, debug) }
-        val result = HealthCheck().analyzeBytes(exporter::readBytes).securityHealthCheck()
+        val result = HealthCheck().analyzeBytes(exporter::exportBytes).securityHealthCheck()
 
         assertTrue(result)
     }
@@ -172,7 +172,7 @@ class HealthCheckTest {
         val sample = ByteArray(1024)
 
         // A sample from a random generator can be taken for closer lookup
-        val result = HealthCheck.doubleHealthCheckWithSample { _ -> analyzeLongs(exporter::readLongs, sample) }
+        val result = HealthCheck.doubleHealthCheckWithSample { _ -> analyzeLongs(exporter::exportLongs, sample) }
 
         assertTrue(result)
         //println(sample.asHexSymbols())
@@ -183,7 +183,7 @@ class HealthCheckTest {
         val secrand = Fakes.unsafeSecRand()
 
         println("One (1) purposeful debug print:")
-        val result = HealthCheck.doubleHealthCheckDebug { debug -> analyzeLongs(secrand::readLongs, debug) }
+        val result = HealthCheck.doubleHealthCheckDebug { debug -> analyzeLongs(secrand::exportLongs, debug) }
 
         assertFalse(result)
     }
@@ -192,7 +192,7 @@ class HealthCheckTest {
     fun testDoubleHealthCheckDebugPass() {
         val secrand = Fakes.safeSecRand()
 
-        val result = HealthCheck.doubleHealthCheckDebug { debug -> analyzeLongs(secrand::readLongs, debug) }
+        val result = HealthCheck.doubleHealthCheckDebug { debug -> analyzeLongs(secrand::exportLongs, debug) }
 
         assertTrue(result)
     }

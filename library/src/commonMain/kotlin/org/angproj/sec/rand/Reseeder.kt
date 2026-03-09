@@ -40,10 +40,10 @@ public class Reseeder(sponge: Sponge) : AbstractRandom<Sponge>(sponge, sponge.vi
     }
 
     public fun reseed(entropySource: Security) {
-        innerFill(entropySource::readLongs) { _, _ -> }
+        innerFill(entropySource::exportLongs) { _, _ -> }
     }
 
     public fun reseed(entropySource: JitterEntropy) {
-        innerFill(entropySource::readLongs) { _, _ -> }
+        innerFill(entropySource::exportLongs) { _, _ -> }
     }
 }
