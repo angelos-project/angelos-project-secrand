@@ -15,7 +15,7 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.AbstractRandom
-import org.angproj.sec.rand.Security
+import org.angproj.sec.rand.AbstractSecurity
 import org.angproj.sec.rand.Sponge
 import org.angproj.sec.stat.BenchmarkArticle
 import org.angproj.sec.stat.BenchmarkTester
@@ -86,7 +86,7 @@ object Mocks {
         override fun digest(value: Long, pos: Int, len: Int, writeOctet: WriteOctet<Sponge, Byte>) {
             obj.absorb(value, pos).also { digestMockCount++ } }
         override fun whenSatisfied() { obj.scramble().also { whenSatisfiedMockCount++ } }
-        public fun fillup(entropySource: Security) {
+        public fun fillup(entropySource: AbstractSecurity) {
             (innerFill(entropySource::exportLongs) { _, _ -> }).also { reseedSecurityMockCount++ } }
     }
 }

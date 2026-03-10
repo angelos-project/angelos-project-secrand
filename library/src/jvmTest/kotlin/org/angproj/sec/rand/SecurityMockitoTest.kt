@@ -26,19 +26,8 @@ import kotlin.test.assertEquals
 class SecurityMockitoTest {
 
     @Mock
-    private val security: Security = mock()
+    private val security: AbstractSecurity = mock()
 
-   @Test
-   fun testTotalBits() {
-       whenever(security.totalBits).thenReturn(1_000_000)
-       assertEquals(security.totalBits, 1_000_000)
-   }
-
-    @Test
-    fun testLastReseedBits() {
-        whenever(security.lastReseedBits).thenReturn(500_000)
-        assertEquals(security.lastReseedBits, 500_000)
-    }
 
     @Test
     fun testReadLongs() {
@@ -58,11 +47,5 @@ class SecurityMockitoTest {
         }
         doNothing().whenever(security).exportBytes(data, 0, data.size, writeOctet)
         assertEquals(security.exportBytes(data, 0, data.size, writeOctet), Unit)
-    }
-
-    @Test
-    fun testSecurityHealthCheck() {
-        doNothing().whenever(security).securityHealthCheck()
-        assertEquals(security.securityHealthCheck(), Unit)
     }
 }

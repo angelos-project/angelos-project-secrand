@@ -14,14 +14,19 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.rand.AbstractSponge2256
+import org.angproj.sec.hash.squeezerOf
+import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.InitializationVector
 import org.angproj.sec.rand.Sponge
 import org.angproj.sec.stat.BenchmarkArticle
 import org.angproj.sec.stat.BenchmarkTester
+import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
+import org.angproj.sec.util.WriteOctet
+import org.angproj.sec.util.ceilDiv
 import kotlin.math.E
 import kotlin.math.PI
+import kotlin.math.min
 import kotlin.random.Random
 
 object Stubs {
@@ -56,11 +61,33 @@ object Stubs {
         }
     }
 
-    fun stubSucceedSqueezeSponge(seed: Long = 0): Sponge = object : AbstractSponge2256() {
+    fun stubSucceedSqueezeSponge(seed: Long = 0): Sponge = object : AbstractSponge256() {
         init {
             absorb(seed, 0)
             scramble()
         }
+    }
+
+    fun stubOctetProducer(): Octet.Producer = object : Octet.Producer {
+        override fun <E> exportLongs(dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Long>) {
+            val squeezer = stubSucceedSqueezeSponge().squeezerOf()
+            repeat(length) {
+                dst.writeOctet(offset + it, squeezer())
+            }
+        }
+
+        override fun <E> exportBytes(dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Byte>) {
+            val squeezer = stubSucceedSqueezeSponge().squeezerOf()
+            var pos = 0
+            repeat(length.ceilDiv(TypeSize.longSize)) { _ ->
+                val bytes = min(TypeSize.longSize, length - pos)
+                var entropy = squeezer()
+                repeat(bytes) {
+                    dst.writeOctet(offset + pos++, entropy.toByte())
+                    entropy = entropy ushr TypeSize.byteBits
+                }
+            }        }
+
     }
 
     fun<B> stubBenchmarkTester(
