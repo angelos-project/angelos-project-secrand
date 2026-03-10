@@ -40,6 +40,7 @@ public abstract class AbstractSecurity(protected val sponge: Sponge): Octet.Prod
     protected fun seedEntropy(entropySource: Octet.Producer) {
         totalForwards += hashHelper.forwards
         bytesExported = 0
+        bitsExported = 0
         hashHelper.reset()
         Reseeder(sponge).reseed(entropySource)
         hashHelper.switchMode()
