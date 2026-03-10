@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 by Kristoffer Paulsson <kristoffer.paulsson@talenten.se>.
+ * Copyright (c) 2025-2026 by Kristoffer Paulsson <kristoffer.paulsson@talenten.se>.
  *
  * This software is available under the terms of the MIT license. Parts are licensed
  * under different terms if stated. The legal terms are attached to the LICENSE file
@@ -28,15 +28,21 @@ public abstract class AbstractSecurity(protected val sponge: Sponge): Octet.Prod
     protected val hashAbsorber: HashAbsorber = hashHelper.absorber
     protected val hashSqueezer: HashSqueezer = hashHelper.squeezer
 
-    protected var bitsExported: Long = 0
     protected var initialized: Boolean = false
-    protected var bitCounter: Long = 0
+
+    private var totalForwards: Long = 0
+    protected val bitCounter: Long
+        get() = (totalForwards + hashHelper.forwards) * TypeSize.longBits
+
+    protected var bitsExported: Long = 0
     protected var bytesExported: Int = 0
 
-    public fun <E> seedEntropy(entropySource: Octet.Producer) {
+    protected fun seedEntropy(entropySource: Octet.Producer) {
+        totalForwards += hashHelper.forwards
         hashHelper.reset()
         Reseeder(sponge).reseed(entropySource)
         hashHelper.switchMode()
+        initialized = true
     }
 
     override fun <E> exportLongs(
@@ -61,6 +67,7 @@ public abstract class AbstractSecurity(protected val sponge: Sponge): Octet.Prod
         if(length <= 0) return
 
         //check(checkExportConditions(length.toLong() * TypeSize.byteBits)) { "Export conditions not met" }
+        val curForwards = hashHelper.forwards
         var pos = 0
         repeat(length.ceilDiv(TypeSize.longSize)) {
             val bytes = min(TypeSize.longSize, length - pos)
@@ -70,5 +77,7 @@ public abstract class AbstractSecurity(protected val sponge: Sponge): Octet.Prod
                 entropy = entropy ushr TypeSize.byteBits
             }
         }
+        bitsExported = (hashHelper.forwards - curForwards) * TypeSize.longBits
+        bytesExported = (bitsExported / 8L).toInt()
     }
 }
