@@ -79,15 +79,15 @@ object Stubs {
         override fun <E> exportBytes(dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Byte>) {
             val squeezer = stubSucceedSqueezeSponge().squeezerOf()
             var pos = 0
+
             repeat(length.ceilDiv(TypeSize.longSize)) { _ ->
                 val bytes = min(TypeSize.longSize, length - pos)
-                var entropy = squeezer()
+                val entropy = squeezer()
                 repeat(bytes) {
-                    dst.writeOctet(offset + pos++, entropy.toByte())
-                    entropy = entropy ushr TypeSize.byteBits
+                    dst.writeOctet(offset + pos++, ((entropy ushr offset * 8) and 0xff).toByte())
                 }
-            }        }
-
+            }
+        }
     }
 
     fun<B> stubBenchmarkTester(

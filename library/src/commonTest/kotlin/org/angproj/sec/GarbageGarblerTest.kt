@@ -91,4 +91,12 @@ class GarbageGarblerTest {
 
         assertTrue { HealthCheck.healthCheck { analyzeByteArray(buffer) } }
     }
+
+    @Test
+    @Suppress
+    fun testHealthCheck() {
+        val garbler = GarbageGarbler()
+        garbler.reseed(Fakes.safeSecRand())
+        garbler.checkSecurityHealth()
+    }
 }

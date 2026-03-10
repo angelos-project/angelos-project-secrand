@@ -28,4 +28,10 @@ class SecureEntropyTest {
             }
         }
     }
+
+    @Test
+    @Suppress
+    fun testHealthCheck() {
+        SecureEntropy.checkSecurityHealth()
+    }
 }

@@ -17,6 +17,11 @@ package org.angproj.sec.rand
 import org.angproj.sec.hash.HashAbsorber
 import org.angproj.sec.hash.HashHelper
 import org.angproj.sec.hash.HashSqueezer
+import org.angproj.sec.stat.AvalancheEffectTester
+import org.angproj.sec.stat.BenchmarkSuiteBuilder
+import org.angproj.sec.stat.ChiSquareTester
+import org.angproj.sec.stat.MonteCarloTester
+import org.angproj.sec.stat.SpongeBenchmark
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.WriteOctet
@@ -81,5 +86,17 @@ public abstract class AbstractSecurity(protected val sponge: Sponge): Octet.Prod
             }
         }
         bytesExported += length
+    }
+
+    public fun checkSecurityHealth() {
+        val suite = BenchmarkSuiteBuilder.build {
+            samples { 10_000_000 }
+            article { SpongeBenchmark(sponge) }
+            register { ChiSquareTester(samples, article) }
+            register { MonteCarloTester(samples, MonteCarloTester.Mode.MODE_64_BIT,article) }
+            register { AvalancheEffectTester(samples, article) }
+        }
+        suite.runBlocking()
+        println(suite.toString())
     }
 }
