@@ -20,6 +20,7 @@ import org.angproj.sec.stat.Randomness
 import org.angproj.sec.util.Octet
 import org.angproj.sec.rand.RandomBits
 import org.angproj.sec.util.TypeSize
+import org.angproj.sec.util.ceilDiv
 
 
 /**
@@ -40,11 +41,13 @@ public class GarbageGarbler: AbstractSecurity(object : AbstractSponge1024() {}),
 
     /** Number of bytes readable from the garbler until depletion */
     public val remainingBytes: Int
-        get() = (Int.MAX_VALUE / 2) - (hashHelper.forwards.toInt() * 8)
+        get() = ((Int.MAX_VALUE / 2L) - bytesExported - bitsExported.ceilDiv(TypeSize.byteBits.toLong())).toInt()
 
     public fun reseed(seeder: Octet.Producer) {
         seedEntropy(seeder)
     }
+
+    override fun reseedPolicy(bytesNeeded: Int): Boolean = remainingBytes >= bytesNeeded
 
     /**
      * Retrieves the next specified number of random bits from the sponge.
@@ -56,6 +59,8 @@ public class GarbageGarbler: AbstractSecurity(object : AbstractSponge1024() {}),
      */
     override fun nextBits(bits: Int): Int {
         require(bits in 1..TypeSize.intBits) { "Bits must be between 1 and 32" }
+        check(reseedPolicy(bits.ceilDiv(TypeSize.byteBits))) { "Export conditions not met" }
+        bitsExported += bits
         return RandomBits.compactBitEntropy(bits, hashSqueezer.squeeze())
     }
 

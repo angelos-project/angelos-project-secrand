@@ -38,7 +38,6 @@ public object SecureRandom : Randomness {
      * @param size The number of bytes to read. Defaults to the size of the ByteArray.
      */
     public override fun readBytes(data: ByteArray, offset: Int, size: Int) {
-        SecureFeed.revitalize()
         SecureFeed.exportBytes(data, offset, size) { index, value ->
             this[index] = value
         }

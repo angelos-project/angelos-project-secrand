@@ -35,15 +35,18 @@ public abstract class AbstractSecurity(protected val sponge: Sponge): Octet.Prod
         get() = (totalForwards + hashHelper.forwards) * TypeSize.longBits
 
     protected var bitsExported: Long = 0
-    protected var bytesExported: Int = 0
+    protected var bytesExported: Long = 0
 
     protected fun seedEntropy(entropySource: Octet.Producer) {
         totalForwards += hashHelper.forwards
+        bytesExported = 0
         hashHelper.reset()
         Reseeder(sponge).reseed(entropySource)
         hashHelper.switchMode()
         initialized = true
     }
+
+    protected abstract fun reseedPolicy(bytesNeeded: Int): Boolean
 
     override fun <E> exportLongs(
         dst: E,
@@ -66,8 +69,7 @@ public abstract class AbstractSecurity(protected val sponge: Sponge): Octet.Prod
     ) {
         if(length <= 0) return
 
-        //check(checkExportConditions(length.toLong() * TypeSize.byteBits)) { "Export conditions not met" }
-        val curForwards = hashHelper.forwards
+        check(reseedPolicy(length)) { "Export conditions not met" }
         var pos = 0
         repeat(length.ceilDiv(TypeSize.longSize)) {
             val bytes = min(TypeSize.longSize, length - pos)
@@ -77,7 +79,6 @@ public abstract class AbstractSecurity(protected val sponge: Sponge): Octet.Prod
                 entropy = entropy ushr TypeSize.byteBits
             }
         }
-        bitsExported = (hashHelper.forwards - curForwards) * TypeSize.longBits
-        bytesExported = (bitsExported / 8L).toInt()
+        bytesExported += length
     }
 }

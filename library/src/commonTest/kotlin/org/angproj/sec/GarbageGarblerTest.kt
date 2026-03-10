@@ -48,7 +48,7 @@ class GarbageGarblerTest {
         val remaining = garbler.remainingBytes
         garbler.readLong()
 
-        assertEquals(remaining - TypeSize.longSize - TypeSize.longSize, garbler.remainingBytes)
+        assertEquals(remaining - TypeSize.longSize, garbler.remainingBytes)
     }
 
     @Test
