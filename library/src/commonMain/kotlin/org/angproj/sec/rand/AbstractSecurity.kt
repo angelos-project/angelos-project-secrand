@@ -88,15 +88,16 @@ public abstract class AbstractSecurity(protected val sponge: Sponge): Octet.Prod
         bytesExported += length
     }
 
-    public fun checkSecurityHealth() {
+    public fun checkSecurityHealth(numSamples: Int = 10_000_000) {
+        require(numSamples > 0) { "Number samples must be greater than 0" }
         val suite = BenchmarkSuiteBuilder.build {
-            samples { 10_000_000 }
+            samples { numSamples }
             article { SpongeBenchmark(sponge) }
             register { ChiSquareTester(samples, article) }
             register { MonteCarloTester(samples, MonteCarloTester.Mode.MODE_64_BIT,article) }
             register { AvalancheEffectTester(samples, article) }
         }
         suite.runBlocking()
-        println(suite.toString())
+        //println(suite.toString())
     }
 }
