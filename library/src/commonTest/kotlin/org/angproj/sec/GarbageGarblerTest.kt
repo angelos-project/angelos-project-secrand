@@ -15,21 +15,40 @@
 package org.angproj.sec
 
 import org.angproj.sec.util.HealthCheck
+import org.angproj.sec.util.TypeSize
 import kotlin.test.Test
-import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse
+import kotlin.test.assertEquals
 
 
 class GarbageGarblerTest {
-
-    val loops = 1
 
     @Test
     fun testNotInitialized() {
         val garbler = GarbageGarbler()
 
         assertFalse { garbler.isInitialized }
+    }
+
+    @Test
+    fun testInitialized() {
+        val garbler = GarbageGarbler()
+
+        garbler.reseed(Fakes.safeSecRand())
+
+        assertTrue { garbler.isInitialized }
+    }
+
+    @Test
+    fun testRemainingBytes() {
+        val garbler = GarbageGarbler()
+
+        garbler.reseed(Fakes.safeSecRand())
+        val remaining = garbler.remainingBytes
+        garbler.readLong()
+
+        assertEquals(remaining - TypeSize.longSize - TypeSize.longSize, garbler.remainingBytes)
     }
 
     @Test

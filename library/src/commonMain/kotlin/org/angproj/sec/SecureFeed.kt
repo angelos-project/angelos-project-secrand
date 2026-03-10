@@ -14,11 +14,9 @@
  */
 package org.angproj.sec
 
+import org.angproj.sec.rand.AbstractSecurity
 import org.angproj.sec.rand.AbstractSponge512
-import org.angproj.sec.rand.Security
-import org.angproj.sec.rand.Sponge
 import org.angproj.sec.rand.RandomBits
-import org.angproj.sec.rand.Reseeder
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.floorMod
 
@@ -31,20 +29,12 @@ import org.angproj.sec.util.floorMod
  * The SecureFeed object is designed to be used in cryptographic applications where
  * high-quality randomness is required.
  */
-public object SecureFeed : Security(), RandomBits {
+public object SecureFeed : AbstractSecurity(object : AbstractSponge512() {}), RandomBits {
 
-    override val sponge: Sponge = object : AbstractSponge512() {}
-
-    private var next: Long = 0
+    private var nextForward: Long = 0
 
     init {
         revitalize()
-    }
-
-    override fun checkReseedConditions(): Boolean = true
-
-    override fun reseedImpl() {
-        Reseeder(sponge).reseed(SecureEntropy)
     }
 
     /**
@@ -57,31 +47,26 @@ public object SecureFeed : Security(), RandomBits {
      *
      * @param count The number of bytes to add to the counter.
      */
-    private fun revitalize() {
-        if (lastReseedBits >= next) {
-            next = AVERAGE_THRESHOLD + sponge.squeeze(0).floorMod(AVERAGE_THRESHOLD) - DEVIATION_THRESHOLD
-            reseed()
+    internal fun revitalize() {
+        if (hashHelper.forwards >= nextForward) {
+            seedEntropy(SecureEntropy)
+            nextForward = AVERAGE_THRESHOLD + hashSqueezer.squeeze().floorMod(AVERAGE_THRESHOLD) - DEVIATION_THRESHOLD
         }
     }
 
-    override fun checkExportConditions(bitsNeeded: Long): Boolean {
-        revitalize()
-        return true
-    }
-
     public override fun nextBits(bits: Int): Int {
-        require(bits in 1..32) { "Bits must be between 1 and 32" }
+        require(bits in 1..TypeSize.intBits) { "Bits must be between 1 and 32" }
         revitalize()
-        return sponge.getNextBits(bits)
+        return RandomBits.compactBitEntropy(bits, hashSqueezer.squeeze())
     }
 
     /**
-     * Average threshold for reseeding the sponge, which is a half gigabyte in bits.
+     * Average threshold for reseeding the sponge, which is a half gigabyte in longs.
      */
-    public const val AVERAGE_THRESHOLD: Long = (1024 * 1024 * 1024) / 2L * TypeSize.byteBits
+    public const val AVERAGE_THRESHOLD: Long = (1024 * 1024 * 1024) / 8L / 2
 
     /**
-     * Deviation threshold for reseeding the sponge, which is a quarter gigabyte in bits.
+     * Deviation threshold for reseeding the sponge, which is a quarter gigabyte in longs.
      */
     public const val DEVIATION_THRESHOLD: Long = AVERAGE_THRESHOLD / 2
 }

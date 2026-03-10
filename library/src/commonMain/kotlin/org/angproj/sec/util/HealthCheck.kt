@@ -15,6 +15,7 @@
 package org.angproj.sec.util
 
 import org.angproj.sec.hash.squeezerOf
+import org.angproj.sec.rand.AbstractSecurity
 import org.angproj.sec.rand.RandomBits
 import org.angproj.sec.rand.Security
 import org.angproj.sec.rand.Sponge
@@ -114,6 +115,10 @@ public class HealthCheck : BitStatisticCollector() {
     }
 
     public fun analyzeSecurity(security: Security, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
+        return analyzeLongs(security::exportLongs, debug)
+    }
+
+    public fun analyzeSecurity(security: AbstractSecurity, debug: ByteArray = byteArrayOf()): BitStatisticSnapshot {
         return analyzeLongs(security::exportLongs, debug)
     }
 

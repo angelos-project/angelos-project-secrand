@@ -16,8 +16,8 @@ package org.angproj.sec.util
 
 import org.angproj.sec.SecureFeed
 import org.angproj.sec.rand.AbstractRandom
+import org.angproj.sec.rand.AbstractSecurity
 import org.angproj.sec.rand.JitterEntropy
-import org.angproj.sec.rand.Security
 import kotlin.math.max
 import kotlin.math.min
 
@@ -41,7 +41,7 @@ public abstract class SecurelyRandomize<E>(obj: E, size: Int) : AbstractRandom<E
     /* No additional action needed when satisfied, as the array is already filled with random data. */
     }
 
-    public fun randomize(entropySource: Security, writeOctet: WriteOctet<E, Byte>) {
+    public fun randomize(entropySource: AbstractSecurity, writeOctet: WriteOctet<E, Byte>) {
         innerFill(entropySource::exportLongs, writeOctet)
     }
 
