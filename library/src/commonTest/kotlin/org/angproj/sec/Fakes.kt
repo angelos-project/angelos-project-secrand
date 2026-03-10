@@ -26,7 +26,7 @@ object Fakes {
         init { reseed() }
         override fun checkReseedConditions(): Boolean = true
         override fun reseedImpl() { sponge.scramble() }
-        override fun checkExportConditions(length: Int): Boolean {
+        override fun checkExportConditions(bitsNeeded: Long): Boolean {
             reseed()
             return true
         }
@@ -37,7 +37,7 @@ object Fakes {
         init { reseed() }
         override fun checkReseedConditions(): Boolean = true
         override fun reseedImpl() { sponge.scramble() }
-        override fun checkExportConditions(length: Int): Boolean {
+        override fun checkExportConditions(bitsNeeded: Long): Boolean {
             reseed()
             return true
         }
@@ -46,5 +46,19 @@ object Fakes {
     fun safeRandomBits(): RandomBits {
         val squeezer = HashHelper(Stubs.stubSucceedSqueezeSponge(), 0,HashHelper.HashMode.SQUEEZING).squeezer
         return RandomBits { RandomBits.compactBitEntropy(it, squeezer.squeeze()) }
+    }
+
+    fun safeSecurity(): Security = object : Security() {
+        override val sponge = Stubs.stubSucceedSqueezeSponge()
+        override fun checkReseedConditions(): Boolean = true //lastReseedBits >= 1024
+        override fun reseedImpl() {
+            sponge.absorb(1L, 1)
+            sponge.scramble()
+        }
+        //override fun checkExportConditions(length: Int): Boolean = length <= (1024 - lastReseedBits)
+        override fun checkExportConditions(bitsNeeded: Long): Boolean {
+            if(bitsNeeded <= (1024 - lastReseedBits)) reseed()
+            return true
+        }
     }
 }

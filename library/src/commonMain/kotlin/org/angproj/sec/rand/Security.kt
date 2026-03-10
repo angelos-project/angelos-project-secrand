@@ -96,7 +96,11 @@ public abstract class Security: Octet.Producer {
 
     protected abstract fun reseedImpl()
 
-    protected abstract fun checkExportConditions(length: Int): Boolean
+    /**
+     * How many bits are needed to satisfy the next export and how many bits are left
+     * until the need for reseeding.
+     * */
+    protected abstract fun checkExportConditions(bitsNeeded: Long): Boolean
 
     /**
      * Reads random longs into a LongArray from the secure random source.
@@ -108,7 +112,7 @@ public abstract class Security: Octet.Producer {
     public override fun <E> exportLongs(dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Long>) {
         if(length <= 0) return
 
-        check(checkExportConditions(length)) { "Export conditions not met" }
+        check(checkExportConditions(length.toLong() * TypeSize.longBits)) { "Export conditions not met" }
         repeat(length) { index ->
             dst.writeOctet(offset + index, RandomBits.nextBitsToLong { sponge.getNextBits(it) })
         }
@@ -132,7 +136,7 @@ public abstract class Security: Octet.Producer {
     public override fun <E> exportBytes(dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Byte>) {
         if(length <= 0) return
 
-        check(checkExportConditions(length)) { "Export conditions not met" }
+        check(checkExportConditions(length.toLong() * TypeSize.byteBits)) { "Export conditions not met" }
         var pos = 0
         repeat(length.ceilDiv(TypeSize.intSize)) {
             val bytes = min(TypeSize.intSize, length - pos)

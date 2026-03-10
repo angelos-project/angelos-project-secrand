@@ -39,7 +39,7 @@ public object SecureEntropy : Security() {
         Reseeder(sponge).reseed(JitterEntropy)
     }
 
-    override fun checkExportConditions(length: Int): Boolean {
+    override fun checkExportConditions(bitsNeeded: Long): Boolean {
         reseed()
         return true
     }

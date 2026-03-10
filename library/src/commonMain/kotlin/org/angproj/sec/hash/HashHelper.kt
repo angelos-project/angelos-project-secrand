@@ -30,6 +30,10 @@ public class HashHelper(private val sponge: Sponge, position: Int = 0, mode: Has
         SQUEEZING, ABSORBING
     }
 
+    private var _forwards = 0L
+    public val forwards: Long
+        get() = _forwards
+
     private var _position = position
     public val position: Int
         get() = _position
@@ -39,6 +43,7 @@ public class HashHelper(private val sponge: Sponge, position: Int = 0, mode: Has
         get() = _mode
 
     internal fun forward() {
+        _forwards++
         _position++
         if(_position == sponge.visibleSize) {
             _position = 0
@@ -52,6 +57,7 @@ public class HashHelper(private val sponge: Sponge, position: Int = 0, mode: Has
         sponge.reset()
         _mode = mode
         _position = 0
+        _forwards = 0
     }
 
     public fun switchMode(): HashMode = when(_mode) {

@@ -77,8 +77,8 @@ public class GarbageGarbler(entropySource: Octet.Producer = JitterEntropy): Secu
         entropyPos = 0
     }
 
-    override fun checkExportConditions(length: Int): Boolean {
-        if(length <= remainingBytes) {
+    override fun checkExportConditions(bitsNeeded: Long): Boolean {
+        if(bitsNeeded <= remainingBits) {
             return true
         }
         if(checkReseedConditions()) {
@@ -153,6 +153,9 @@ public class GarbageGarbler(entropySource: Octet.Producer = JitterEntropy): Secu
     }
 
     public companion object {
-        private const val THRESHOLD: Long = Int.MAX_VALUE.toLong() / 2L * TypeSize.byteBits
+        /**
+         * 1 Gigabyte in bits.
+         * */
+        private const val THRESHOLD: Long = (1024 * 1024 * 1024L) * TypeSize.byteBits
     }
 }

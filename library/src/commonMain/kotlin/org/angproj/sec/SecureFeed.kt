@@ -44,10 +44,6 @@ public object SecureFeed : Security(), RandomBits {
     override fun checkReseedConditions(): Boolean = true
 
     override fun reseedImpl() {
-        /*SecureEntropy.readLongs(sponge, 0, sponge.visibleSize) { index, value ->
-            sponge.absorb(value, index)
-        }
-        sponge.scramble()*/
         Reseeder(sponge).reseed(SecureEntropy)
     }
 
@@ -68,7 +64,7 @@ public object SecureFeed : Security(), RandomBits {
         }
     }
 
-    override fun checkExportConditions(length: Int): Boolean {
+    override fun checkExportConditions(bitsNeeded: Long): Boolean {
         revitalize()
         return true
     }
@@ -80,12 +76,12 @@ public object SecureFeed : Security(), RandomBits {
     }
 
     /**
-     * Average threshold for reseeding the sponge, which is a half gigabyte.
+     * Average threshold for reseeding the sponge, which is a half gigabyte in bits.
      */
-    public const val AVERAGE_THRESHOLD: Long = Int.MAX_VALUE / 4 * TypeSize.byteBits.toLong()
+    public const val AVERAGE_THRESHOLD: Long = (1024 * 1024 * 1024) / 2L * TypeSize.byteBits
 
     /**
-     * Deviation threshold for reseeding the sponge, which is a quarter gigabyte.
+     * Deviation threshold for reseeding the sponge, which is a quarter gigabyte in bits.
      */
     public const val DEVIATION_THRESHOLD: Long = AVERAGE_THRESHOLD / 2
 }
