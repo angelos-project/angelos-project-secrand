@@ -51,7 +51,7 @@ public object JitterEntropy: Octet.Producer {
         private var count = 0
 
         init {
-            ensure<SecureRandomException>(start.hasPassedNow()) { SecureRandomException("Time source is not tick fast enough") }
+            ensure<SecureRandomException>(start.hasPassedNow()) { SecureRandomException("Time source is not ticking fast enough!!!") }
         }
 
         /**
