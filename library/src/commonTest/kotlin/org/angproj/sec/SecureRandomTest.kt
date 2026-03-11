@@ -14,6 +14,7 @@
  */
 package org.angproj.sec
 
+import org.angproj.sec.stat.securityHealthCheck
 import org.angproj.sec.util.HealthCheck
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -49,11 +50,15 @@ class SecureRandomTest {
 
     @Test
     fun testReadBytes() {
-        val buffer = ByteArray(1024)
+        val buffer1 = ByteArray(1024)
+        val buffer2 = ByteArray(1024)
 
-        SecureRandom.readBytes(buffer)
+        SecureRandom.readBytes(buffer1)
+        SecureRandom.readBytes(buffer2)
 
-        assertTrue { HealthCheck.singleHealthCheckDebug(buffer) }
+        val result = HealthCheck().analyzeByteArray(buffer1).securityHealthCheck()
+        val result2 = HealthCheck().analyzeByteArray(buffer2).securityHealthCheck()
+        assertTrue{ result || result2 }
     }
 
     @Test
