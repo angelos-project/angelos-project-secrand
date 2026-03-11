@@ -18,7 +18,6 @@ import org.angproj.sec.rand.RandomBits
 import org.angproj.sec.stat.checkBitBalance
 import org.angproj.sec.stat.checkHexUniformity
 import org.angproj.sec.stat.checkRunDistribution
-import org.angproj.sec.stat.securityHealthCheck
 import org.angproj.sec.util.HealthCheck
 import org.angproj.sec.util.Octet
 import kotlin.math.E
@@ -102,9 +101,12 @@ class UuidTest {
     fun testUuidHealth() {
         val secRand = Fakes.safeRandomBits()
 
-        val result = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid(secRand)}).securityHealthCheck()
+        /*val result = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid(secRand)}).securityHealthCheck()
         val result2 = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid(secRand)}).securityHealthCheck()
-        assertTrue{ result || result2 }
+        assertTrue{ result || result2 }*/
+        assertTrue{
+            HealthCheck.doubleHealthCheckDebug { analyzeByteArray(uuid4Sample{ Uuid(secRand)}) }
+        }
     }
 
     @Test

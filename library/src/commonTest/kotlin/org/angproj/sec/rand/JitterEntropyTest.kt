@@ -49,16 +49,16 @@ class JitterEntropyTest {
 
     @Test
     fun testInternalRandomBits() {
-        assertTrue{ HealthCheck.doubleHealthCheckWithSample{ debug -> analyzeBits(JitterEntropy.JitterEntropyState(), debug) } }
+        assertTrue{ HealthCheck.doubleHealthCheckDebug{ debug -> analyzeBits(JitterEntropy.JitterEntropyState(), debug) } }
     }
 
     @Test
     fun testExportBytes() {
-        assertTrue{ HealthCheck.doubleHealthCheckWithSample{ debug -> analyzeBytes(JitterEntropy::exportBytes, debug) } }
+        assertTrue{ HealthCheck.doubleHealthCheckDebug{ debug -> analyzeBytes(JitterEntropy::exportBytes, debug) } }
     }
 
     @Test
     fun testExportLongs() {
-        assertTrue{ HealthCheck.doubleHealthCheckWithSample{ debug -> analyzeLongs(JitterEntropy::exportLongs, debug) } }
+        assertTrue{ HealthCheck.doubleHealthCheckDebug{ debug -> analyzeLongs(JitterEntropy::exportLongs, debug) } }
     }
 }

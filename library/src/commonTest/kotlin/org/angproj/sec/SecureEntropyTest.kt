@@ -24,7 +24,7 @@ class SecureEntropyTest {
     @Test
     fun testSecurityHealth() {
         assertTrue{
-            HealthCheck.doubleHealthCheckWithSample { debug ->
+            HealthCheck.doubleHealthCheckDebug { debug ->
                 analyzeSecurity(SecureEntropy, debug)
             }
         }

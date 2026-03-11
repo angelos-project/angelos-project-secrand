@@ -40,7 +40,7 @@ class AbstractSecurityTest {
         try {
             val sec = Fakes.safeSecRand()
 
-            sec.exportLongs(longArrayOf(), 0, 0) { index, value ->}
+            sec.exportLongs(longArrayOf(), 0, 0) { _, _ ->}
         } catch (e: Exception) {
             println(e)
             assertFalse(true)
@@ -52,7 +52,7 @@ class AbstractSecurityTest {
         try {
             val sec = Fakes.safeSecRand()
 
-            sec.exportBytes(byteArrayOf(), 0, 0) { index, value ->}
+            sec.exportBytes(byteArrayOf(), 0, 0) { _, _ ->}
         } catch (e: Exception) {
             println(e)
             assertFalse(true)
