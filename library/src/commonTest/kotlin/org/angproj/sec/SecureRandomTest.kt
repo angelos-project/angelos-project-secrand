@@ -25,51 +25,35 @@ class SecureRandomTest {
 
     @Test
     fun testReadByteRange() {
-        try {
-            repeat(loops) {
-                val value = SecureRandom.readByte()
-                assertTrue(value in Byte.MIN_VALUE..Byte.MAX_VALUE)
-            }
-        } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeBits({ SecureRandom.readInt() }, debug) }
+        repeat(loops) {
+            val value = SecureRandom.readByte()
+            assertTrue(value in Byte.MIN_VALUE..Byte.MAX_VALUE)
         }
     }
 
     @Test
     fun testReadShortRange() {
-        try {
-            repeat(loops) {
-                val value = SecureRandom.readShort()
-                assertTrue(value in Short.MIN_VALUE..Short.MAX_VALUE)
-            }
-        } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeBits({ SecureRandom.readInt() }, debug) }
+        repeat(loops) {
+            val value = SecureRandom.readShort()
+            assertTrue(value in Short.MIN_VALUE..Short.MAX_VALUE)
         }
     }
 
     @Test
     fun testReadIntRange() {
-        try {
-            repeat(loops) {
-                val value = SecureRandom.readInt()
-                assertTrue(value in Int.MIN_VALUE..Int.MAX_VALUE)
-            }
-        } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeBits({ SecureRandom.readInt() }, debug) }
+        repeat(loops) {
+            val value = SecureRandom.readInt()
+            assertTrue(value in Int.MIN_VALUE..Int.MAX_VALUE)
         }
     }
 
     @Test
     fun testReadBytes() {
-        try {
-            val buffer = ByteArray(1024)
+        val buffer = ByteArray(1024)
 
-            SecureRandom.readBytes(buffer)
+        SecureRandom.readBytes(buffer)
 
-            assertTrue { HealthCheck.healthCheck { analyzeByteArray(buffer) } }
-        } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeBits({ SecureRandom.readInt() }, debug) }
-        }
+        assertTrue { HealthCheck.healthCheck { analyzeByteArray(buffer) } }
     }
 
     @Test

@@ -15,6 +15,7 @@
 package org.angproj.sec.util
 
 import org.angproj.sec.SecureRandom
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -23,8 +24,8 @@ class FloorModTest {
     @Test
     fun testFloorMod() {
         repeat(10) {
-            val dividend = SecureRandom.readInt()
-            val divisor = SecureRandom.readInt()
+            val dividend = Random.nextInt()
+            val divisor = Random.nextInt()
 
             //println("assertEquals(${dividend.floorMod(divisor)}, ${dividend}.floorMod(${divisor}))")
 
@@ -39,8 +40,8 @@ class FloorModTest {
     @Test
     fun testFloorModLong() {
         repeat(10) {
-            val dividend = SecureRandom.readLong()
-            val divisor = SecureRandom.readLong()
+            val dividend = Random.nextLong()
+            val divisor = Random.nextLong()
 
             //println("assertEquals(${dividend.floorMod(divisor)}, ${dividend}.floorMod(${divisor}))")
 

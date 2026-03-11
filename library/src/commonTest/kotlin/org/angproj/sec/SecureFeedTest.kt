@@ -28,8 +28,6 @@ class SecureFeedTest {
     fun testNextBits() {
         try {
             SecureFeed.nextBits(21).countLeadingZeroBits()
-        } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeSecurity( SecureFeed , debug) }
         } catch (_: Exception) {
             assertFalse(true)
         }
@@ -37,15 +35,11 @@ class SecureFeedTest {
 
     @Test
     fun testNextBitsToMuch() {
-        try {
-            assertFailsWith<IllegalArgumentException>{
-                SecureFeed.nextBits(33)
-            }
-            assertFailsWith<IllegalArgumentException>{
-                SecureFeed.nextBits(-1)
-            }
-        } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckWithSample { debug -> analyzeSecurity( SecureFeed , debug) }
+        assertFailsWith<IllegalArgumentException>{
+            SecureFeed.nextBits(33)
+        }
+        assertFailsWith<IllegalArgumentException>{
+            SecureFeed.nextBits(-1)
         }
     }
 

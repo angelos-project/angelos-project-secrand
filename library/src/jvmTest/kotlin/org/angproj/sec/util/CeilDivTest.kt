@@ -14,7 +14,7 @@
  */
 package org.angproj.sec.util
 
-import org.angproj.sec.SecureRandom
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -29,8 +29,8 @@ class CeilDivTest {
     @Test
     fun testCeilDiv() {
         repeat(10) {
-            val dividend = SecureRandom.readInt()
-            val divisor = SecureRandom.readShort().toInt()
+            val dividend = Random.nextInt()
+            val divisor = Random.nextInt().toShort().toInt()
 
             //println("assertEquals(${dividend.ceilDiv(divisor)}, ${dividend}.ceilDiv(${divisor}))")
 
@@ -46,8 +46,8 @@ class CeilDivTest {
     @Test
     fun testCeilDivLong() {
         repeat(10) {
-            val dividend = SecureRandom.readLong()
-            val divisor = SecureRandom.readShort().toLong()
+            val dividend = Random.nextLong()
+            val divisor = Random.nextInt().toShort().toLong()
 
             //println("assertEquals(${dividend.ceilDiv(divisor)}, ${dividend}.ceilDiv(${divisor}))")
 

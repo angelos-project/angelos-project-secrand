@@ -14,48 +14,36 @@
  */
 package org.angproj.sec.util
 
-import org.angproj.sec.SecureFeed
-import org.angproj.sec.SecureRandomException
-import org.angproj.sec.rand.JitterEntropy
 import kotlin.test.Test
 import kotlin.test.assertTrue
+import kotlin.test.assertFalse
 
 class SecurelyRandomizeTest {
 
     @Test
     fun testSecurelyRandomizeByteArray() {
-        try {
-            val buffer = ByteArray(1024)
+        val buffer = ByteArray(1024)
 
-            buffer.securelyRandomize()
+        buffer.securelyRandomize()
 
-            assertTrue(HealthCheck.healthCheckWithSample { _ -> analyzeByteArray(buffer) })
-        } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckWithSample { sample -> analyzeSecurity(SecureFeed, sample) }
-        }
+        assertTrue(HealthCheck.doubleHealthCheckWithSample { _ -> analyzeByteArray(buffer) })
     }
 
     @Test
     fun testSecurelyEntropizeByteArray() {
-        try {
-            val buffer = ByteArray(1024)
+        val buffer = ByteArray(1024)
 
-            buffer.securelyEntropize()
+        buffer.securelyEntropize()
 
-            assertTrue(HealthCheck.healthCheckWithSample { _ -> analyzeByteArray(buffer) })
-        } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckWithSample { sample -> analyzeLongs(JitterEntropy::exportLongs, sample) }
-        }
+        assertTrue(HealthCheck.doubleHealthCheckWithSample { _ -> analyzeByteArray(buffer) })
     }
 
     @Test
     fun testSecurelyEntropizeZeroSize() {
         try {
             ByteArray(0).securelyEntropize()
-        } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckWithSample { sample -> analyzeLongs(JitterEntropy::exportLongs, sample) }
         } catch (_: Exception) {
-            assertTrue(false)
+            assertFalse(true)
         }
     }
 
@@ -63,10 +51,8 @@ class SecurelyRandomizeTest {
     fun testSecurelyRandomizeZeroSize() {
         try {
             ByteArray(0).securelyRandomize()
-        } catch (_: SecureRandomException) {
-            HealthCheck.doubleHealthCheckWithSample { sample -> analyzeSecurity(SecureFeed, sample) }
         } catch (_: Exception) {
-            assertTrue(false)
+            assertFalse(true)
         }
     }
 }
