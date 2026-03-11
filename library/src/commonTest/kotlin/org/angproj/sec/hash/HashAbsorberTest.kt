@@ -40,4 +40,14 @@ class HashAbsorberTest {
         assertEquals(hashHelper.forwards, 1)
         assertEquals(hashHelper.position, 1)
     }
+
+    @Test
+    fun testAbsorbOf() {
+        val sponge = Stubs.stubSucceedSqueezeSponge()
+        val absorber = sponge.absorberOf { 1L }
+
+        val position = absorber()
+
+        assertEquals(position, 1)
+    }
 }

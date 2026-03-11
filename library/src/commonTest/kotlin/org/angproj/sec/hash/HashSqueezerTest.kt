@@ -40,4 +40,14 @@ class HashSqueezerTest {
         assertEquals(hashHelper.forwards, 1)
         assertEquals(hashHelper.position, 1)
     }
+
+    @Test
+    fun testSqueezeOf() {
+        val sponge = Stubs.stubSucceedSqueezeSponge()
+        val squeezer = sponge.squeezerOf()
+
+        val out: Long = squeezer()
+
+        assertEquals(out, 1633779978952490085)
+    }
 }
