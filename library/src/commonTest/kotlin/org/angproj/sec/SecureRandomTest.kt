@@ -53,7 +53,7 @@ class SecureRandomTest {
 
         SecureRandom.readBytes(buffer)
 
-        assertTrue { HealthCheck.doubleHealthCheckDebug { analyzeByteArray(buffer) } }
+        assertTrue { HealthCheck.singleHealthCheckDebug(buffer) }
     }
 
     @Test

@@ -14,12 +14,7 @@
  */
 package org.angproj.sec.util
 
-import org.angproj.sec.Fakes
-import org.angproj.sec.SecureRandomException
-import org.angproj.sec.Stubs
-import org.angproj.sec.rand.Reseeder
 import kotlin.test.Test
-import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse
 
@@ -31,7 +26,7 @@ class SecurelyRandomizeTest {
 
         buffer.securelyRandomize()
 
-        assertTrue(HealthCheck.doubleHealthCheckDebug { analyzeByteArray(buffer) })
+        assertTrue(HealthCheck.singleHealthCheckDebug(buffer))
     }
 
     @Test
@@ -40,7 +35,7 @@ class SecurelyRandomizeTest {
 
         buffer.securelyEntropize()
 
-        assertTrue(HealthCheck.doubleHealthCheckDebug { analyzeByteArray(buffer) })
+        assertTrue(HealthCheck.singleHealthCheckDebug(buffer))
     }
 
     @Test
