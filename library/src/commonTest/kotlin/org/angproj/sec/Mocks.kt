@@ -49,44 +49,4 @@ object Mocks {
         override fun byteSizeImpl(): Int = sampleByteSize
         override fun nextSample(): ByteArray = allocSampleArray().apply { article.nextBytes(this) }
     }
-
-    fun mockSponge(sponge: Sponge): Sponge = object: Sponge {
-        var resetMockCount: Int = 0
-        var roundMockCount: Int = 0
-        var absorbMockCount: Int = 0
-        var squeezeMockCount: Int = 0
-
-        private val inner = sponge
-        override val spongeSize: Int
-            get() = inner.spongeSize
-        override val visibleSize: Int
-            get() = inner.visibleSize
-        override val byteSize: Int
-            get() = inner.byteSize
-        override val bitSize: Int
-            get() = inner.bitSize
-
-        override fun reset() { inner.reset().also { resetMockCount++ } }
-        override fun round() { inner.round().also { roundMockCount++ } }
-        override fun absorb(value: Long, position: Int) { inner.absorb(value, position).also { absorbMockCount++ } }
-        override fun squeeze(position: Int): Long { return inner.squeeze(position).also { squeezeMockCount++ }}
-    }
-
-    fun mockAbstractRandom(sponge: Sponge): AbstractRandom<Sponge> = object: AbstractRandom<Sponge>(sponge, sponge.visibleSize){
-        var exportSizeMockCount: Int = 0
-        var posProgressionMockCount: Int = 0
-        var invalidateStateMockCount: Int = 0
-        var digestMockCount: Int = 0
-        var whenSatisfiedMockCount: Int = 0
-        var reseedSecurityMockCount: Int = 0
-
-        override fun exportSize(): Int { return 1024 / TypeSize.longSize.also { exportSizeMockCount++ } }
-        override fun posProgress(pos: Int): Int {return 1.also { posProgressionMockCount++ }}
-        override fun invalidateState() { obj.reset().also { invalidateStateMockCount++ } }
-        override fun digest(value: Long, pos: Int, len: Int, writeOctet: WriteOctet<Sponge, Byte>) {
-            obj.absorb(value, pos).also { digestMockCount++ } }
-        override fun whenSatisfied() { obj.scramble().also { whenSatisfiedMockCount++ } }
-        public fun fillup(entropySource: AbstractSecurity) {
-            (innerFill(entropySource::exportLongs) { _, _ -> }).also { reseedSecurityMockCount++ } }
-    }
 }

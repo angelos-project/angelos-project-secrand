@@ -22,7 +22,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-public abstract class SecurelyRandomize<E>(obj: E, size: Int) : AbstractRandom<E>(obj, size) {
+public abstract class SecurelyRandomize<E>(obj: E, size: Int) : AbstractRandom<E, Byte>(obj, size) {
 
     override fun exportSize(): Int = max(1024 / TypeSize.longSize, size.ceilDiv(8))
 

@@ -19,7 +19,7 @@ import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.WriteOctet
 
 
-public class Reseeder(sponge: Sponge) : AbstractRandom<Sponge>(sponge, sponge.visibleSize){
+public class Reseeder(sponge: Sponge) : AbstractRandom<Sponge, Long>(sponge, sponge.visibleSize){
 
     override fun exportSize(): Int = 1024 / TypeSize.longSize
 
@@ -31,9 +31,9 @@ public class Reseeder(sponge: Sponge) : AbstractRandom<Sponge>(sponge, sponge.vi
         value: Long,
         pos: Int,
         len: Int,
-        writeOctet: WriteOctet<Sponge, Byte>
+        writeOctet: WriteOctet<Sponge, Long>
     ) {
-        obj.absorb(value, pos)
+        obj.writeOctet(pos, value)
     }
 
     override fun whenSatisfied() {
@@ -41,6 +41,6 @@ public class Reseeder(sponge: Sponge) : AbstractRandom<Sponge>(sponge, sponge.vi
     }
 
     public fun reseed(entropySource: Octet.Producer) {
-        innerFill(entropySource::exportLongs) { _, _ -> }
+        innerFill(entropySource::exportLongs) { index, value -> this.absorb(value, index)}
     }
 }

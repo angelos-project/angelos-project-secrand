@@ -24,7 +24,7 @@ import org.angproj.sec.util.WriteOctet
 import org.angproj.sec.util.ensure
 
 
-public abstract class AbstractRandom<E>(
+public abstract class AbstractRandom<E, T>(
     protected val obj: E,
     protected val size: Int
 ): BitStatisticCollector() {
@@ -37,11 +37,11 @@ public abstract class AbstractRandom<E>(
 
     protected abstract fun invalidateState()
 
-    protected abstract fun digest(value: Long, pos: Int, len: Int, writeOctet: WriteOctet<E, Byte>)
+    protected abstract fun digest(value: Long, pos: Int, len: Int, writeOctet: WriteOctet<E, T>)
 
     protected abstract fun whenSatisfied()
 
-    protected fun innerFill(exporter: Octet.ExportLongs<E>, writeOctet: WriteOctet<E, Byte>) {
+    protected fun innerFill(exporter: Octet.ExportLongs<E>, writeOctet: WriteOctet<E, T>) {
         require(size in 0..(32 * 1024)) { "Array size must be between 0 and 32768 bytes." }
         if(size == 0) return
 
