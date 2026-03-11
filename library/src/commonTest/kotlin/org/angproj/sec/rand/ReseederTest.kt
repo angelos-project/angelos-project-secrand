@@ -15,9 +15,31 @@
 package org.angproj.sec.rand
 
 import org.angproj.sec.Fakes
+import org.angproj.sec.SecureRandomException
+import org.angproj.sec.Stubs
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 
 class ReseederTest {
+
+    @Test
+    fun testFailedReseeder() {
+        assertFailsWith<SecureRandomException> {
+            val reseeder = Reseeder(Stubs.stubSucceedSqueezeSponge())
+            reseeder.reseed(Fakes.unsafeSecRand())
+        }
+    }
+
+    @Test
+    fun testSucceedingReseeder() {
+        try {
+            val reseeder = Reseeder(Stubs.stubSucceedSqueezeSponge())
+            reseeder.reseed(Fakes.safeSecRand())
+        } catch (e: SecureRandomException) {
+            assertFalse(true)
+        }
+    }
 
     @Test
     fun testReseedSecurity256() {

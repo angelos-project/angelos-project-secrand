@@ -31,7 +31,6 @@ class HealthCheckTest {
         val squeezer =  Stubs.stubFailSqueezeSponge().squeezerOf()
         val bits = RandomBits { RandomBits.compactBitEntropy(TypeSize.intBits, squeezer()) }
 
-        //val result = HealthCheck.healthCheckWithSample { debug -> analyzeBits(bits, debug) }
         val result = HealthCheck().analyzeBits(bits).securityHealthCheck()
 
         assertFalse(result)
@@ -42,7 +41,6 @@ class HealthCheckTest {
         val squeezer =  Stubs.stubSucceedSqueezeSponge().squeezerOf()
         val bits = RandomBits { RandomBits.compactBitEntropy(TypeSize.intBits, squeezer()) }
 
-        //val result = HealthCheck.healthCheckWithSample { debug -> analyzeBits(bits, debug) }
         val result = HealthCheck().analyzeBits(bits).securityHealthCheck()
 
         assertTrue(result)
@@ -52,9 +50,7 @@ class HealthCheckTest {
     fun testAnalyzeSpongeFail() {
         val sponge = Stubs.stubFailSqueezeSponge()
 
-        //val result = HealthCheck.healthCheckWithSample { debug -> analyzeSponge(sponge, debug) }
         val result = HealthCheck().analyzeSponge(sponge).securityHealthCheck()
-
 
         assertFalse(result)
     }
@@ -63,7 +59,6 @@ class HealthCheckTest {
     fun testAnalyzeSpongeSucceed() {
         val sponge = Stubs.stubSucceedSqueezeSponge()
 
-        //val result = HealthCheck.healthCheckWithSample { debug -> analyzeSponge(sponge, debug) }
         val result = HealthCheck().analyzeSponge(sponge).securityHealthCheck()
 
         assertTrue(result)
@@ -77,7 +72,6 @@ class HealthCheckTest {
             override fun hasNext(): Boolean = true
         }
 
-        //val result = HealthCheck.healthCheckWithSample { debug -> analyzeIter(iter, debug) }
         val result = HealthCheck().analyzeIter(iter).securityHealthCheck()
 
         assertFalse(result)
@@ -91,8 +85,25 @@ class HealthCheckTest {
             override fun hasNext(): Boolean = true
         }
 
-        //val result = HealthCheck.healthCheckWithSample { debug -> analyzeIter(iter, debug) }
         val result = HealthCheck().analyzeIter(iter).securityHealthCheck()
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun testAnalyzeSecurityFail() {
+        val security = Fakes.unsafeSecRand()
+
+        val result = HealthCheck().analyzeSecurity(security).securityHealthCheck()
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun testAnalyzeSecuritySucceed() {
+        val security = Fakes.safeSecRand()
+
+        val result = HealthCheck().analyzeSecurity(security).securityHealthCheck()
 
         assertTrue(result)
     }
@@ -101,7 +112,6 @@ class HealthCheckTest {
     fun testAnalyzeByteArrayFail() {
         val sample = Sampler.failedSample()
 
-        //val result = HealthCheck.healthCheckWithSample { _ -> analyzeByteArray(sample) }
         val result = HealthCheck().analyzeByteArray(sample).securityHealthCheck()
 
         assertFalse(result)
@@ -111,7 +121,6 @@ class HealthCheckTest {
     fun testAnalyzeByteArraySucceed() {
         val sample = Sampler.healthySample()
 
-        //val result = HealthCheck.healthCheckWithSample { _ -> analyzeByteArray(sample) }
         val result = HealthCheck().analyzeByteArray(sample).securityHealthCheck()
 
         assertTrue(result)
@@ -121,7 +130,6 @@ class HealthCheckTest {
     fun testAnalyzeLongsFail() {
         val exporter = Fakes.unsafeSecRand()
 
-        //val result = HealthCheck.healthCheckWithSample { debug -> analyzeLongs(exporter::readLongs, debug) }
         val result = HealthCheck().analyzeLongs(exporter::exportLongs).securityHealthCheck()
 
         assertFalse(result)
@@ -131,7 +139,6 @@ class HealthCheckTest {
     fun testAnalyzeLongsSucceed() {
         val exporter = Fakes.safeSecRand()
 
-        //val result = HealthCheck.healthCheckWithSample { debug -> analyzeLongs(exporter::readLongs, debug) }
         val result = HealthCheck().analyzeLongs(exporter::exportLongs).securityHealthCheck()
 
         assertTrue(result)
@@ -141,7 +148,6 @@ class HealthCheckTest {
     fun testAnalyzeBytesFail() {
         val exporter = Fakes.unsafeSecRand()
 
-        //val result = HealthCheck.healthCheckWithSample { debug -> analyzeBytes(exporter::readBytes, debug) }
         val result = HealthCheck().analyzeBytes(exporter::exportBytes).securityHealthCheck()
 
         assertFalse(result)
@@ -151,7 +157,6 @@ class HealthCheckTest {
     fun testAnalyzeBytesSucceed() {
         val exporter = Fakes.safeSecRand()
 
-        //val result = HealthCheck.healthCheckWithSample { debug -> analyzeBytes(exporter::readBytes, debug) }
         val result = HealthCheck().analyzeBytes(exporter::exportBytes).securityHealthCheck()
 
         assertTrue(result)
@@ -171,7 +176,6 @@ class HealthCheckTest {
         val exporter = Fakes.safeSecRand()
         val sample = ByteArray(1024)
 
-        // A sample from a random generator can be taken for closer lookup
         val result = HealthCheck.doubleHealthCheckWithSample { _ -> analyzeLongs(exporter::exportLongs, sample) }
 
         assertTrue(result)
