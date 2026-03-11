@@ -31,7 +31,7 @@ class SecurelyRandomizeTest {
 
         buffer.securelyRandomize()
 
-        assertTrue(HealthCheck.doubleHealthCheckWithSample { _ -> analyzeByteArray(buffer) })
+        assertTrue(HealthCheck.doubleHealthCheckDebug { analyzeByteArray(buffer) })
     }
 
     @Test
@@ -40,7 +40,7 @@ class SecurelyRandomizeTest {
 
         buffer.securelyEntropize()
 
-        assertTrue(HealthCheck.doubleHealthCheckWithSample { _ -> analyzeByteArray(buffer) })
+        assertTrue(HealthCheck.doubleHealthCheckDebug { analyzeByteArray(buffer) })
     }
 
     @Test
