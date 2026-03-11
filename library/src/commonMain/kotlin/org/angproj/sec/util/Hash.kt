@@ -14,24 +14,10 @@
  */
 package org.angproj.sec.util
 
+import org.angproj.sec.hash.HashHelper
 import org.angproj.sec.rand.Sponge
 import org.angproj.sec.util.Octet.importBytes
 
-public class HashAbsorber(private val sponge: Sponge) {
-
-    private var _position = 0
-
-    public val position: Int
-        get() = _position
-
-    public fun absorb(value: Long) {
-        sponge.absorb(value, _position++)
-        if(_position == sponge.visibleSize) {
-            _position = 0
-            sponge.round()
-        }
-    }
-}
 
 /**
  * Abstract base class for hash functions using a sponge construction.
@@ -45,10 +31,10 @@ public class HashAbsorber(private val sponge: Sponge) {
  * @param E The type of sponge used in the hash function, must implement the Sponge interface.
  * @property sponge The sponge instance used for hashing.
  */
-public abstract class Hash<E: Sponge>(sponge: E) {
+public abstract class Hash(private val sponge: Sponge) {
 
+    private val hashHelper = HashHelper(sponge)
     private var state = RunState.INITIALIZE
-    private val sponge: E = sponge
     private var remainder: ByteArray = byteArrayOf()
     private var offset = 0
 
@@ -75,15 +61,13 @@ public abstract class Hash<E: Sponge>(sponge: E) {
     private fun runUpdate(input: ByteArray) {
         val data = remainder + input
         val loops = (data.size - data.size.mod(TypeSize.longSize)).div(TypeSize.longSize)
+        val absorber = hashHelper.absorber
         repeat(loops){
             val value = Octet.readNet(data, it * TypeSize.longSize, TypeSize.longSize) { index ->
                 data[index]
             }
-            sponge.absorb(value, offset++ % sponge.visibleSize)
-            if(offset == sponge.visibleSize) {
-                offset = 0
-                sponge.round()
-            }
+            absorber.absorb(value)
+            offset = hashHelper.position
         }
         remainder = data.copyOfRange(data.size - (data.size.mod(TypeSize.longSize)), data.size)
     }
@@ -93,10 +77,7 @@ public abstract class Hash<E: Sponge>(sponge: E) {
             runUpdate(ByteArray(TypeSize.longSize - remainder.size.mod(TypeSize.longSize)))
             check(remainder.isEmpty()) { "Remainder must be empty, still " + remainder.size + " bytes left" }
         }
-        if(offset != 0) {
-            sponge.round()
-        }
-        sponge.scramble()
+        hashHelper.switchMode()
     }
 
     /**
@@ -114,9 +95,10 @@ public abstract class Hash<E: Sponge>(sponge: E) {
             runFinalize()
         }
 
+        val squeezer = hashHelper.squeezer
         repeat(sponge.visibleSize) {
             Octet.writeNet(
-                sponge.squeeze(it),
+                squeezer.squeeze(),
                 dst,
                 offset + it * TypeSize.longSize,
                 TypeSize.longSize,

@@ -15,8 +15,11 @@
 package org.angproj.sec
 
 import org.angproj.sec.rand.RandomBits
-import org.angproj.sec.stat.bitStatisticOf
+import org.angproj.sec.stat.checkBitBalance
+import org.angproj.sec.stat.checkHexUniformity
+import org.angproj.sec.stat.checkRunDistribution
 import org.angproj.sec.stat.securityHealthCheck
+import org.angproj.sec.util.HealthCheck
 import org.angproj.sec.util.Octet
 import kotlin.math.E
 import kotlin.math.PI
@@ -39,20 +42,16 @@ class UuidTest {
 
     @Test
     fun testUuid() {
-        repeat(10) {
-            val uuid = Uuid.uuid()
-            assertNotEquals(0, uuid.lower)
-            assertNotEquals(0, uuid.upper)
-        }
+        val uuid = Uuid.uuid()
+        assertNotEquals(0, uuid.lower)
+        assertNotEquals(0, uuid.upper)
     }
 
     @Test
     fun testUuid4() {
-        repeat(10) {
-            val uuid = Uuid.uuid4()
-            assertEquals(4, uuid.version)
-            assertEquals(2, uuid.variant)
-        }
+        val uuid = Uuid.uuid4()
+        assertEquals(4, uuid.version)
+        assertEquals(2, uuid.variant)
     }
 
     @Test
@@ -85,7 +84,7 @@ class UuidTest {
         assertEquals("11223344-5566-7788-1122-334455667788",Uuid(error, error).toString())
     }
 
-    fun uuid4Sample(uuid:() -> Uuid): ByteArray {
+    fun uuid4Sample(uuid: () -> Uuid): ByteArray {
         val sample = ByteArray(1024)
         repeat(64) {
             val uuidSample = uuid()
@@ -101,15 +100,22 @@ class UuidTest {
 
     @Test
     fun testUuidHealth() {
-        val result = bitStatisticOf(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
-        val result2 = bitStatisticOf(uuid4Sample{ Uuid.uuid()}).securityHealthCheck()
+        val secRand = Fakes.safeRandomBits()
+
+        val result = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid(secRand)}).securityHealthCheck()
+        val result2 = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid(secRand)}).securityHealthCheck()
         assertTrue{ result || result2 }
     }
 
     @Test
     fun testUuid4Health() {
-        val result = bitStatisticOf(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
-        val result2 = bitStatisticOf(uuid4Sample{ Uuid.uuid4()}).securityHealthCheck()
-        assertTrue{ result || result2 }
+        // Chi Square is not used here due to the UUIDv4 enforced 4 which faults secure crypto
+        val snapshot1 = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid.uuid4()})
+        val snapshot2 = HealthCheck().analyzeByteArray(uuid4Sample{ Uuid.uuid4()})
+
+        assertTrue {
+            (snapshot1.checkRunDistribution() && snapshot1.checkBitBalance() && snapshot1.checkHexUniformity()) ||
+            (snapshot2.checkRunDistribution() && snapshot2.checkBitBalance() && snapshot2.checkHexUniformity())
+        }
     }
 }

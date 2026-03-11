@@ -14,62 +14,26 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.stat.bitStatisticOf
-import org.angproj.sec.stat.securityHealthCheck
+import org.angproj.sec.util.HealthCheck
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class SecureEntropyTest {
 
     @Test
-    fun testExportBytesLengthAndRandomness() {
-        val size = 34
-        val buffer1 = ByteArray(size)
-        val buffer2 = ByteArray(size)
-
-        SecureEntropy.readBytes(buffer1, 0, size) { idx, value -> this[idx] = value }
-        SecureEntropy.readBytes(buffer2, 0, size) { idx, value -> this[idx] = value }
-
-        assertEquals(size, buffer1.size)
-        assertEquals(size, buffer2.size)
-        // With high probability, two random arrays should not be equal
-        assertNotEquals(buffer1.toList(), buffer2.toList())
-    }
-
-    @Test
-    fun testExportLongsLengthAndRandomness() {
-        val size = 10
-        val buffer1 = LongArray(size)
-        val buffer2 = LongArray(size)
-
-        SecureEntropy.readLongs(buffer1, 0, size) { idx, value -> this[idx] = value }
-        SecureEntropy.readLongs(buffer2, 0, size) { idx, value -> this[idx] = value }
-
-        assertEquals(size, buffer1.size)
-        assertEquals(size, buffer2.size)
-        // With high probability, two random arrays should not be equal
-        assertNotEquals(buffer1.toList(), buffer2.toList())
-    }
-
-    @Test
-    fun testTotalBits() {
-        SecureEntropy.readLongs(LongArray(2), 0, 2) { idx, value -> this[idx] = value }
-        assertNotEquals(0, SecureEntropy.totalBits)
-    }
-
-    @Test
     fun testSecurityHealth() {
-        val result = ByteArray(1024).let {
-            SecureEntropy.readBytes(it, 0, it.size) { idx, value -> this[idx] = value }
-            bitStatisticOf(it).securityHealthCheck()
+        assertTrue{
+            HealthCheck.doubleHealthCheckWithSample { debug ->
+                analyzeSecurity(SecureEntropy, debug)
+            }
         }
-        val result2 = ByteArray(1024).let {
-            SecureEntropy.readBytes(it, 0, it.size) { idx, value -> this[idx] = value }
-            bitStatisticOf(it).securityHealthCheck()
-        }
+    }
 
-        assertTrue{ result || result2 }
+    @Test
+    fun testHealthCheck() {
+        val result = SecureEntropy.checkSecurityHealth(1)
+
+        assertEquals(result.size, 3)
     }
 }

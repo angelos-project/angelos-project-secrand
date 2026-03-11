@@ -16,19 +16,23 @@ package org.angproj.sec.rand
 
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
+import kotlin.test.assertEquals
 
-
-class MockSponge : AbstractSponge(4, 5) {
-    override fun round() {
+class AbstractSpongeTest {
+    @Test
+    fun testInitializeWrongVisibleSize() {
+        assertFailsWith<IllegalArgumentException> {
+            object : AbstractSponge(1, 2) {
+                override fun round() {  /* Empty */ }
+            }
+        }
     }
-}
-
-open class AbstractSpongeTest {
 
     @Test
-    fun testSpongeInit() {
-        assertFailsWith<IllegalArgumentException> {
-            MockSponge()
+    fun testPrivateAccessToPrimes() {
+        val sponge = object : AbstractSponge(2, 1) {
+            override fun round() { assertEquals(export.size, 16) }
         }
+        sponge.round()
     }
 }

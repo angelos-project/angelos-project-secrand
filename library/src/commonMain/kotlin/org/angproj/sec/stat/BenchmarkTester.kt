@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.stat
 
+import kotlin.math.min
 import kotlin.time.Duration
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
@@ -23,20 +24,37 @@ import kotlin.time.TimeSource
  *
  * @param B The type of the object being benchmarked.
  * @param E The type of the BenchmarkObject wrapper.
- * @property samples The number of samples to collect during benchmarking.
- * @property obj The benchmark object instance, created by the provided config function.
+ * @property samplesAsked The number of samples to collect during benchmarking.
+ * @property benchmarkArticle The benchmark object instance, created by the provided config function.
  *
  * Extend this class to implement specific benchmarking logic.
  * Use the config function to initialize the object to be benchmarked.
  */
-public abstract class BenchmarkTester<B, E: BenchmarkObject<B>>(
-    public val samples: Long,
+public abstract class BenchmarkTester<B, E: BenchmarkArticle<B>>(
+    public val samplesAsked: Long,
     public val atomicSampleByteSize: Int,
-    protected val obj: E
+    protected val benchmarkArticle: E
 ) {
+
+    init {
+        require(samplesAsked > 0) { "At least one sample is asked for" }
+        require(atomicSampleByteSize > 0) { "Atomic size has to be above 0" }
+    }
 
     protected lateinit var startTime: TimeMark
     protected var duration: Duration = Duration.INFINITE
+
+    protected var totalTakenSamples: Long = 0
+    public val samplesTaken: Long
+        get() = totalTakenSamples
+
+    public val neededSampleDataByteSize: Long
+        get() = samplesAsked * atomicSampleByteSize
+
+    public val samplesLeft: Long
+        get() = samplesAsked - samplesTaken
+
+    protected fun maxLoops(sampleSize: Int): Int = min(sampleSize.toLong() / atomicSampleByteSize, samplesLeft).toInt()
 
     /**
      * Starts the benchmark timer.
@@ -52,6 +70,9 @@ public abstract class BenchmarkTester<B, E: BenchmarkObject<B>>(
         duration = startTime.elapsedNow() // Duration in nanoseconds
     }
 
+    /**
+     * Samples should be counted by their atomic size
+     * */
     protected abstract fun calculateSampleImpl(sample: ByteArray)
 
     /**

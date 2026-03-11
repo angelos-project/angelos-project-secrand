@@ -14,13 +14,14 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.Sampler
 import org.angproj.sec.util.Hash
 import org.angproj.sec.util.Octet.asHexSymbols
 import org.angproj.sec.util.hashDigestOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-abstract class SpongeTest<S: Sponge> {
+abstract class SpongeTest {
 
     protected abstract val emptyHash: String
     protected abstract val singleAHash: String
@@ -32,7 +33,7 @@ abstract class SpongeTest<S: Sponge> {
     protected abstract val eightNumHash: String
     protected abstract val millionAHash: String
 
-    protected abstract fun getHashInstance(): Hash<S>
+    protected abstract fun getHashInstance(): Hash
 
     protected fun printDebug(output: String) {
         if(debug) println(output)
@@ -120,7 +121,7 @@ class HashTestGenerator {
         TEST_MILLION_A
     }
 
-    fun<E: Sponge> runTest(name: NamedTest, hash: Hash<E>): String = when(name) {
+    fun runTest(name: NamedTest, hash: Hash): String = when(name) {
         NamedTest.TEST_EMPTY -> emptyTest(hash)
         NamedTest.TEST_A -> singleATest(hash)
         NamedTest.TEST_ABC -> abcTest(hash)
@@ -132,84 +133,39 @@ class HashTestGenerator {
         NamedTest.TEST_MILLION_A -> millionATest(hash)
     }.asHexSymbols()
 
-    private fun<E: Sponge> emptyTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update(byteArrayOf())
+    private fun emptyTest(hash: Hash): ByteArray = hashDigestOf(hash) {
+        update(Sampler.emptySample())
     }
 
-    private fun<E: Sponge> singleATest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update("a".encodeToByteArray())
+    private fun singleATest(hash: Hash): ByteArray = hashDigestOf(hash) {
+        update(Sampler.singleASample())
     }
 
-    private fun<E: Sponge> abcTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update("abc".encodeToByteArray())
+    private fun abcTest(hash: Hash): ByteArray = hashDigestOf(hash) {
+        update(Sampler.abcSample())
     }
 
-    private fun<E: Sponge> mdTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update("message digest".encodeToByteArray())
+    private fun mdTest(hash: Hash): ByteArray = hashDigestOf(hash) {
+        update(Sampler.messageDigestSample())
     }
 
-    private fun<E: Sponge> aToZTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update(aToZGenerator().encodeToByteArray())
+    private fun aToZTest(hash: Hash): ByteArray = hashDigestOf(hash) {
+        update(Sampler.aToZSample())
     }
 
-    private fun<E: Sponge> nopqTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update(nopqGenerator().encodeToByteArray())
+    private fun nopqTest(hash: Hash): ByteArray = hashDigestOf(hash) {
+        update(Sampler.nopqSample())
     }
 
-    private fun<E: Sponge> alphaNumTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        update((aToZGenerator().uppercase() + aToZGenerator() + numGenerator()).encodeToByteArray())
+    private fun alphaNumTest(hash: Hash): ByteArray = hashDigestOf(hash) {
+        update(Sampler.alphaNumSample())
     }
 
-    private fun<E: Sponge> eightNumTest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        val num = numGenerator().encodeToByteArray()
-        repeat(8) {
-            update(num)
-        }
+    private fun eightNumTest(hash: Hash): ByteArray = hashDigestOf(hash) {
+        update(Sampler.eightNumSample())
     }
 
-    private fun<E: Sponge> millionATest(hash: Hash<E>): ByteArray = hashDigestOf(hash) {
-        val num = "a".repeat(100).encodeToByteArray()
-        repeat(10_000) {
-            this.update(num)
-        }
-    }
-
-    public fun numGenerator(): String {
-        val sb = StringBuilder()
-        (48 .. 57).forEach { sb.append(it.toChar()) }
-        return sb.toString()
-    }
-
-    public fun aToZGenerator(): String {
-        val sb = StringBuilder()
-        (97 .. 122).forEach { sb.append(it.toChar()) }
-        return sb.toString()
-    }
-
-    public fun nopqGenerator(): String {
-        val sb = StringBuilder()
-        val alphabet = aToZGenerator()
-        (0 .. (110 - 97)).forEach {
-            sb.append(alphabet.substring(it, it + 4))
-        }
-        return sb.toString()
-    }
-}
-
-class TestGenTest {
-
-    @Test
-    fun testNumGenerator() {
-        assertEquals(HashTestGenerator().numGenerator(), "0123456789")
-    }
-
-    @Test
-    fun testAtoZ2Generator() {
-        assertEquals(HashTestGenerator().aToZGenerator(), "abcdefghijklmnopqrstuvwxyz")
-    }
-
-    @Test
-    fun testNopqGenerator() {
-        assertEquals(HashTestGenerator().nopqGenerator(), "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq")
+    private fun millionATest(hash: Hash): ByteArray = hashDigestOf(hash) {
+        this.update(Sampler.millionASample())
     }
 }

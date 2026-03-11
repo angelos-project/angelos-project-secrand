@@ -17,6 +17,7 @@ package org.angproj.sec.stat
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 import kotlin.math.abs
+import kotlin.math.max
 
 /**
  * Tester for the Avalanche Effect of a cryptographic function.
@@ -32,20 +33,19 @@ import kotlin.math.abs
  * @param B The type of the benchmark result.
  * @param E The type of the benchmark object, which must extend BenchmarkObject<B>.
  * @property samples The number of samples to collect for the test.
- * @property obj The benchmark object that provides the cryptographic function to be tested.
+ * @property benchmarkArticle The benchmark object that provides the cryptographic function to be tested.
  */
-public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
-    samples: Long, obj: E
-) : BenchmarkTester<B, E>(samples, 16, obj) {
+public class AvalancheEffectTester<B, E: BenchmarkArticle<B>>(
+    samples: Long, benchmarkArticle: E
+) : BenchmarkTester<B, E>(samples, max(benchmarkArticle.sampleByteSize, TypeSize.longSize), benchmarkArticle) {
 
-    private var totalTakenSamples: Long = 0
-    private val stats = IntArray(obj.sampleByteSize * TypeSize.byteBits)
+    private val stats = IntArray(benchmarkArticle.sampleByteSize * TypeSize.byteBits)
     private var lastSample: ByteArray = byteArrayOf()
     private var currentSample: ByteArray = byteArrayOf()
 
     private fun accumulateSample() {
         var total = 0
-        repeat(obj.sampleByteSize / TypeSize.longSize) { idx ->
+        repeat(benchmarkArticle.sampleByteSize / TypeSize.longSize) { idx ->
             val offset = idx * TypeSize.longSize
 
             val last = Octet.read(lastSample, offset, TypeSize.longSize) { index ->
@@ -62,23 +62,19 @@ public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
     }
 
     override fun calculateSampleImpl(sample: ByteArray) {
-        if(currentSample.size + sample.size == obj.sampleByteSize) {
-            currentSample += sample
-            if(lastSample.size == obj.sampleByteSize) {
-                accumulateSample()
-            }
-            lastSample = currentSample
-            currentSample = byteArrayOf()
-        } else {
-            currentSample += sample
+        currentSample = sample
+        if(lastSample.size == benchmarkArticle.sampleByteSize) {
+            accumulateSample()
         }
+        lastSample = currentSample
+        currentSample = byteArrayOf()
     }
 
     private fun evaluateSampleData(): Double {
         val sum = stats.sum()
         var total = 0L
         stats.forEachIndexed { index, value -> total += index * value }
-        return total / sum.toDouble() / (obj.sampleByteSize * TypeSize.byteBits)
+        return total / sum.toDouble() / (benchmarkArticle.sampleByteSize * TypeSize.byteBits)
     }
 
     override fun collectStatsImpl(): Statistical {
@@ -86,6 +82,7 @@ public class AvalancheEffectTester<B, E: BenchmarkObject<B>>(
             totalTakenSamples,
             evaluateSampleData(),
             duration,
+            totalTakenSamples * atomicSampleByteSize,
             toString()
         )
     }

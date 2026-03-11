@@ -14,6 +14,7 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.WriteOctet
 import org.angproj.sec.util.ceilDiv
@@ -30,14 +31,14 @@ import kotlin.time.TimeSource
  * trigonometric functions and bitwise operations to enhance randomness.
  *
  * Usage:
- * - Call [readLongs] to fill a data structure with random [Long] values.
- * - Call [readBytes] to fill a data structure with random [Byte] values.
+ * - Call [exportLongs] to fill a data structure with random [Long] values.
+ * - Call [exportBytes] to fill a data structure with random [Byte] values.
  *
  * Limitations:
- * - The maximum length for [readLongs] is 128 (1KB) to prevent excessive computation time.
- * - The maximum length for [readBytes] is 1024 (1KB) for the same reason.
+ * - The maximum length for [exportLongs] is 128 (1KB) to prevent excessive computation time.
+ * - The maximum length for [exportBytes] is 1024 (1KB) for the same reason.
  */
-public object JitterEntropy {
+public object JitterEntropy: Octet.Producer {
 
     /**
      * Internal state for tracking timing measurements and generating jitter-based entropy.
@@ -61,7 +62,7 @@ public object JitterEntropy {
             val recent = start.elapsedNow()
             // Derive entropy from nanosecond and microsecond timing jitter
             val nano: Double = 1.0 / recent.inWholeNanoseconds
-            val micro: Double = 1.0 - ((count++).toDouble() / recent.inWholeMicroseconds)
+            val micro: Double = 1.0 - ((++count).toDouble() / recent.inWholeMicroseconds)
 
             // Apply trigonometric functions to introduce non-linearity
             val nanoBits: Long = sin(nano).toRawBits()
@@ -84,19 +85,19 @@ public object JitterEntropy {
      * Exports true random [Long] values to the provided data structure.
      * Generates up to 128 [Long] values (1024 bytes) to prevent excessive computation.
      *
-     * @param data The target data structure to write to.
+     * @param dst The target data structure to write to.
      * @param offset The starting index in the data structure.
      * @param length The number of [Long] values to generate (max 128).
      * @param writeOctet The function to write a [Long] value at a specific index.
      * @throws IllegalArgumentException If [length] exceeds 128.
      */
-    public fun <E> readLongs(data: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Long>) {
+    public override fun <E> exportLongs(dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Long>) {
         require(length <= 128) { "Too large for time-gated entropy! Max 1Kb." }
 
         val state = JitterEntropyState()
 
         repeat(length) { index ->
-            data.writeOctet(offset + index, RandomBits.nextBitsToLong { state.nextBits(it) })
+            dst.writeOctet(offset + index, RandomBits.nextBitsToLong { state.nextBits(it) })
         }
     }
 
@@ -104,13 +105,13 @@ public object JitterEntropy {
      * Exports true random [Byte] values to the provided data structure.
      * Generates up to 1024 [Byte] values to prevent excessive computation.
      *
-     * @param data The target data structure to write to.
+     * @param dst The target data structure to write to.
      * @param offset The starting index in the data structure.
      * @param length The number of [Byte] values to generate (max 1024).
      * @param writeOctet The function to write a [Byte] value at a specific index.
      * @throws IllegalArgumentException If [length] exceeds 1024.
      */
-    public fun <E> readBytes(data: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Byte>) {
+    public override fun <E> exportBytes(dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Byte>) {
         require(length <= 1024) { "Too large for time-gated entropy! Max 1Kb." }
 
         val state = JitterEntropyState()
@@ -120,7 +121,7 @@ public object JitterEntropy {
             val bytes = min(TypeSize.longSize, length - pos)
             var entropy = RandomBits.nextBitsToLong { state.nextBits(it) }
             repeat(bytes) {
-                data.writeOctet(offset + pos++, entropy.toByte())
+                dst.writeOctet(offset + pos++, entropy.toByte())
                 entropy = entropy ushr TypeSize.byteBits
             }
         }

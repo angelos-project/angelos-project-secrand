@@ -20,9 +20,12 @@ import org.angproj.sec.rand.AbstractSponge2256
 import org.angproj.sec.rand.AbstractSponge2512
 import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.AbstractSponge512
+import org.angproj.sec.rand.JitterEntropy
+import org.angproj.sec.rand.Reseeder
 import org.angproj.sec.rand.Sponge
 import org.angproj.sec.stat.AvalancheEffectTester
-import org.angproj.sec.stat.BenchmarkSession
+import org.angproj.sec.stat.BenchmarkSuiteBuilder
+import org.angproj.sec.stat.ChiSquareTester
 import org.angproj.sec.stat.MonteCarloTester
 import org.angproj.sec.stat.SpongeBenchmark
 import kotlin.jvm.JvmStatic
@@ -31,24 +34,21 @@ import kotlin.math.abs
 
 
 public fun healthCheck(sponge: Sponge): Boolean {
-    val objectSponge = SpongeBenchmark(sponge)
-    val samplesNeeded = MonteCarloTester.Mode.MODE_64_BIT.size * 10_000_000L / objectSponge.sampleByteSize
+    Reseeder(sponge).reseed(JitterEntropy)
 
-    val session = BenchmarkSession(samplesNeeded, objectSponge.sampleByteSize, objectSponge)
-    val monteCarlo = session.registerTester { MonteCarloTester(10_000_000, MonteCarloTester.Mode.MODE_64_BIT, it) }
-    val avalancheEffect = session.registerTester { AvalancheEffectTester(10_000_000, it) }
-
-    session.startRun()
-    repeat(samplesNeeded.toInt()) {
-        session.collectSample()
+    val suite = BenchmarkSuiteBuilder.build {
+        samples { 10_000_000 }
+        article { SpongeBenchmark(sponge) }
+        register { MonteCarloTester(samples, MonteCarloTester.Mode.MODE_64_BIT, article) }
+        register { AvalancheEffectTester(samples, article) }
+        register { ChiSquareTester(samples, article) }
     }
-    session.stopRun()
-    val results = session.finalizeCollecting()
+    suite.runBlocking()
 
-    println(results[monteCarlo]!!.report)
-    println(results[avalancheEffect]!!.report)
-    return !(abs(0.5 - results[avalancheEffect]!!.keyValue) > 0.01 ||
-            abs(PI - results[monteCarlo]!!.keyValue) > 0.01)
+    println(suite)
+    val results = suite.collectResults()
+    return !(abs(0.5 - results["AvalancheEffectTester"]!!.keyValue) > 0.01 ||
+            abs(PI - results["MonteCarloTester"]!!.keyValue) > 0.01)
 }
 
 public object BenchmarkSponges {

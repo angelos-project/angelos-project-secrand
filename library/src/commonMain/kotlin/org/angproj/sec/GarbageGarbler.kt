@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024-2025 by Kristoffer Paulsson <kristoffer.paulsson@talenten.se>.
+ * Copyright (c) 2024-2026 by Kristoffer Paulsson <kristoffer.paulsson@talenten.se>.
  *
  * This software is available under the terms of the MIT license. Parts are licensed
  * under different terms if stated. The legal terms are attached to the LICENSE file
@@ -14,16 +14,13 @@
  */
 package org.angproj.sec
 
+import org.angproj.sec.rand.AbstractSecurity
 import org.angproj.sec.rand.AbstractSponge1024
-import org.angproj.sec.rand.JitterEntropy
-import org.angproj.sec.rand.Security
 import org.angproj.sec.stat.Randomness
 import org.angproj.sec.util.Octet
 import org.angproj.sec.rand.RandomBits
-import org.angproj.sec.util.ReadOctet
 import org.angproj.sec.util.TypeSize
-import org.angproj.sec.util.ensure
-import kotlin.math.min
+import org.angproj.sec.util.ceilDiv
 
 
 /**
@@ -37,88 +34,20 @@ import kotlin.math.min
  *
  * @constructor Creates a new instance of GarbageGarbler with an initialized sponge and entropy pool.
  */
-public class GarbageGarbler: Security(), RandomBits, Randomness {
+public class GarbageGarbler: AbstractSecurity(object : AbstractSponge1024() {}), RandomBits, Randomness {
 
-    override val sponge: AbstractSponge1024 = object : AbstractSponge1024() {}
-
-    private val entropy: ByteArray = ByteArray(128)
-    private var entropyPos = 0
-
-    /** Number of bytes missing to fill the entropy pool */
-    public val missing: Int
-        get() = entropy.size - entropyPos
-
-    /** Number of bits readable from the garbler until depletion */
-    public val remainingBits: Long
-        get() = THRESHOLD - lastReseedBits
+    public val isInitialized: Boolean
+        get() = initialized
 
     /** Number of bytes readable from the garbler until depletion */
     public val remainingBytes: Int
-        get() = (remainingBits / TypeSize.byteBits).toInt()
+        get() = ((Int.MAX_VALUE / 2L) - bytesExported - bitsExported.ceilDiv(TypeSize.byteBits.toLong())).toInt()
 
-    init {
-        // Seed the sponge
-        JitterEntropy.readLongs(sponge, 0, sponge.visibleSize) { index, value ->
-            sponge.absorb(value, index)
-        }
-        sponge.scramble()
+    public fun reseed(seeder: Octet.Producer) {
+        seedEntropy(seeder)
     }
 
-    override fun checkReseedConditions(): Boolean {
-        return missing <= 0
-    }
-
-    override fun reseedImpl() {
-        repeat(sponge.visibleSize) {
-            val data = Octet.read(entropy, it * TypeSize.longSize, TypeSize.longSize) { index ->
-                this[index]
-            }
-            sponge.absorb(data, it)
-        }
-        sponge.scramble()
-        entropyPos = 0
-    }
-
-    override fun checkExportConditions(length: Int): Boolean {
-        if(length <= remainingBytes) {
-            return true
-        }
-        if(checkReseedConditions()) {
-            reseed()
-            return true
-        }
-        return false
-    }
-
-    /**
-     * Attempts to reseed the internal entropy pool if the conditions are met.
-     *
-     * @return `true` if reseeding was performed, `false` otherwise.
-     */
-    public fun revitalize(): Boolean {
-        if(checkReseedConditions()) {
-            reseed()
-            return true
-        }
-        return false
-    }
-
-    /**
-     * Seeds bytes into the internal entropy pool.
-     *
-     * @param data The data source containing bytes to import.
-     * @param offset The starting index in the data source.
-     * @param length The number of bytes to import.
-     * @param readOctet A lambda function to read a byte from the data source at a given index.
-     * @throws IllegalArgumentException if length is less than or equal to zero.
-     */
-    public fun <E> seedEntropy(data: E, offset: Int, length: Int, readOctet: ReadOctet<E, Byte>) {
-        require(length > 0) { "Zero length data" }
-
-        repeat(min(length, missing)) { index ->
-            entropy[entropyPos++] = data.readOctet(index + offset)
-        }
-    }
+    override fun reseedPolicy(bytesNeeded: Int): Boolean = remainingBytes >= bytesNeeded
 
     /**
      * Retrieves the next specified number of random bits from the sponge.
@@ -130,8 +59,9 @@ public class GarbageGarbler: Security(), RandomBits, Randomness {
      */
     override fun nextBits(bits: Int): Int {
         require(bits in 1..TypeSize.intBits) { "Bits must be between 1 and 32" }
-        ensure<SecureRandomException>(remainingBits >= bits) { SecureRandomException("GarbageGarbler has depleted") }
-        return sponge.getNextBits(bits)
+        check(reseedPolicy(bits.ceilDiv(TypeSize.byteBits))) { "Export conditions not met" }
+        bitsExported += bits
+        return RandomBits.compactBitEntropy(bits, hashSqueezer.squeeze())
     }
 
     override fun readByte(): Byte = nextBits(TypeSize.byteBits).toByte()
@@ -149,12 +79,8 @@ public class GarbageGarbler: Security(), RandomBits, Randomness {
      * @throws IllegalStateException if the GarbageGarbler is depleted.
      */
     override fun readBytes(data: ByteArray, offset: Int, size: Int) {
-        readBytes(data, offset, size) { index, value ->
+        exportBytes(data, offset, size) { index, value ->
             this[index] = value
         }
-    }
-
-    public companion object {
-        private const val THRESHOLD: Long = Int.MAX_VALUE.toLong() / 2L * TypeSize.byteBits
     }
 }

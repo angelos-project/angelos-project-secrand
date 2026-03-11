@@ -14,53 +14,48 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.stat.doubleHealthCheck
+import org.angproj.sec.util.HealthCheck
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import kotlin.test.assertFalse
 
 
 class SecureFeedTest {
 
     @Test
-    fun testExportBytesLengthAndRandomness() {
-        val size = 34
-        val buffer1 = ByteArray(size)
-        val buffer2 = ByteArray(size)
-
-        SecureFeed.readBytes(buffer1, 0, size) { idx, value -> this[idx] = value }
-        SecureFeed.readBytes(buffer2, 0, size) { idx, value -> this[idx] = value }
-
-        assertEquals(size, buffer1.size)
-        assertEquals(size, buffer2.size)
-        // With high probability, two random arrays should not be equal
-        assertNotEquals(buffer1, buffer2)
+    fun testNextBits() {
+        try {
+            SecureFeed.nextBits(21).countLeadingZeroBits()
+        } catch (_: Exception) {
+            assertFalse(true)
+        }
     }
 
     @Test
-    fun testExportLongsLengthAndRandomness() {
-        val size = 10
-        val buffer1 = LongArray(size)
-        val buffer2 = LongArray(size)
-
-        SecureFeed.readLongs(buffer1, 0, size) { idx, value -> this[idx] = value }
-        SecureFeed.readLongs(buffer2, 0, size) { idx, value -> this[idx] = value }
-
-        assertEquals(size, buffer1.size)
-        assertEquals(size, buffer2.size)
-        // With high probability, two random arrays should not be equal
-        assertNotEquals(buffer1, buffer2)
-    }
-
-    @Test
-    fun testTotalBits() {
-        SecureFeed.nextBits(21)
-        assertNotEquals(0, SecureFeed.totalBits)
+    fun testNextBitsToMuch() {
+        assertFailsWith<IllegalArgumentException>{
+            SecureFeed.nextBits(33)
+        }
+        assertFailsWith<IllegalArgumentException>{
+            SecureFeed.nextBits(-1)
+        }
     }
 
     @Test
     fun testSecurityHealth() {
-        assertTrue{ doubleHealthCheck(SecureFeed) }
+        assertTrue{
+            HealthCheck.doubleHealthCheckWithSample { debug ->
+                analyzeSecurity(SecureFeed, debug)
+            }
+        }
+    }
+
+    @Test
+    fun testHealthCheck() {
+        val result = SecureEntropy.checkSecurityHealth(1)
+
+        assertEquals(result.size, 3)
     }
 }

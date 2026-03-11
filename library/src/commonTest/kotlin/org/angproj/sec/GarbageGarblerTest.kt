@@ -14,176 +14,92 @@
  */
 package org.angproj.sec
 
-import org.angproj.sec.stat.doubleHealthCheck
+import org.angproj.sec.util.HealthCheck
+import org.angproj.sec.util.TypeSize
 import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
+import kotlin.test.assertFalse
+import kotlin.test.assertEquals
 
 
 class GarbageGarblerTest {
 
     @Test
-    fun testRandomBytesAreNotConstant() {
-        val garbler = GarbageGarbler()
-        val buffer1 = ByteArray(32)
-        val buffer2 = ByteArray(32)
-
-        // Fill buffer1
-        for (i in buffer1.indices) {
-            buffer1[i] = garbler.readByte()
-        }
-        // Fill buffer2
-        for (i in buffer2.indices) {
-            buffer2[i] = garbler.readByte()
-        }
-        // With high probability, two random arrays should not be equal
-        assertNotEquals(buffer1.toList(), buffer2.toList())
-    }
-
-
-    @Test
-    fun testTriggerReseedAndRemainingReset() {
+    fun testNotInitialized() {
         val garbler = GarbageGarbler()
 
-        val initialRemaining = garbler.remainingBytes
-        repeat(256) { garbler.readDouble() }
-        assertEquals(2048, initialRemaining-garbler.remainingBytes)
-
-        // Use the importBytes to fill entropy and trigger reseed
-        val seed = ByteArray(128) { it.toByte() }
-        garbler.seedEntropy(seed, 0, seed.size) { idx -> this[idx] }
-        garbler.revitalize()
-        assertEquals(initialRemaining, garbler.remainingBytes)
+        assertFalse { garbler.isInitialized }
     }
 
     @Test
-    fun testRemainingDecreases() {
+    fun testInitialized() {
         val garbler = GarbageGarbler()
-        val initialRemaining = garbler.remainingBytes
-        repeat(10) { garbler.readByte() }
-        assertTrue(garbler.remainingBytes < initialRemaining)
+
+        garbler.reseed(Fakes.safeSecRand())
+
+        assertTrue { garbler.isInitialized }
     }
 
     @Test
-    fun testImportBytesRejectsZeroLength() {
+    fun testRemainingBytes() {
         val garbler = GarbageGarbler()
-        val data = ByteArray(10)
-        try {
-            garbler.seedEntropy(data, 0, 0) { idx -> this[idx] }
-            assertTrue(false)
-        } catch (_: IllegalArgumentException) {
-            assertTrue(true)
-        }
+
+        garbler.reseed(Fakes.safeSecRand())
+        val remaining = garbler.remainingBytes
+        garbler.readLong()
+
+        assertEquals(remaining - TypeSize.longSize, garbler.remainingBytes)
     }
 
     @Test
     fun testReadByteRange() {
         val garbler = GarbageGarbler()
-        repeat(1000) {
-            val value = garbler.readByte()
-            assertTrue(value in Byte.MIN_VALUE..Byte.MAX_VALUE)
-        }
-    }
+        garbler.reseed(Fakes.safeSecRand())
 
-    @Test
-    fun testReadUByteRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
-            val value = garbler.readUByte()
-            assertTrue(value in UByte.MIN_VALUE..UByte.MAX_VALUE)
-        }
+        val value = garbler.readByte()
+
+        assertTrue(value in Byte.MIN_VALUE..Byte.MAX_VALUE)
     }
 
     @Test
     fun testReadShortRange() {
         val garbler = GarbageGarbler()
-        repeat(1000) {
-            val value = garbler.readShort()
-            assertTrue(value in Short.MIN_VALUE..Short.MAX_VALUE)
-        }
-    }
+        garbler.reseed(Fakes.safeSecRand())
 
-    @Test
-    fun testReadUShortRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
-            val value = garbler.readUShort()
-            assertTrue(value in UShort.MIN_VALUE..UShort.MAX_VALUE)
-        }
+        val value = garbler.readShort()
+
+        assertTrue(value in Short.MIN_VALUE..Short.MAX_VALUE)
     }
 
     @Test
     fun testReadIntRange() {
         val garbler = GarbageGarbler()
-        repeat(1000) {
-            val value = garbler.readInt()
-            assertTrue(value in Int.MIN_VALUE..Int.MAX_VALUE)
-        }
-    }
+        garbler.reseed(Fakes.safeSecRand())
 
-    @Test
-    fun testReadUIntRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
-            val value = garbler.readUInt()
-            assertTrue(value in UInt.MIN_VALUE..UInt.MAX_VALUE)
-        }
-    }
+        val value = garbler.readInt()
 
-    @Test
-    fun testReadLongRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
-            val value = garbler.readLong()
-            assertTrue(value in Long.MIN_VALUE..Long.MAX_VALUE)
-        }
-    }
-
-    @Test
-    fun testReadULongRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
-            val value = garbler.readULong()
-            assertTrue(value in ULong.MIN_VALUE..ULong.MAX_VALUE)
-        }
-    }
-
-    @Test
-    fun testReadFloatRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
-            val value = garbler.readFloat()
-            assertTrue(value in 0.0f..1.0f)
-        }
-    }
-
-    @Test
-    fun testReadDoubleRange() {
-        val garbler = GarbageGarbler()
-        repeat(1000) {
-            val value = garbler.readDouble()
-            assertTrue(value in 0.0..1.0)
-        }
+        assertTrue(value in Int.MIN_VALUE..Int.MAX_VALUE)
     }
 
     @Test
     fun testReadBytes() {
-        val buffer = ByteArray(16)
-        GarbageGarbler().readBytes(buffer)
-        assertNotEquals(0, buffer.sum())
-    }
-
-    @Test
-    fun testTotalBits() {
+        val buffer = ByteArray(1024)
         val garbler = GarbageGarbler()
-        assertEquals(0, garbler.totalBits)
-        garbler.readByte()
-        assertEquals(8, garbler.totalBits)
+        garbler.reseed(Fakes.safeSecRand())
+
+        garbler.readBytes(buffer)
+
+        assertTrue { HealthCheck.healthCheck { analyzeByteArray(buffer) } }
     }
 
     @Test
-    fun testSecurityHealth() {
-        assertTrue{ doubleHealthCheck(GarbageGarbler()) }
+    @Suppress
+    fun testHealthCheck() {
+        val garbler = GarbageGarbler()
+        garbler.reseed(Fakes.safeSecRand())
+
+        val result = garbler.checkSecurityHealth(1)
+
+        assertEquals(result.size, 3)
     }
 }

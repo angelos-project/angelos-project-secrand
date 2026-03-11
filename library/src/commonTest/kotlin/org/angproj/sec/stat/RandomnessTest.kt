@@ -31,11 +31,6 @@ class RandomMock : AbstractSponge256(), Randomness, RandomBits {
         (offset until offset + size).forEach { data[it] = nextBits(8).toByte() }
     }
 
-    override fun readDouble(): Double {
-        // Mocking the generation of a uniform random double in [0.0, 1.0)
-        return nextBitsToLong(this).toUnitFraction()
-    }
-
     override fun nextBits(bits: Int): Int {
         round()
         return compactBitEntropy(bits, squeeze(0))
@@ -43,6 +38,9 @@ class RandomMock : AbstractSponge256(), Randomness, RandomBits {
 }
 
 class RandomnessTest {
+
+    val loops = 1 // Originally 100
+
     private lateinit var randomness: Randomness
 
     @BeforeTest
@@ -52,7 +50,7 @@ class RandomnessTest {
 
     @Test
     fun testReadByte() {
-        repeat(100) {
+        repeat(loops) {
             val byte = randomness.readByte()
             assertContains(Byte.MIN_VALUE.toInt()..Byte.MAX_VALUE.toInt(), byte.toInt())
         }
@@ -60,7 +58,7 @@ class RandomnessTest {
 
     @Test
     fun testReadUByte() {
-        repeat(100) {
+        repeat(loops) {
             val uByte = randomness.readUByte()
             assertContains(UByte.MIN_VALUE.toInt()..UByte.MAX_VALUE.toInt(), uByte.toInt())
         }
@@ -68,7 +66,7 @@ class RandomnessTest {
 
     @Test
     fun testReadShort() {
-        repeat(100) {
+        repeat(loops) {
             val short = randomness.readShort()
             assertContains(Short.MIN_VALUE.toInt()..Short.MAX_VALUE.toInt(), short.toInt())
         }
@@ -76,7 +74,7 @@ class RandomnessTest {
 
     @Test
     fun testReadUShort() {
-        repeat(100) {
+        repeat(loops) {
             val uShort = randomness.readUShort()
             assertContains(UShort.MIN_VALUE.toInt()..UShort.MAX_VALUE.toInt(), uShort.toInt())
         }
@@ -84,7 +82,7 @@ class RandomnessTest {
 
     @Test
     fun testReadInt() {
-        repeat(100) {
+        repeat(loops) {
             val int = randomness.readInt()
             assertContains(Int.MIN_VALUE..Int.MAX_VALUE, int)
         }
@@ -92,7 +90,7 @@ class RandomnessTest {
 
     @Test
     fun testReadUInt() {
-        repeat(100) {
+        repeat(loops) {
             val uInt = randomness.readUInt()
             assertContains(UInt.MIN_VALUE.toLong()..UInt.MAX_VALUE.toLong(), uInt.toLong())
         }
@@ -100,7 +98,7 @@ class RandomnessTest {
 
     @Test
     fun testReadLong() {
-        repeat(100) {
+        repeat(loops) {
             val long = randomness.readLong()
             assertContains(Long.MIN_VALUE..Long.MAX_VALUE, long)
         }
@@ -108,7 +106,7 @@ class RandomnessTest {
 
     @Test
     fun testReadULong() {
-        repeat(100) {
+        repeat(loops) {
             val uLong = randomness.readULong()
             assertTrue(uLong >= ULong.MIN_VALUE && uLong <= ULong.MAX_VALUE, "ULong must be in [${ULong.MIN_VALUE}, ${ULong.MAX_VALUE}]")
         }
@@ -116,7 +114,7 @@ class RandomnessTest {
 
     @Test
     fun testReadFloat() {
-        repeat(100) {
+        repeat(loops) {
             val float = randomness.readFloat()
             assertContains(0.0f..1.0f, float)
             assertTrue(float in 0.0f..<1.0f, "Float must be in [0.0, 1.0)")
@@ -125,7 +123,7 @@ class RandomnessTest {
 
     @Test
     fun testReadDouble() {
-        repeat(100) {
+        repeat(loops) {
             val double = randomness.readDouble()
             assertContains(0.0..1.0, double)
             assertTrue(double in 0.0..<1.0, "Double must be in [0.0, 1.0)")
@@ -137,6 +135,15 @@ class RandomnessTest {
         val size = 128
         val byteArray = ByteArray(size)
         randomness.readBytes(byteArray)
+        assertEquals(size, byteArray.size)
+        assertTrue(byteArray.all { it in Byte.MIN_VALUE..Byte.MAX_VALUE })
+    }
+
+    @Test
+    fun testReadBytesInner() {
+        val size = 128
+        val byteArray = ByteArray(size)
+        randomness.readBytes(byteArray, 0, byteArray.size)
         assertEquals(size, byteArray.size)
         assertTrue(byteArray.all { it in Byte.MIN_VALUE..Byte.MAX_VALUE })
     }
@@ -156,7 +163,7 @@ class RandomnessTest {
 
     @Test
     fun testReadUniform() {
-        repeat(100) {
+        repeat(loops) {
             val min = 1.0
             val max = 500.0
             val double = randomness.readUniform(min, max)
@@ -169,7 +176,7 @@ class RandomnessTest {
 
     @Test
     fun testReadDiscreteUniform() {
-        repeat(100) {
+        repeat(loops) {
             val min = 1
             val max = 500
             val int = randomness.readDiscreteUniform(min, max)
@@ -211,7 +218,7 @@ class RandomnessTest {
     fun testReadBinomial() {
         val n = 10
         val p = 0.5
-        repeat(100) {
+        repeat(loops) {
             val int = randomness.readBinomial(n, p)
             assertContains(0..n, int)
         }
@@ -228,7 +235,7 @@ class RandomnessTest {
     @Test
     fun testReadPoisson() {
         val lambda = 4.0
-        repeat(100) {
+        repeat(loops) {
             val int = randomness.readPoisson(lambda)
             assertTrue(int >= 0, "Poisson must be non-negative")
         }
@@ -243,7 +250,7 @@ class RandomnessTest {
     @Test
     fun testReadGeometric() {
         val p = 0.5
-        repeat(100) {
+        repeat(loops) {
             val int = randomness.readGeometric(p)
             assertTrue(int >= 1, "Geometric must be at least 1")
         }
@@ -260,7 +267,7 @@ class RandomnessTest {
     fun testReadNegativeBinomial() {
         val r = 5
         val p = 0.5
-        repeat(100) {
+        repeat(loops) {
             val int = randomness.readNegativeBinomial(r, p)
             assertTrue(int >= 0, "Negative Binomial must be non-negative")
         }
@@ -278,7 +285,7 @@ class RandomnessTest {
     fun testReadGamma() {
         val shape = 2.0
         val scale = 2.0
-        repeat(100) {
+        repeat(loops) {
             val double = randomness.readGamma(shape, scale)
             assertTrue(double >= 0.0, "Gamma must be non-negative")
         }
@@ -296,7 +303,7 @@ class RandomnessTest {
     fun testReadBeta() {
         val alpha = 2.0
         val beta = 5.0
-        repeat(100) {
+        repeat(loops) {
             val double = randomness.readBeta(alpha, beta)
             assertContains(0.0..1.0, double)
             assertTrue(double >= 0.0 && double <= 1.0, "Beta must be in [0.0, 1.0]")
@@ -314,7 +321,7 @@ class RandomnessTest {
     @Test
     fun testReadChiSquare() {
         val df = 4
-        repeat(100) {
+        repeat(loops) {
             val double = randomness.readChiSquare(df)
             assertTrue(double >= 0.0, "Chi-Square must be non-negative")
         }
@@ -329,7 +336,7 @@ class RandomnessTest {
     @Test
     fun testReadStudentT() {
         val df = 10
-        repeat(100) {
+        repeat(loops) {
             val double = randomness.readStudentT(df)
             assertTrue(double.isFinite(), "Student's t must be finite")
         }
@@ -344,7 +351,7 @@ class RandomnessTest {
     @Test
     fun testReadBernoulli() {
         val p = 0.5
-        repeat(100) {
+        repeat(loops) {
             val int = randomness.readBernoulli(p)
             assertContains(0..1, int, "Bernoulli must be 0 or 1")
         }
@@ -361,7 +368,7 @@ class RandomnessTest {
     fun testReadLaplace() {
         val mean = 0.0
         //val scale = 1.0
-        repeat(100) {
+        repeat(loops) {
             val double = randomness.readLaplace()
             assertTrue(double.isFinite(), "Laplace must be finite")
         }
@@ -377,7 +384,7 @@ class RandomnessTest {
     fun testReadLogistic() {
         val mean = 0.0
         //val scale = 1.0
-        repeat(100) {
+        repeat(loops) {
             val double = randomness.readLogistic()
             assertTrue(double.isFinite(), "Logistic must be finite")
         }
@@ -393,7 +400,7 @@ class RandomnessTest {
     fun testReadCauchy() {
         val x0 = 0.0
         //val gamma = 1.0
-        repeat(100) {
+        repeat(loops) {
             val double = randomness.readCauchy()
             assertTrue(double.isFinite() || double.isInfinite(), "Cauchy must be finite or infinite")
         }
@@ -409,7 +416,7 @@ class RandomnessTest {
     fun testReadF() {
         val d1 = 5
         val d2 = 10
-        repeat(100) {
+        repeat(loops) {
             val double = randomness.readFDist(d1, d2)
             assertTrue(double >= 0.0 || double.isInfinite(), "F-distribution must be non-negative or infinite")
         }

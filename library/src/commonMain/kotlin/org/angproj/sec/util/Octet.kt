@@ -77,6 +77,11 @@ public object Octet {
         )
     }
 
+    public interface Producer {
+        public fun<E> exportLongs(dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Long>)
+        public fun<E> exportBytes(dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Byte>)
+    }
+
     /**
      * @param E The type of the source to read bytes from.
      */
@@ -140,7 +145,7 @@ public object Octet {
         size: Int,
         readOctet: ReadOctet<E, Byte>
     ): Long {
-        require(size in 1 .. TypeSize.longSize)
+        require(size in 0 .. TypeSize.longSize)
         var dst: Long = 0
         repeat(size) {
             dst = dst or ((src.readOctet(index + it).toLong() shl (8 * (size - 1 - it))) and (0xffL shl (8 * (size - 1 - it))))
@@ -158,7 +163,7 @@ public object Octet {
         size: Int,
         writeOctet: WriteOctet<E, Byte>
     ) {
-        require(size in 1 .. TypeSize.longSize)
+        require(size in 0 .. TypeSize.longSize)
         repeat(size) {
             dst.writeOctet(it + index, ((src ushr ((size - 1) - it) * 8) and 0xff).toByte())
         }
@@ -173,7 +178,7 @@ public object Octet {
         size: Int,
         readOctet: ReadOctet<E, Byte>
     ): Long {
-        require(size in 1 .. TypeSize.longSize)
+        require(size in 0 .. TypeSize.longSize)
         var dst: Long = 0
         repeat(size) {
             dst = dst or ((src.readOctet(index + it).toLong() shl (8 * it)) and (0xffL shl (8 * it)))
@@ -191,7 +196,7 @@ public object Octet {
         size: Int,
         writeOctet: WriteOctet<E, Byte>
     ) {
-        require(size in 1 .. TypeSize.longSize)
+        require(size in 0 .. TypeSize.longSize)
         repeat(size) {
             dst.writeOctet(it + index, ((src ushr it * 8) and 0xff).toByte())
         }
@@ -246,10 +251,6 @@ public object Octet {
 
     public fun ByteArray.exportBytes(importer: ImportBytes<ByteArray>, readOctet: ReadOctet<ByteArray, Byte>) {
         importer.import(this, 0, this.size, readOctet)
-    }
-
-    public fun ByteArray.bitIterator(range: IntRange = 0..lastIndex): Iterator<Boolean> = bitIterator(range, this) { index ->
-        this[index]
     }
 
     public fun<E> bitIterator(range: IntRange, src: E, readOctet: ReadOctet<E, Byte>): Iterator<Boolean> = object : Iterator<Boolean> {

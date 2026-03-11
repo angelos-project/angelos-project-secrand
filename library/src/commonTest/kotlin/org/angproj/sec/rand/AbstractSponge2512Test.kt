@@ -17,7 +17,7 @@ package org.angproj.sec.rand
 import org.angproj.sec.util.Hash
 import org.angproj.sec.util.hash2512
 
-class AbstractSponge2512Test : SpongeTest<AbstractSponge2512>() {
+class AbstractSponge2512Test : SpongeTest() {
 
     override val emptyHash = "bad18383571ac3cec7464ca257d3e6e27e5dc1e001cef26022d7f554d1a99654fa91b52ef782c5d9cc14c89cfad035bc4c36f71a09515d3a8bc750ce87e05558"
     override val singleAHash = "0c0a9160952f23f66508585c8702c8297e64abb64ee435b7c602258d80edfdf242ab4f0824dd7efe5780c5a508f4ce3cfec7447dd7e6196848abe346854d7c3b"
@@ -29,7 +29,7 @@ class AbstractSponge2512Test : SpongeTest<AbstractSponge2512>() {
     override val eightNumHash = "5ea9eb602d1a9116ce0ac4e7644b946b366e5eeef85c9a6a51bb7180213cebb22cd377347ccab8dec593d26c152812710973b1117a20fb1f7d9e2bf1b4cfeed8"
     override val millionAHash = "2fa25b40cbd8657889e81fce76b72453a3a36636fc97c3254c4808c2033d7f831583960ac9d4cc5531d91889a24651f146302dce8d28d78389a4204b37a2a251"
 
-    override fun getHashInstance(): Hash<AbstractSponge2512> {
+    override fun getHashInstance(): Hash {
         return hash2512()
     }
 }

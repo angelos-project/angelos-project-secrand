@@ -24,18 +24,17 @@ import org.angproj.sec.util.TypeSize
  * This class extends the BenchmarkObject class and provides functionality
  * to benchmark a RandomBits instance.
  *
- * @param obj The RandomBits instance to be benchmarked.
+ * @param article The RandomBits instance to be benchmarked.
  */
-public class RandomBitsBenchmark(obj: RandomBits): BenchmarkObject<RandomBits>(obj) {
+public class RandomBitsBenchmark(article: RandomBits): BenchmarkArticle<RandomBits>(article) {
 
-    override val sampleByteSize: Int
-        get() = 16
+    override fun byteSizeImpl(): Int = 4
 
     override fun nextSample(): ByteArray {
         val sample = allocSampleArray()
         repeat(sampleByteSize / TypeSize.intSize) {
             Octet.write(
-                obj.nextBits(TypeSize.intBits).toLong(),
+                article.nextBits(TypeSize.intBits).toLong(),
                 sample,
                 it * TypeSize.intSize,
                 TypeSize.intSize

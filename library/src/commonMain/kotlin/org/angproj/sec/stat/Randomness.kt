@@ -140,13 +140,6 @@ public interface Randomness {
     public fun readBytes(data: ByteArray, offset: Int = 0, size: Int = data.size)
 
     /**
-     * Reads bytes into a ByteArray from the random source.
-     *
-     * @param data The ByteArray to fill with random bytes.
-     */
-    public fun readBytes(data: ByteArray): Unit = readBytes(data, 0, data.size)
-
-    /**
      * Generates a random double from a continuous uniform distribution over [min, max).
      *
      * @param min The inclusive lower bound of the distribution.

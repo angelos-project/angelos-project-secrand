@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "org.angproj.sec"
-version = "0.12.5"
+version = "0.12.6"
 
 kotlin {
     explicitApi()

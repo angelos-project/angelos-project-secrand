@@ -14,7 +14,6 @@
  */
 package org.angproj.sec.util
 
-import org.angproj.sec.stat.BitStatistic
 import kotlin.math.absoluteValue
 
 /**
@@ -29,11 +28,7 @@ import kotlin.math.absoluteValue
  * @return The ceiling of the division.
  * @throws ArithmeticException if [chunkSize] is zero.
  */
-public fun Int.ceilDiv(other: Int): Int {
-    val qout = this / other
-    if ((this xor other) >= 0 && (qout * other != this)) return qout + 1
-    return qout
-}
+public fun Int.ceilDiv(other: Int): Int = -((-this).floorDiv(other))
 
 /**
  * Performs ceiling division of this long value by [chunkSize].
@@ -47,14 +42,11 @@ public fun Int.ceilDiv(other: Int): Int {
  * @return The ceiling of the division.
  * @throws ArithmeticException if [chunkSize] is zero.
  */
-public fun Long.ceilDiv(other: Long): Long {
-    val quot = this / other
-    if ((this xor other) >= 0 && (quot * other != this)) return quot + 1
-    return quot
-}
+public fun Long.ceilDiv(other: Long): Long = -((-this).floorDiv(other))
 
 
 /**
+ * FloorMod according to https://www.w3schools.com/java/ref_math_floormod.asp
  * Computes the floor modulus of this integer with respect to [other].
  *
  * The floor modulus is always non-negative and is defined as:
@@ -69,6 +61,7 @@ public fun Int.floorMod(other: Int): Int = this - this.floorDiv(other) * other
 
 
 /**
+ * FloorMod according to https://www.w3schools.com/java/ref_math_floormod.asp
  * Computes the floor modulus of this long value with respect to [other].
  *
  * The floor modulus is always non-negative and is defined as:
@@ -153,61 +146,3 @@ public fun Int.toUnitFraction(): Float = ((this and 0x7FFFFFFF) / (1 shl 31).toF
  */
 public fun Long.toUnitFraction(): Double = ((this and 0x7fffffffffffffffL) / (1L shl 63).toDouble()).absoluteValue
 
-
-/**
- * Collects statistical information about the bits in the given source data.
- *
- * This function analyzes the bits of the source data [src] using the provided [readOctet] function to read bytes.
- * It computes various statistics, including the total number of bits, counts of ones and zeros, distribution of hexadecimal values,
- * run lengths of consecutive bits, and counts of long runs. The results are encapsulated in a [BitStatistic] object.
- *
- * @param src The source data from which to collect bit statistics.
- * @param size The size of the source data in bytes. Must be greater than 0.
- * @param readOctet A function that reads a byte from the source data at a given index.
- * @return A [BitStatistic] object containing the collected statistics about the bits in the source data.
- * @throws IllegalArgumentException if [size] is not greater than 0.
- */
-public fun<E> bitStatisticCollection(
-    src: E,
-    size: Int,
-    readOctet: ReadOctet<E, Byte>
-): BitStatistic {
-    check(size > 0) { "Entropy cannot be empty" }
-
-    var total = 0
-    var longRun = 0
-    val runs = IntArray(20)
-    val hex = IntArray(16)
-    var run = 0
-    var ones = 0
-    var zeros = 0
-    var last = false
-    var data = 0
-
-    fun stat(bit: Boolean) {
-        total++
-        data = (data shl 1) or if (bit) 1 else 0
-        if(total % 4 == 0) hex[data and 0xF]++
-        if (bit) ones++ else zeros++
-        if (bit == last) run++ else {
-            if (run > 0) {
-                if (run > 20) longRun++ else runs[run - 1]++
-            }
-            last = bit
-            run = 1
-        }
-    }
-
-    val iter = Octet.bitIterator(0 until size, src, readOctet)
-    last = iter.next().also { stat(it) }
-
-    iter.forEach { bit ->
-        stat(bit)
-    }
-
-    if (run > 0) {
-        if (run > 20) longRun++ else runs[run - 1]++
-    }
-
-    return BitStatistic(total, ones, zeros, hex.toList(), runs.toList(), longRun)
-}

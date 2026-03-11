@@ -15,6 +15,7 @@
 package org.angproj.sec.stat
 
 import org.angproj.sec.SecureRandomException
+import org.angproj.sec.util.HealthCheck
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
@@ -22,17 +23,17 @@ class BitStaticTest {
     @Test
     fun testSecurityHealthCheck() {
         assertFailsWith<SecureRandomException> {
-            bitStatisticOf(ByteArray(100)).securityHealthCheck()
+            HealthCheck().analyzeByteArray(ByteArray(100)).securityHealthCheck()
         }
         assertFailsWith<SecureRandomException> {
-            bitStatisticOf(ByteArray(1024 * 32 + 1)).securityHealthCheck()
+            HealthCheck().analyzeByteArray((ByteArray(1024 * 32 + 1))).securityHealthCheck()
         }
     }
 
     @Test
     fun testCryptoHealthCheck() {
         assertFailsWith<SecureRandomException> {
-            bitStatisticOf(ByteArray(1024 * 32 + 1)).cryptoHealthCheck()
+            HealthCheck().analyzeByteArray((ByteArray(1024 * 32 + 1))).cryptoHealthCheck()
         }
     }
 }
