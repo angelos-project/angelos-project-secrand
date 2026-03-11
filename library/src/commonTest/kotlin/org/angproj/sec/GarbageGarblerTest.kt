@@ -95,8 +95,11 @@ class GarbageGarblerTest {
     @Test
     @Suppress
     fun testHealthCheck() {
-        /*val garbler = GarbageGarbler()
+        val garbler = GarbageGarbler()
         garbler.reseed(Fakes.safeSecRand())
-        garbler.checkSecurityHealth()*/
+
+        val result = garbler.checkSecurityHealth(1)
+
+        assertEquals(result.size, 3)
     }
 }

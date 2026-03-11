@@ -16,6 +16,7 @@ package org.angproj.sec
 
 import org.angproj.sec.util.HealthCheck
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse
@@ -58,8 +59,9 @@ class SecureFeedTest {
     }
 
     @Test
-    @Suppress
     fun testHealthCheck() {
-        //SecureFeed.checkSecurityHealth()
+        val result = SecureEntropy.checkSecurityHealth(1)
+
+        assertEquals(result.size, 3)
     }
 }

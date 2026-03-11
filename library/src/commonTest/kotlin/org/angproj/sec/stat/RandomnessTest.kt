@@ -31,11 +31,6 @@ class RandomMock : AbstractSponge256(), Randomness, RandomBits {
         (offset until offset + size).forEach { data[it] = nextBits(8).toByte() }
     }
 
-    override fun readDouble(): Double {
-        // Mocking the generation of a uniform random double in [0.0, 1.0)
-        return nextBitsToLong(this).toUnitFraction()
-    }
-
     override fun nextBits(bits: Int): Int {
         round()
         return compactBitEntropy(bits, squeeze(0))
@@ -140,6 +135,15 @@ class RandomnessTest {
         val size = 128
         val byteArray = ByteArray(size)
         randomness.readBytes(byteArray)
+        assertEquals(size, byteArray.size)
+        assertTrue(byteArray.all { it in Byte.MIN_VALUE..Byte.MAX_VALUE })
+    }
+
+    @Test
+    fun testReadBytesInner() {
+        val size = 128
+        val byteArray = ByteArray(size)
+        randomness.readBytes(byteArray, 0, byteArray.size)
         assertEquals(size, byteArray.size)
         assertTrue(byteArray.all { it in Byte.MIN_VALUE..Byte.MAX_VALUE })
     }

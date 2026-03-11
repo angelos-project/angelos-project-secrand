@@ -22,6 +22,7 @@ import org.angproj.sec.stat.BenchmarkSuiteBuilder
 import org.angproj.sec.stat.ChiSquareTester
 import org.angproj.sec.stat.MonteCarloTester
 import org.angproj.sec.stat.SpongeBenchmark
+import org.angproj.sec.stat.Statistical
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.WriteOctet
@@ -36,7 +37,7 @@ public abstract class AbstractSecurity(protected val sponge: Sponge): Octet.Prod
     protected var initialized: Boolean = false
 
     private var totalForwards: Long = 0
-    protected val bitCounter: Long
+    public val bitCounter: Long
         get() = (totalForwards + hashHelper.forwards) * TypeSize.longBits
 
     protected var bitsExported: Long = 0
@@ -90,7 +91,10 @@ public abstract class AbstractSecurity(protected val sponge: Sponge): Octet.Prod
         bytesExported += length
     }
 
-    public fun checkSecurityHealth(numSamples: Int = 10_000_000) {
+    /**
+     * It is recommended to use 10 000 000 samples as standard.
+     * */
+    public fun checkSecurityHealth(numSamples: Int): Map<String, Statistical> {
         require(numSamples > 0) { "Number samples must be greater than 0" }
         val suite = BenchmarkSuiteBuilder.build {
             samples { numSamples }
@@ -100,6 +104,6 @@ public abstract class AbstractSecurity(protected val sponge: Sponge): Octet.Prod
             register { AvalancheEffectTester(samples, article) }
         }
         suite.runBlocking()
-        //println(suite.toString())
+        return suite.collectResults()
     }
 }
