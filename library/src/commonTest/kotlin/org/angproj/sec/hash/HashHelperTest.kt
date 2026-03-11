@@ -39,11 +39,12 @@ class HashHelperTest {
 
     @Test
     fun testSwitchMode() {
-        val hashHelper = HashHelper(Stubs.stubSucceedSqueezeSponge())
+        val hashHelper = HashHelper(Stubs.stubSucceedSqueezeSponge(), 1)
 
         hashHelper.switchMode()
 
         assertEquals(hashHelper.mode, HashHelper.HashMode.SQUEEZING)
+        assertEquals(hashHelper.position, 0)
     }
 
     @Test
