@@ -18,6 +18,8 @@ import org.angproj.sec.util.Octet.asHexSymbols
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertContentEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotEquals
 
 class OctetTest {
 
@@ -78,5 +80,58 @@ class OctetTest {
     @Test
     fun testAsHexSymbol() {
         assertEquals(byteArrayOf(0x11, 0x22, 0x33, 0x44).asHexSymbols(), "11223344")
+    }
+
+    @Test
+    fun testBigLittleOpposite() {
+        assertNotEquals(Octet.isBigEndian, Octet.isLittleEndian)
+    }
+
+    @Test
+    fun testReadRevOutside() {
+        assertFailsWith<IllegalArgumentException>{
+            Octet.readRev(byteArrayOf(), 0, 65) { _ ->
+                0.toByte()
+            }
+        }
+        assertFailsWith<IllegalArgumentException>{
+            Octet.readRev(byteArrayOf(), 0, -1) { _ ->
+                0.toByte()
+            }
+        }
+    }
+
+    @Test
+    fun testWriteRevOutside() {
+        assertFailsWith<IllegalArgumentException>{
+            Octet.writeRev(0L, 0, 0, 65) { _, _ -> }
+        }
+        assertFailsWith<IllegalArgumentException>{
+            Octet.writeRev(0L, 0, 0, -1) { _, _ -> }
+        }
+    }
+
+    @Test
+    fun testReadOutside() {
+        assertFailsWith<IllegalArgumentException>{
+            Octet.read(byteArrayOf(), 0, 65) { _ ->
+                0.toByte()
+            }
+        }
+        assertFailsWith<IllegalArgumentException>{
+            Octet.read(byteArrayOf(), 0, -1) { _ ->
+                0.toByte()
+            }
+        }
+    }
+
+    @Test
+    fun testWriteOutside() {
+        assertFailsWith<IllegalArgumentException>{
+            Octet.write(0L, 0, 0, 65) { _, _ -> }
+        }
+        assertFailsWith<IllegalArgumentException>{
+            Octet.write(0L, 0, 0, -1) { _, _ -> }
+        }
     }
 }

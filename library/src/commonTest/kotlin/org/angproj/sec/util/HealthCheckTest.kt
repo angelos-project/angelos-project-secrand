@@ -23,6 +23,8 @@ import org.angproj.sec.stat.securityHealthCheck
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse
+import kotlin.test.assertFailsWith
+
 
 class HealthCheckTest {
 
@@ -145,6 +147,15 @@ class HealthCheckTest {
     }
 
     @Test
+    fun testAnalyzeLongsWrongDebug() {
+        val exporter = Fakes.safeSecRand()
+
+        assertFailsWith<IllegalArgumentException> {
+            HealthCheck().analyzeLongs(exporter::exportLongs, ByteArray(1)).securityHealthCheck()
+        }
+    }
+
+    @Test
     fun testAnalyzeBytesFail() {
         val exporter = Fakes.unsafeSecRand()
 
@@ -163,12 +174,31 @@ class HealthCheckTest {
     }
 
     @Test
+    fun testAnalyzeBytesWrongDebug() {
+        val exporter = Fakes.safeSecRand()
+
+        assertFailsWith<IllegalArgumentException> {
+            HealthCheck().analyzeBytes(exporter::exportBytes, ByteArray(1)).securityHealthCheck()
+        }
+    }
+
+    @Test
     fun testHealthCheck() {
         val sample = Sampler.healthySample()
 
         val result = HealthCheck.healthCheck { analyzeByteArray(sample) }
 
         assertTrue(result)
+    }
+
+    @Test
+    fun testeHealthCheckFailedSample() {
+        val secrand = Fakes.unsafeSecRand()
+
+        println("One (1) purposeful debug print:")
+        val result = HealthCheck.healthCheckFailedSample { debug -> analyzeLongs(secrand::exportLongs, debug) }
+
+        assertFalse(result)
     }
 
     @Test
