@@ -14,7 +14,6 @@
  */
 package org.angproj.sec.util
 
-import org.angproj.sec.stat.BitStatisticSnapshot
 import kotlin.math.absoluteValue
 
 /**
@@ -29,11 +28,7 @@ import kotlin.math.absoluteValue
  * @return The ceiling of the division.
  * @throws ArithmeticException if [chunkSize] is zero.
  */
-public fun Int.ceilDiv(other: Int): Int {
-    val qout = this / other
-    if ((this xor other) >= 0 && (qout * other != this)) return qout + 1
-    return qout
-}
+public fun Int.ceilDiv(other: Int): Int = -((-this).floorDiv(other))
 
 /**
  * Performs ceiling division of this long value by [chunkSize].
@@ -47,14 +42,11 @@ public fun Int.ceilDiv(other: Int): Int {
  * @return The ceiling of the division.
  * @throws ArithmeticException if [chunkSize] is zero.
  */
-public fun Long.ceilDiv(other: Long): Long {
-    val quot = this / other
-    if ((this xor other) >= 0 && (quot * other != this)) return quot + 1
-    return quot
-}
+public fun Long.ceilDiv(other: Long): Long = -((-this).floorDiv(other))
 
 
 /**
+ * FloorMod according to https://www.w3schools.com/java/ref_math_floormod.asp
  * Computes the floor modulus of this integer with respect to [other].
  *
  * The floor modulus is always non-negative and is defined as:
@@ -69,6 +61,7 @@ public fun Int.floorMod(other: Int): Int = this - this.floorDiv(other) * other
 
 
 /**
+ * FloorMod according to https://www.w3schools.com/java/ref_math_floormod.asp
  * Computes the floor modulus of this long value with respect to [other].
  *
  * The floor modulus is always non-negative and is defined as:
