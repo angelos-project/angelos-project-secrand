@@ -50,7 +50,6 @@ public object SecureFeed : AbstractSecurity(object : AbstractSponge512() {}), Ra
      */
     internal fun revitalize(needed: Boolean) {
         if (needed) {
-            SecureEntropy.reseed()
             seedEntropy(SecureEntropy)
             nextBytes = AVERAGE_THRESHOLD + hashSqueezer.squeeze().floorMod(AVERAGE_THRESHOLD) - DEVIATION_THRESHOLD
         }

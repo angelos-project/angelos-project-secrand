@@ -61,7 +61,6 @@ class SecureRandomTest {
 
     @Test
     fun testReadBytes() {
-        SecureEntropy.reseed()
         try {
             val buffer = ByteArray(1024)
 

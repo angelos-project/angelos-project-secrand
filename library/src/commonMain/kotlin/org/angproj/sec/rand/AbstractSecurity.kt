@@ -62,9 +62,11 @@ public abstract class AbstractSecurity(protected val sponge: Sponge): Octet.Prod
     ) {
         if(length <= 0) return
 
+        check(reseedPolicy(length * TypeSize.longSize)) { "Export conditions not met" }
         repeat(length) { index ->
             dst.writeOctet(offset + index, hashSqueezer.squeeze())
         }
+        bytesExported += length * TypeSize.longSize
     }
 
     override fun <E> exportBytes(

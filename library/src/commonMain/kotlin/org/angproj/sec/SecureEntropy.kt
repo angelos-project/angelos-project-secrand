@@ -25,15 +25,11 @@ import org.angproj.sec.rand.JitterEntropy
  */
 public object SecureEntropy : AbstractSecurity(object : AbstractSponge256() {}) {
     init {
-        reseed()
-    }
-
-    public fun reseed() {
-        seedEntropy(JitterEntropy)
+        initialized = true
     }
 
     override fun reseedPolicy(bytesNeeded: Int): Boolean {
-        reseed()
+        seedEntropy(JitterEntropy)
         return true
     }
 }
