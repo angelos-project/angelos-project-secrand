@@ -1,3 +1,10 @@
+package org.angproj.sec.hash
+
+import org.angproj.sec.rand.Sponge
+import org.angproj.sec.util.ReadOctet
+import org.angproj.sec.util.RunState
+import org.angproj.sec.util.WriteOctet
+
 /**
  * Copyright (c) 2026 by Kristoffer Paulsson <kristoffer.paulsson@talenten.se>.
  *
@@ -12,11 +19,6 @@
  * Contributors:
  *      Kristoffer Paulsson - initial implementation
  */
-package org.angproj.sec.util
-
-import org.angproj.sec.hash.HashHelper
-import org.angproj.sec.rand.Sponge
-
 public class Hash64(private val sponge: Sponge) {
 
     public val bitSize: Int

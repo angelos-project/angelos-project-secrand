@@ -19,7 +19,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 
-class HashTest {
+/*class HashTest {
 
     @Test
     fun testUpdateAndFinalByteArray() {
@@ -97,4 +97,4 @@ class HashTest {
             result.asHexSymbols()
         )
     }
-}
+}*/

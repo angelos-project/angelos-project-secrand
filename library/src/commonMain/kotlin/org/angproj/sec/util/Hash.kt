@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 by Kristoffer Paulsson <kristoffer.paulsson@talenten.se>.
+ * Copyright (c) 2025-2026 by Kristoffer Paulsson <kristoffer.paulsson@talenten.se>.
  *
  * This software is available under the terms of the MIT license. Parts are licensed
  * under different terms if stated. The legal terms are attached to the LICENSE file
@@ -14,9 +14,8 @@
  */
 package org.angproj.sec.util
 
-import org.angproj.sec.hash.HashHelper
+import org.angproj.sec.hash.Hash64
 import org.angproj.sec.rand.Sponge
-import org.angproj.sec.util.Octet.importBytes
 
 
 /**
@@ -31,79 +30,43 @@ import org.angproj.sec.util.Octet.importBytes
  * @param E The type of sponge used in the hash function, must implement the Sponge interface.
  * @property sponge The sponge instance used for hashing.
  */
-public abstract class Hash(private val sponge: Sponge) {
+public abstract class Hash(sponge: Sponge) {
 
-    private val hashHelper = HashHelper(sponge)
-    private var state = RunState.INITIALIZE
+    private val hash64 = Hash64(sponge)
     private var remainder: ByteArray = byteArrayOf()
-    private var offset = 0
 
-    public fun init() {
-        check(state == RunState.INITIALIZE)
-        state = RunState.RUNNING
-    }
+    public fun init() { hash64.init()}
 
     /**
      * Absorbs the input ByteArray into the sponge state, treating the input as big endian.
      * On a little endian system, bytes are reversed before conversion to Long.
      */
-    public fun update(input: ByteArray) {
-        check(state == RunState.RUNNING)
-        runUpdate(input)
-    }
-
-    public fun<E> update(src: E, offset: Int, size: Int, readOctet: ReadOctet<E, Byte>) {
-        check(state == RunState.RUNNING)
-        val input = ByteArray(size) { src.readOctet(offset + it) }
-        runUpdate(input)
-    }
-
-    private fun runUpdate(input: ByteArray) {
-        val data = remainder + input
-        val loops = (data.size - data.size.mod(TypeSize.longSize)).div(TypeSize.longSize)
-        val absorber = hashHelper.absorber
-        repeat(loops){
-            val value = Octet.readNet(data, it * TypeSize.longSize, TypeSize.longSize) { index ->
+    public fun update(data: ByteArray) {
+        val input = remainder + data
+        hash64.update(input, 0, input.size.floorDiv(TypeSize.longSize)) {
+            Octet.readNet(data, it * TypeSize.longSize, TypeSize.longSize) { index ->
                 data[index]
             }
-            absorber.absorb(value)
-            offset = hashHelper.position
         }
-        remainder = data.copyOfRange(data.size - (data.size.mod(TypeSize.longSize)), data.size)
-    }
-
-    private fun runFinalize() {
-        if(remainder.isNotEmpty()) {
-            runUpdate(ByteArray(TypeSize.longSize - remainder.size.mod(TypeSize.longSize)))
-            check(remainder.isEmpty()) { "Remainder must be empty, still " + remainder.size + " bytes left" }
-        }
-        hashHelper.switchMode()
+        remainder = input.copyOfRange(input.size - input.size.floorMod(TypeSize.longSize), input.size)
     }
 
     /**
      * Returns the digest as a ByteArray in big endian order.
      * Converts each internal little endian Long to big endian bytes.
      */
-    public fun final(): ByteArray = ByteArray(sponge.byteSize).also { it.importBytes(::final) }
-
-    public fun<E> final(dst: E, offset: Int, size: Int, writeOctet: WriteOctet<E, Byte>) {
-        check(state != RunState.INITIALIZE)
-        check(size == sponge.byteSize)
-
-        if (state == RunState.RUNNING) {
-            state = RunState.FINISHED
-            runFinalize()
+    public fun final(): ByteArray {
+        if(remainder.isNotEmpty()) {
+            update(remainder + ByteArray(TypeSize.longSize - remainder.size))
+            remainder = byteArrayOf()
         }
 
-        val squeezer = hashHelper.squeezer
-        repeat(sponge.visibleSize) {
-            Octet.writeNet(
-                squeezer.squeeze(),
-                dst,
-                offset + it * TypeSize.longSize,
-                TypeSize.longSize,
-                writeOctet
-            )
+        val output = ByteArray(hash64.byteSize)
+        hash64.final(output, 0, hash64.visibleSize) { index, long ->
+            Octet.writeNet(long, output, index * TypeSize.longSize, TypeSize.longSize) { idx, byte ->
+                this[idx] = byte
+            }
         }
+        return output
     }
 }
