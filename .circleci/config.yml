@@ -104,7 +104,7 @@ commands:
             GRADLE_ARGS=$(cat classnames.txt | awk '{for (i=1; i<=NF; i++) print "--tests",$i}')
             echo "Prepared arguments for Gradle: $GRADLE_ARGS"
 
-            ../../gradlew :library:jvmTest $GRADLE_ARGS --no-daemon --stacktrace  # Adjust path to gradlew if needed; use :library: prefix for subproject
+            ./gradlew :library:jvmTest $GRADLE_ARGS --no-daemon --stacktrace  # Adjust path to gradlew if needed; use :library: prefix for subproject
 
       - store_test_results:
           path: library/build/test-results
