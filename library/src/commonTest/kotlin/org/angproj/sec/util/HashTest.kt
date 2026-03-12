@@ -19,7 +19,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 
-/*class HashTest {
+class HashTest {
 
     @Test
     fun testUpdateAndFinalByteArray() {
@@ -46,10 +46,7 @@ import kotlin.test.assertEquals
             hash.update(num)
         }
 
-        val result = ByteArray(32)
-        hash.final(result, 0, result.size) { index, value ->
-            result[index] = value
-        }
+        val result = hash.final()
 
         assertEquals(
             "6ecd3b8f83fe1848e1d8feda9e9d22542c24f7bda52d310853ca12a93fa0f3f4",
@@ -64,9 +61,7 @@ import kotlin.test.assertEquals
 
         val num = "a".repeat(100).encodeToByteArray()
         repeat(10_000) {
-            hash.update(num, 0, num.size) { index ->
-                num[index]
-            }
+            hash.update(num)
         }
 
         assertEquals(
@@ -82,19 +77,14 @@ import kotlin.test.assertEquals
 
         val num = "a".repeat(100).encodeToByteArray()
         repeat(10_000) {
-            hash.update(num, 0, num.size) { index ->
-                num[index]
-            }
+            hash.update(num)
         }
 
-        val result = ByteArray(32)
-        hash.final(result, 0, result.size) { index, value ->
-            result[index] = value
-        }
+        val result = hash.final()
 
         assertEquals(
             "6ecd3b8f83fe1848e1d8feda9e9d22542c24f7bda52d310853ca12a93fa0f3f4",
             result.asHexSymbols()
         )
     }
-}*/
+}

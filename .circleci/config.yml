@@ -88,6 +88,8 @@ commands:
       - run:
           name: Run allTests
           command: ./gradlew allTests --no-daemon --stacktrace
+      - store_test_results:
+          path: library/build/test-results
   publish_to_maven_local:
     steps:
       - run:
@@ -207,7 +209,7 @@ parameters:
   action:
     type: enum
     enum: [test, coverage, report]
-    default: coverage
+    default: test
   platform:
     type: enum
     enum: [gradle, macos, windows]
