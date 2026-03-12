@@ -56,6 +56,21 @@ class Hash64Test {
     }
 
     @Test
+    fun testHash64WrongSize() {
+        val hash64 = Hash64(Stubs.stubSucceedSqueezeSponge())
+
+        try {
+            hash64.init()
+            hash64.update(longArrayOf(), 0, 0, ) { _ -> 0L }
+            assertFailsWith<IllegalArgumentException> {
+                hash64.final(longArrayOf(), 0, hash64.visibleSize-1) { _, _ -> }
+            }
+        } catch (_: Exception) {
+            assertFalse(true)
+        }
+    }
+
+    @Test
     fun testInitError() {
         val hash64 = Hash64(Stubs.stubSucceedSqueezeSponge())
         hash64.init()
