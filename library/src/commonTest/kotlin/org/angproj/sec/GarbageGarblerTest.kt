@@ -20,6 +20,7 @@ import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 
 class GarbageGarblerTest {
@@ -38,6 +39,18 @@ class GarbageGarblerTest {
         garbler.reseed(Fakes.safeSecRand())
 
         assertTrue { garbler.isInitialized }
+    }
+
+    @Test
+    fun testNextBitsToMuch() {
+        val garbler = GarbageGarbler()
+
+        assertFailsWith<IllegalArgumentException>{
+            garbler.nextBits(33)
+        }
+        assertFailsWith<IllegalArgumentException>{
+            garbler.nextBits(-1)
+        }
     }
 
     @Test

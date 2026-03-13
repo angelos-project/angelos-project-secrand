@@ -243,16 +243,6 @@ public object Octet {
         }
     }
 
-    public fun ByteArray.importBytes(exporter: ExportBytes<ByteArray>) {
-        exporter.export(this, 0, this.size) { index, value ->
-            this[index] = value
-        }
-    }
-
-    public fun ByteArray.exportBytes(importer: ImportBytes<ByteArray>, readOctet: ReadOctet<ByteArray, Byte>) {
-        importer.import(this, 0, this.size, readOctet)
-    }
-
     public fun<E> bitIterator(range: IntRange, src: E, readOctet: ReadOctet<E, Byte>): Iterator<Boolean> = object : Iterator<Boolean> {
         private var current = 0
         private var pos = range.first * 8

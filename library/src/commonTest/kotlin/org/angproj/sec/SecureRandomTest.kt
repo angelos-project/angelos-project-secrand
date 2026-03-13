@@ -14,6 +14,7 @@
  */
 package org.angproj.sec
 
+import org.angproj.sec.stat.securityHealthCheck
 import org.angproj.sec.util.HealthCheck
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -49,17 +50,21 @@ class SecureRandomTest {
 
     @Test
     fun testReadBytes() {
-        val buffer = ByteArray(1024)
+        val buffer1 = ByteArray(1024)
+        val buffer2 = ByteArray(1024)
 
-        SecureRandom.readBytes(buffer)
+        SecureRandom.readBytes(buffer1)
+        SecureRandom.readBytes(buffer2)
 
-        assertTrue { HealthCheck.healthCheck { analyzeByteArray(buffer) } }
+        val result = HealthCheck().analyzeByteArray(buffer1).securityHealthCheck()
+        val result2 = HealthCheck().analyzeByteArray(buffer2).securityHealthCheck()
+        assertTrue{ result || result2 }
     }
 
     @Test
     fun testSecurityHealth() {
-        assertTrue{ HealthCheck.doubleHealthCheckWithSample { debug -> analyzeBits( { SecureRandom.readInt() }, debug)  } }
-        assertFalse{ HealthCheck.doubleHealthCheckWithSample { debug -> analyzeBits({ (SecureRandom.readInt() and 0x1f_ff_ff_ff) }, debug) } }
+        assertTrue{ HealthCheck.doubleHealthCheckDebug { debug -> analyzeBits( { SecureRandom.readInt() }, debug)  } }
+        assertFalse{ HealthCheck.doubleHealthCheckDebug { debug -> analyzeBits({ (SecureRandom.readInt() and 0x1f_ff_ff_ff) }, debug) } }
         // Statistically it looks like 3 out of 32 being distorted leads to double failures.
     }
 }

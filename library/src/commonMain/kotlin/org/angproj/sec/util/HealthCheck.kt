@@ -163,5 +163,11 @@ public class HealthCheck : BitStatisticCollector() {
         public fun doubleHealthCheckDebug(
             test: HealthCheck.(ByteArray) -> BitStatisticSnapshot
         ): Boolean = healthCheckWithSample(test) || healthCheckFailedSample(test)
+
+        public fun singleHealthCheckDebug(
+            sample: ByteArray
+        ): Boolean = HealthCheck().analyzeByteArray(sample).securityHealthCheck().also {
+            if(!it) println("Debug sample: ${sample.asHexSymbols()}")
+        }
     }
 }

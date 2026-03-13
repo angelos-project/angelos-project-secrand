@@ -17,8 +17,6 @@ package org.angproj.sec.stat
 import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.RandomBits
 import org.angproj.sec.rand.RandomBits.Companion.compactBitEntropy
-import org.angproj.sec.rand.RandomBits.Companion.nextBitsToLong
-import org.angproj.sec.util.toUnitFraction
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.test.*

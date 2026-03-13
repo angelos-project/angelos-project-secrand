@@ -36,7 +36,7 @@ class ReseederTest {
         try {
             val reseeder = Reseeder(Stubs.stubSucceedSqueezeSponge())
             reseeder.reseed(Fakes.safeSecRand())
-        } catch (e: SecureRandomException) {
+        } catch (_: SecureRandomException) {
             assertFalse(true)
         }
     }

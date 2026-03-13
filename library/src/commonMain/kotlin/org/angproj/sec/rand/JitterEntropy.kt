@@ -14,10 +14,12 @@
  */
 package org.angproj.sec.rand
 
+import org.angproj.sec.SecureRandomException
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.WriteOctet
 import org.angproj.sec.util.ceilDiv
+import org.angproj.sec.util.ensure
 import kotlin.math.*
 import kotlin.time.TimeSource
 
@@ -47,6 +49,10 @@ public object JitterEntropy: Octet.Producer {
         // Monotonic clock mark to measure elapsed time for entropy generation
         private val start = TimeSource.Monotonic.markNow()
         private var count = 0
+
+        init {
+            ensure<SecureRandomException>(start.hasPassedNow()) { SecureRandomException("Time source is not ticking fast enough!!!") }
+        }
 
         /**
          * Generates a true random [Int] with the specified number of bits (1 to 32) based on timing jitter.
