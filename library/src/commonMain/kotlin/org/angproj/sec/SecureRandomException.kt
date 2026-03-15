@@ -14,4 +14,9 @@
  */
 package org.angproj.sec
 
+/**
+ * Exception thrown for secure random related errors.
+ *
+ * @param message the error message.
+ */
 public class SecureRandomException(message: String = ""): RuntimeException(message)

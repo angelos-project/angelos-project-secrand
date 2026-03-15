@@ -31,19 +31,38 @@ public data class Uuid(
     public val upper: Long = 0,
     public val lower: Long = 0
 ) {
+    /**
+     * Creates a UUID from a RandomBits instance.
+     *
+     * @param randomBits the source of randomness.
+     */
     public constructor(randomBits: RandomBits) : this(
         RandomBits.nextBitsToLong(randomBits),
         RandomBits.nextBitsToLong(randomBits)
     )
 
+    /**
+     * Creates a random UUID using SecureFeed.
+     */
     public constructor() : this(SecureFeed)
 
+    /**
+     * The version of the UUID.
+     */
     public val version: Int
         get() = ((upper ushr 12) and 0xf).toInt()
 
+    /**
+     * The variant of the UUID.
+     */
     public val variant: Int
         get() = ((lower ushr 62) and 0x3).toInt()
 
+    /**
+     * Returns the string representation of the UUID in standard format.
+     *
+     * @return the UUID as a string.
+     */
     public override fun toString(): String = buildString {
         printStr<Unit>(lower, this, printStr<Unit>(upper, this, 0))
     }
@@ -69,23 +88,30 @@ public data class Uuid(
         /**
          * Generates a random UUID.
          *
-         * @return A randomly generated UUID.
+         * @return a new random UUID.
          */
         public fun uuid(): Uuid = Uuid()
 
         private const val uuid4Variant: Long = (-0x80000000L shl 32)
+        
         /**
-         * Generates a random version 4 UUID.
+         * Generates a version 4 UUID.
          *
-         * @return A randomly generated version 4 UUID.
+         * @return a new version 4 UUID.
          */
         public fun uuid4(): Uuid = Uuid(
             (RandomBits.nextBitsToLong(SecureFeed) and 0xffffffff_ffff0fffuL.toLong()) or 0x4000,
             (RandomBits.nextBitsToLong(SecureFeed) and 0x3fffffff_ffffffff) or uuid4Variant
         )
 
+        /**
+         * The nil UUID (all zeros).
+         */
         public val nil: Uuid by lazy { Uuid(0,0) }
 
+        /**
+         * The maximum UUID (all ones).
+         */
         public val max: Uuid by lazy { Uuid(ULong.MAX_VALUE.toLong(), ULong.MAX_VALUE.toLong()) }
     }
 }

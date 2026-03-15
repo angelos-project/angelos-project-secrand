@@ -18,24 +18,38 @@ import org.angproj.sec.stat.Randomness
 import org.angproj.sec.util.TypeSize
 
 /**
- * SecureRandom provides a high-quality source of random numbers
- * using a secure entropy feed. It reads bytes, shorts, ints, longs,
- * and floating-point numbers from the secure random source.
+ * SecureRandom provides a simple interface for secure random values.
+ * It delegates to SecureFeed for generation.
  */
 public object SecureRandom : Randomness {
 
+    /**
+     * Reads a random byte.
+     *
+     * @return a random byte.
+     */
     override fun readByte(): Byte = SecureFeed.nextBits(TypeSize.byteBits).toByte()
 
+    /**
+     * Reads a random short.
+     *
+     * @return a random short.
+     */
     override fun readShort(): Short = SecureFeed.nextBits(TypeSize.shortBits).toShort()
 
+    /**
+     * Reads a random int.
+     *
+     * @return a random int.
+     */
     override fun readInt(): Int = SecureFeed.nextBits(TypeSize.intBits)
 
     /**
-     * Reads bytes into a ByteArray from the secure random source.
+     * Reads random bytes into the array.
      *
-     * @param data The ByteArray to fill with random bytes.
-     * @param offset The starting index in the ByteArray to write to.
-     * @param size The number of bytes to read. Defaults to the size of the ByteArray.
+     * @param data the byte array to fill.
+     * @param offset the starting offset.
+     * @param size the number of bytes to read.
      */
     public override fun readBytes(data: ByteArray, offset: Int, size: Int) {
         SecureFeed.exportBytes(data, offset, size) { index, value ->
