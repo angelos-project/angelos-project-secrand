@@ -16,46 +16,14 @@ package org.angproj.sec.rand
 
 import org.angproj.sec.util.TypeSize
 
-
 /**
- * `AbstractSponge256` is an abstract class implementing a cryptographic sponge construction
- * with a linear state array of 4 x 64-bit registers. The state is conceptually interpreted as a 2x2 matrix,
- * enabling neighbor-based mixing operations for strong diffusion and confusion properties.
- * This design is suitable for secure random number generation, hashing, and other cryptographic primitives.
- *
- * ## Design Overview
- * - **State Representation:** The internal state is a linear array of 4 elements, treated as a 2x2 matrix.
- * - **Diffusion:** Achieved by mixing state elements using XOR and bitwise operations, spreading the influence of each bit.
- * - **Confusion:** Non-linear transformations (inversion, negation, multiplication, rotation) obscure relationships between input and output.
- * - **Permutation Round:** The `round` method combines diffusion, confusion, and round constants to update the state, ensuring unpredictability and preventing fixed points.
- *
- * ## Key Methods
- * - `round`: Executes a single permutation round, updating the state with diffusion, confusion, and round constants.
- *
- * ## Security Rationale
- * - **Diffusion** ensures that each bit of input affects many bits of output, making it hard to trace or reverse.
- * - **Confusion** introduces non-linearity, preventing attackers from predicting or reversing transformations.
- * - **Round Constants** and counter updates prevent fixed points and ensure each round is unique, thwarting certain attacks.
- *
- * ## Usage
- * This class is intended for cryptographic contexts requiring strong mixing and unpredictability.
- * Subclasses should implement additional logic for absorbing input and squeezing output as needed.
- *
- * ## Example
- * To use this sponge, extend the class and implement absorb/squeeze methods for your application.
+ * Abstract sponge implementation with a 256-bit state and 256-bit output.
+ * It provides a specific round function for the 256-bit sponge permutation.
  */
 public abstract class AbstractSponge256 : AbstractSponge(4, 4) {
 
     /**
-     * Executes a single permutation round on the sponge state.
-     *
-     * - Computes intermediate values using XOR between state elements for diffusion.
-     * - Applies non-linear confusion using bitwise inversion, negation, multiplication, and rotation.
-     * - Updates the mask with a combination of state, counter, and intermediate values.
-     * - Updates the state with new values, further mixed by XOR with diffusion results.
-     * - Increments the counter to ensure each round is unique.
-     *
-     * This process ensures strong mixing and unpredictability of the sponge state.
+     * Performs the round function for the 256-bit sponge, applying diffusion, confusion, and mask updates.
      */
     override fun round() {
         val d = sponge[0] xor sponge[3] // Diffusion between first and last element

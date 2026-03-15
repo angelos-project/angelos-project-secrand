@@ -15,30 +15,8 @@
 package org.angproj.sec.rand
 
 /**
- * `AbstractSponge2256` is an abstract class implementing a cryptographic sponge construction
- * with a 2x2 state matrix (4 x 64-bit registers). It extends `AbstractSponge`, providing
- * specialized permutation logic for secure mixing of state, suitable for random number generation,
- * hashing, and other cryptographic applications.
- *
- * ## Design Overview
- * - **State Representation:** The sponge state is a linear array, conceptually a 2x2 matrix.
- * - **Diffusion:** Achieved by mixing each value with its matrix neighbors using bitwise shifts and XORs.
- * - **Confusion:** Non-linear transformation obscures input-output relationships, enhancing security.
- * - **Permutation Round:** Combines diffusion, confusion, and round constants to update the state.
- *
- * ## Key Methods
- * - `diffuse`: Mixes a value with its neighbors to spread input influence across the state.
- * - `confuse`: Applies non-linear operations to obscure relationships and resist cryptanalysis.
- * - `round`: Executes a single permutation round, updating the state with diffusion, confusion, and round constants.
- *
- * ## Security Rationale
- * - **Diffusion** ensures that each bit of input affects many bits of output, making it hard to trace.
- * - **Confusion** introduces non-linearity, preventing attackers from predicting or reversing transformations.
- * - **Round Constants** prevent fixed points and ensure each round is unique, thwarting certain attacks.
- *
- * ## Usage
- * This class is intended for cryptographic contexts where strong mixing and unpredictability are required.
- * Subclasses should implement additional logic for absorbing input and squeezing output as needed.
+ * Abstract sponge implementation with a 256-bit state and 256-bit output, using a different permutation.
+ * It provides a specific round function with diffusion and confusion operations.
  */
 public abstract class AbstractSponge2256:  AbstractSponge(4, 4) {
 
@@ -54,6 +32,9 @@ public abstract class AbstractSponge2256:  AbstractSponge(4, 4) {
         return value xor (-value.inv() * 11) xor (-value.inv() * 7)
     }
 
+    /**
+     * Performs the round function for the 256-bit sponge, applying diffusion and confusion.
+     */
     override fun round() {
         val sponge0 = diffuse<Unit>(sponge[0], 2, 2, 1, 1)
         val sponge1 = diffuse<Unit>(sponge[1], 3, 3, 0, 0)
