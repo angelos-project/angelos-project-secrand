@@ -15,8 +15,6 @@ plugins {
     alias(libs.plugins.kover)
 }
 
-group = "org.angproj.sec"
-version = "0.12.6"
 
 kotlin {
     explicitApi()

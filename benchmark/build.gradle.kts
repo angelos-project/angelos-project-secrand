@@ -1,11 +1,8 @@
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
 }
 
-group = "org.angproj.sec"
-version = "1.0-SNAPSHOT"
 
 kotlin {
     explicitApi()
