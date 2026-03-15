@@ -23,7 +23,16 @@ import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.WriteOctet
 import org.angproj.sec.util.ensure
 
-
+/**
+ * Abstract base class for random number generators that perform health checks.
+ * It extends BitStatisticCollector and provides a framework for filling data with random values
+ * while ensuring cryptographic and security health checks are passed.
+ *
+ * @param E the type of the object being randomized.
+ * @param T the type of data written.
+ * @param obj the object to randomize.
+ * @param size the size of the data to generate.
+ */
 public abstract class AbstractRandom<E, T>(
     protected val obj: E,
     protected val size: Int

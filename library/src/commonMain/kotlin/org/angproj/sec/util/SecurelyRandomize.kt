@@ -21,7 +21,14 @@ import org.angproj.sec.rand.JitterEntropy
 import kotlin.math.max
 import kotlin.math.min
 
-
+/**
+ * Abstract class for securely randomizing data.
+ * It fills the data with random values from an entropy source, performing health checks.
+ *
+ * @param E the type of the object to randomize.
+ * @param obj the object to randomize.
+ * @param size the size of the data.
+ */
 public abstract class SecurelyRandomize<E>(obj: E, size: Int) : AbstractRandom<E, Byte>(obj, size) {
 
     override fun exportSize(): Int = max(1024 / TypeSize.longSize, size.ceilDiv(8))
@@ -50,12 +57,8 @@ public abstract class SecurelyRandomize<E>(obj: E, size: Int) : AbstractRandom<E
     }
 }
 
-
 /**
- * Fills this [ByteArray] with cryptographically secure random bytes.
- *
- * Uses [SecureFeed] to generate random data and writes it into the array.
- * The entire array is overwritten with new random values.
+ * Securely randomizes this byte array with cryptographically secure random data.
  */
 public fun ByteArray.securelyRandomize() {
     object : SecurelyRandomize<ByteArray>(this, size) {
@@ -66,10 +69,7 @@ public fun ByteArray.securelyRandomize() {
 }
 
 /**
- * Fills this [ByteArray] with cryptographically secure random bytes using jitter entropy.
- *
- * Uses [JitterEntropy] to generate random data and writes it into the array.
- * The entire array is overwritten with new random values.
+ * Securely entropizes this byte array with jitter entropy.
  */
 public fun ByteArray.securelyEntropize() {
     object : SecurelyRandomize<ByteArray>(this, size) {

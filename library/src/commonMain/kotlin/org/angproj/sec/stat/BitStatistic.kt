@@ -14,7 +14,11 @@
  */
 package org.angproj.sec.stat
 
-
+/**
+ * Interface for collecting and providing bit statistics from random data.
+ * It defines properties for total bits, counts of ones and zeros, hexadecimal distributions,
+ * run lengths, and long runs, along with methods to snapshot and compute differences.
+ */
 public interface BitStatistic {
     // Also implement ChiSquare, sources:
     // https://www.allresearchjournal.com/archives/2024/vol10issue8/PartA/10-7-53-474.pdf
@@ -26,19 +30,40 @@ public interface BitStatistic {
     //
     // https://www.itl.nist.gov/div898/handbook/eda/section3/eda3674.htm
 
+    /**
+     * The total number of bits analyzed.
+     */
     public val total: Int
+
+    /**
+     * The number of bits set to 1 (ones).
+     */
     public val ones: Int
+
+    /**
+     * The number of bits set to 0 (zeros).
+     */
     public val zeros: Int
+
+    /**
+     * The distribution of hexadecimal values (0-15) from the bits.
+     */
     public val hex: List<Int>
+
+    /**
+     * The lengths of runs (sequences of identical bits) up to 20 bits.
+     */
     public val runs: List<Int>
+
+    /**
+     * The number of runs longer than 20 bits.
+     */
     public val longRuns: Int
 
     /**
-     * Creates a snapshot of the current BitStatistic, returning a new BitStatisticSnapshot instance that captures
-     * the current state of the statistics. This allows for immutability and thread-safety when working with
-     * the statistics, as the snapshot will not be affected by any further changes to the original BitStatistic.
+     * Creates a snapshot of the current bit statistics.
      *
-     * @return A new BitStatisticSnapshot containing the current values of total, ones, zeros, hex, runs, and longRuns.
+     * @return a BitStatisticSnapshot containing the current values.
      */
     public fun snapshot(): BitStatisticSnapshot = BitStatisticSnapshot(
         total = total,
@@ -50,12 +75,11 @@ public interface BitStatistic {
     )
 
     /**
-     * Computes the difference between this BitStatistic and another BitStatistic, returning a new
-     * BitStatisticSnapshot that represents the difference. This sample has to be larger or newer
-     * than the other which should be older or smaller.
+     * Computes the difference between this BitStatistic and another.
+     * The current statistic must be equal or larger/newer than the other.
      *
-     * @param other The BitStatistic to compare against.
-     * @return A new BitStatisticSnapshot representing the difference between this BitStatistic and the other BitStatistic.
+     * @param other the other BitStatistic to compare against.
+     * @return a BitStatisticSnapshot representing the differences.
      */
     public fun diff(other: BitStatistic): BitStatisticSnapshot {
         check(total >= other.total) { "The current must be equal or larger/newer than the other."}

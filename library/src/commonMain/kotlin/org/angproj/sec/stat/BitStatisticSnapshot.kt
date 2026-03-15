@@ -19,16 +19,10 @@ import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.ensure
 import kotlin.math.*
 
-
 /**
- * Represents the statistical properties of a byte array in terms of its bits.
- *
- * @property total The total number of bits in the byte array.
- * @property ones The count of bits that are set to 1.
- * @property zeros The count of bits that are set to 0.
- * @property hex A list containing the count of each hexadecimal digit (0-15) in the byte array.
- * @property runs A list where each index k contains the count of runs of length k+1 (consecutive identical bits).
- * @property longRuns The count of runs that exceed a certain length threshold, indicating potential non-randomness.
+ * Data class representing a snapshot of bit statistics.
+ * It holds immutable values for total bits, ones, zeros, hexadecimal distribution, runs, and long runs.
+ * Provides various health check functions to validate the randomness of the data.
  */
 public data class BitStatisticSnapshot(
     override val total: Int,
@@ -39,19 +33,12 @@ public data class BitStatisticSnapshot(
     override val longRuns: Int
 ) : BitStatistic
 
-
-// Bit balance: |ones - n/2| < tolerance * sqrt(n/4)
 /**
- * Checks if the number of ones in the bit statistic is balanced around half of the total bits, within a specified tolerance.
+ * Checks if the bit balance (ratio of ones to zeros) is within acceptable tolerance.
+ * Uses a statistical test to ensure the number of ones is close to half the total bits.
  *
- * The expected number of ones in a random distribution should be close to half of the total bits. This function calculates
- * a deviance based on the total number of bits and a tolerance factor, and checks if the count of ones falls
- * within this range.
- *
- * The tolerance is tuned such that a factor of just a handful of random samples would fail the test of 10000 samples.
- *
- * @param tolerance A multiplier for the acceptable deviation from the expected number of ones. Default is 4.9.
- * @return True if the number of ones is within the acceptable range, false otherwise.
+ * @param tolerance the tolerance factor for deviance, default 4.9.
+ * @return true if the balance is acceptable, false otherwise.
  */
 public fun BitStatisticSnapshot.checkBitBalance(tolerance: Double = 4.9): Boolean {
     val n = total / 2.0
@@ -59,20 +46,12 @@ public fun BitStatisticSnapshot.checkBitBalance(tolerance: Double = 4.9): Boolea
     return ones.toDouble() in (n - deviance)..(n + deviance)
 }
 
-
 /**
- * Checks if the distribution of hexadecimal digits in the bit statistic is uniform, within a specified tolerance.
+ * Checks if the hexadecimal distribution is uniform within acceptable tolerance.
+ * Ensures that each hex value (0-15) appears roughly equally often.
  *
- * The expected count for each hexadecimal digit (0-15) in a random distribution should be close to total/16.
- * This function calculates
- * a deviance for each hexadecimal digit based on its position and the total number of bits, and checks if the
- * count of each digit falls within this range.
- *
- * The tolerance is tuned such that a factor of just a handful of random samples would fail the test of 10000 samples.
- *
- * @param tolerance A multiplier for the acceptable deviation from the expected count for each hexadecimal digit.
- * Default is 3.7.
- * @return True if the distribution of hexadecimal digits is uniform within the acceptable range, false otherwise.
+ * @param tolerance the tolerance factor for deviance, default 3.7.
+ * @return true if the distribution is uniform, false otherwise.
  */
 public fun BitStatisticSnapshot.checkHexUniformity(tolerance: Double = 3.7): Boolean {
     val n = hex.sum() / 16.0
@@ -84,18 +63,11 @@ public fun BitStatisticSnapshot.checkHexUniformity(tolerance: Double = 3.7): Boo
 }
 
 /**
- * Checks if the distribution of runs of identical bits in the bit statistic follows the expected pattern, within a
- * specified tolerance.
+ * Checks if the run distribution (lengths of consecutive identical bits) is within acceptable tolerance.
+ * Validates that runs of various lengths occur as expected in random data.
  *
- * The expected count for runs of length k in a random distribution can be calculated based on the total number of
- * bits and the run length. This function calculates
- * a deviance for each run length based on its position and the total number of bits, and checks if the count of runs
- * of each length falls within this range.
- *
- * The tolerance is tuned such that a factor of just a handful of random samples would fail the test of 10000 samples.
- *
- * @param tolerance A multiplier for the acceptable deviation from the expected count for each run length. Default is 5.0.
- * @return True if the distribution of runs is within the acceptable range, false otherwise.
+ * @param tolerance the tolerance factor for deviance, default 5.0.
+ * @return true if the run distribution is acceptable, false otherwise.
  */
 public fun BitStatisticSnapshot.checkRunDistribution(tolerance: Double = 5.0): Boolean {
     val logExp = log2(total / 4.0)
@@ -113,21 +85,20 @@ public fun BitStatisticSnapshot.checkRunDistribution(tolerance: Double = 5.0): B
     }
 }
 
-// Long runs: longRuns == 0
 /**
- * Checks if there are any long runs of identical bits in the bit statistic.
+ * Checks if there are no long runs (runs longer than 20 bits).
+ * In good random data, long runs should be absent.
  *
- * In a random distribution, long runs of identical bits (exceeding a certain length threshold) should be rare or
- * non-existent. This function checks if the count of long runs is zero.
- *
- * @return True if there are no long runs, false otherwise.
+ * @return true if no long runs are present, false otherwise.
  */
 public fun BitStatisticSnapshot.checkLongRuns(): Boolean = longRuns == 0
 
-
 /**
- * 15 degrees of freedom at significance level of 0.05 gives critical value 24.996.
- * */
+ * Performs a Chi-Square test on the hexadecimal distribution.
+ * Measures how well the observed hex frequencies match the expected uniform distribution.
+ *
+ * @return true if the Chi-Square value is below the threshold, false otherwise.
+ */
 public fun BitStatisticSnapshot.checkChiSquare(): Boolean {
     val sum = hex.sum()
     val expectedAverage = sum / hex.size.toDouble()
@@ -139,22 +110,12 @@ public fun BitStatisticSnapshot.checkChiSquare(): Boolean {
     return chiSquare < 24.996
 }
 
-
 /**
- * Performs a security health check on the bit statistic by validating the total number of bits and checking various
- * statistical properties.
+ * Performs a comprehensive security health check on the bit statistics.
+ * Includes checks for bit balance, hex uniformity, run distribution, and Chi-Square.
+ * Requires the total bits to be between 1K and 32K bits.
  *
- * This function ensures that the total number of bits falls within a specified range (between 1K and 32K bytes),
- * and then checks the bit balance, hexadecimal uniformity, and run distribution of the bit statistic.
- * The checks are designed to identify potential weaknesses in the randomness of the data, which could be indicative
- * of random generator depletion or similar issues.
- * The combined tolerance for the checks are approximately ~99.9% with a slight deviance. Therefore, it is very
- * important to make an extra check in case of failures, as a handful of failures in 10000 samples is expected.
- * If the checks fail, it is recommended to perform additional tests or collect more samples to confirm the results
- * before drawing conclusions about the security of the random generator.
- *
- * @return True if all checks pass, false otherwise.
- * @throws SecureRandomException if the total number of bits is not within the specified range.
+ * @return true if all checks pass, false otherwise.
  */
 public fun BitStatisticSnapshot.securityHealthCheck(): Boolean {
     ensure<SecureRandomException>(
@@ -163,16 +124,12 @@ public fun BitStatisticSnapshot.securityHealthCheck(): Boolean {
     return checkBitBalance() && checkHexUniformity() && checkRunDistribution() && checkChiSquare()
 }
 
-
 /**
- * Performs a cryptographic health check on the bit statistic by validating the total number of bits and checking
- * for long runs.
+ * Performs a cryptographic health check on the bit statistics.
+ * Includes checks for long runs and Chi-Square.
+ * Allows total bits from 0 to 32K bits.
  *
- * This function ensures that the total number of bits falls within a specified range (between 32 and 1024 bytes),
- * and then checks for the presence of long runs in the bit statistic.
- *
- * @return True if all checks pass, false otherwise.
- * @throws SecureRandomException if the total number of bits is not within the specified range.
+ * @return true if all checks pass, false otherwise.
  */
 public fun BitStatisticSnapshot.cryptoHealthCheck(): Boolean {
     ensure<SecureRandomException>(
