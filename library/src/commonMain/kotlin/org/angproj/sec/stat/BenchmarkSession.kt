@@ -17,15 +17,13 @@ package org.angproj.sec.stat
 import org.angproj.sec.util.RunState
 
 /**
- * Manages a benchmarking session for a given benchmark object and its testers.
+ * A session class for managing the execution of benchmark tests.
+ * It handles registering testers, collecting samples, and controlling the run state.
  *
- * @param B The type of the object being benchmarked.
- * @param E The type of the BenchmarkObject wrapper.
- * @property samplesAsked The total number of samples to be collected during the session.
- * @property benchmarkArticle The benchmark object instance to be tested.
- *
- * This class allows registering multiple testers, starting and stopping the benchmarking run,
- * collecting samples, and finalizing the collection to retrieve statistical results.
+ * @param B The type of the benchmark object.
+ * @param E The type of the benchmark article, extending BenchmarkArticle<B>.
+ * @property samplesAsked The number of samples requested for the session.
+ * @property benchmarkArticle The benchmark article providing the samples.
  */
 public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
     public val samplesAsked: Long,
@@ -36,15 +34,19 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
 
     private val registry: MutableMap<String, BenchmarkTester<B, E>> = mutableMapOf()
 
+    /**
+     * Indicates whether all registered testers have collected the required number of samples.
+     */
     public val satisfied: Boolean
         get() = registry.entries.all { it.value.samplesLeft <= 0 }
 
     /**
-     * Registers a new tester for the benchmarking session.
+     * Registers a new tester in the session.
      *
-     * @param builder A function that takes the benchmark object and returns a BenchmarkTester instance.
+     * @param builder A function that builds and returns a benchmark tester.
      * @return A unique token identifying the registered tester.
-     * @throws IllegalStateException if called after the session has started running.
+     * @throws IllegalStateException if called after initialization.
+     * @throws IllegalArgumentException if a tester with the same name is already registered.
      */
     public fun registerTester(builder: (E) -> BenchmarkTester<B, E>): String {
         check(state == RunState.INITIALIZE) { "Can't register new state after INITIALIZE state." }
@@ -60,9 +62,9 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
     }
 
     /**
-     * Collects a sample from the benchmark object and processes it with all registered testers.
+     * Collects a sample and distributes it to all registered testers that still need samples.
      *
-     * @throws IllegalStateException if called when the session is not in the RUNNING state.
+     * @throws IllegalStateException if the session is not in RUNNING state.
      */
     public fun collectSample() {
         check(state == RunState.RUNNING) { "Benchmarking must be in RUNNING state." }
@@ -73,10 +75,9 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
     }
 
     /**
-     * Starts the benchmarking run by initializing all registered testers.
+     * Starts the benchmark run, initializing all testers.
      *
-     * @throws IllegalStateException if called when the session is not in the INITIALIZE state
-     *                               or if no testers have been registered.
+     * @throws IllegalStateException if not in INITIALIZE state or no testers are registered.
      */
     public fun startRun() {
         check(state == RunState.INITIALIZE)
@@ -87,9 +88,9 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
     }
 
     /**
-     * Stops the benchmarking run by finalizing all registered testers.
+     * Stops the benchmark run, finalizing timing for all testers.
      *
-     * @throws IllegalStateException if called when the session is not in the RUNNING state.
+     * @throws IllegalStateException if not in RUNNING state.
      */
     public fun stopRun() {
         check(state == RunState.RUNNING)
@@ -98,10 +99,9 @@ public class BenchmarkSession<B, E: BenchmarkArticle<B>>(
     }
 
     /**
-     * Finalizes the collection of statistics from all registered testers.
+     * Finalizes the session and collects statistics from all testers.
      *
-     * @return A map of tester names to their collected statistical results.
-     * @throws IllegalStateException if called when the session is not in the FINISHED state.
+     * @return A map of tester names to their statistical results.
      */
     public fun finalizeCollecting(): Map<String, Statistical> {
         return buildMap {
