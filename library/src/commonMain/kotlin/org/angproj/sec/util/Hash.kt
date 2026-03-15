@@ -17,29 +17,26 @@ package org.angproj.sec.util
 import org.angproj.sec.hash.Hash64
 import org.angproj.sec.rand.Sponge
 
-
 /**
  * Abstract base class for hash functions using a sponge construction.
+ * It manages the hashing process by updating with data and producing a final hash.
  *
- * This class provides the common functionality for hashing data using a sponge-based
- * approach. It manages the absorption of input data, handling of remainders, and
- * finalization of the hash output. Subclasses must provide a specific sponge implementation.
- *
- * Used for testing purposes.
- *
- * @param E The type of sponge used in the hash function, must implement the Sponge interface.
- * @property sponge The sponge instance used for hashing.
+ * @param sponge the sponge instance used for hashing.
  */
 public abstract class Hash(sponge: Sponge) {
 
     private val hash64 = Hash64(sponge)
     private var remainder: ByteArray = byteArrayOf()
 
-    public fun init() { hash64.init()}
+    /**
+     * Initializes the hash function, initializing the internal state.
+     */
+    public fun init() { hash64.init() }
 
     /**
-     * Absorbs the input ByteArray into the sponge state, treating the input as big endian.
-     * On a little endian system, bytes are reversed before conversion to Long.
+     * Updates the hash with the provided data.
+     *
+     * @param data the byte array to hash.
      */
     public fun update(data: ByteArray) {
         val input = remainder + data
@@ -52,8 +49,9 @@ public abstract class Hash(sponge: Sponge) {
     }
 
     /**
-     * Returns the digest as a ByteArray in big endian order.
-     * Converts each internal little endian Long to big endian bytes.
+     * Finalizes the hash computation and returns the hash value.
+     *
+     * @return the computed hash as a byte array.
      */
     public fun final(): ByteArray {
         if(remainder.isNotEmpty()) {
@@ -68,5 +66,13 @@ public abstract class Hash(sponge: Sponge) {
             }
         }
         return output
+    }
+
+    /**
+     * Resets the hash function to its initial state.
+     */
+    public fun reset() { 
+        hash64.reset() 
+        remainder.fill(0)
     }
 }
