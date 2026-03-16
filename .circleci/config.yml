@@ -183,6 +183,16 @@ commands:
           key: m2-v1-{{ checksum "/tmp/m2-cache-key.txt" }}
           paths:
             - ~/.m2
+  generate_docs:
+    steps:
+      - run:
+          name: Generate documentation with Dokka
+          command: ./gradlew :library:dokkaHtml --no-daemon --stacktrace
+  store_docs:
+    steps:
+      - store_artifacts:
+          path: library/build/dokka/html
+          destination: documentation
   prepare:
     steps:
       - checkout
@@ -236,12 +246,21 @@ jobs:
       - prepare
       - publish_and_backup_maven
       - cleanup
+  gen-docs:
+    executor: << pipeline.parameters.platform >>
+    environment:
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g"
+    steps:
+      - prepare
+      - generate_docs
+      - store_docs
+      - cleanup
 
 parameters:
   action:
     type: enum
-    enum: [test, coverage, report]
-    default: test
+    enum: [test, coverage, report, docs]
+    default: docs
   platform:
     type: enum
     enum: [gradle, macos, windows]
@@ -267,3 +286,8 @@ workflows:
       equal: [ test, << pipeline.parameters.action >> ]
     jobs:
       - build-and-test
+  docs:
+    when:
+      equal: [ docs, << pipeline.parameters.action >> ]
+    jobs:
+      - gen-docs
