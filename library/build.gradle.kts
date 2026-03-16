@@ -11,8 +11,8 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.vanniktech.mavenPublish)
-    alias(libs.plugins.dokka)
     alias(libs.plugins.kover)
+    alias(libs.plugins.dokka)
 }
 
 
@@ -129,17 +129,13 @@ mavenPublishing {
     }
 }
 
-tasks.dokkaHtml {
-    dokkaSourceSets {
-        named("commonMain"){
-            moduleName.set(This.longName)
-            includes.from("Module.md")
-            sourceLink {
-                localDirectory.set(file("src/commonMain/kotlin"))
-                remoteUrl.set(URI(This.url + "/tree/master/library/src/commonMain/kotlin").toURL())
-                remoteLineSuffix.set("#L")
-            }
-        }
+dokka {
+    dokkaPublications.html {
+        moduleName.set(rootProject.name)
+    }
+
+    pluginsConfiguration.html {
+        footerMessage.set("Copyright (c) 2024-2026 Kristoffer Paulsson.")
     }
 }
 

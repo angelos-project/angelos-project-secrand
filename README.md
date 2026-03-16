@@ -25,12 +25,15 @@ For use in a Kotlin/Multiplatform project, or compatible, publish the library to
 
 1. Run `./gradlew publishToMavenLocal`
 2. Add the dependency `org.angproj.sec:angelos-project-secrand:X.Y.Z`
-3. Replace `X.Y.X` with version number in `library/build.gradle.kts`
+3. Replace `X.Y.X` with version number in `gradle.properties`
 
-## Tests
+### Tests
 
 Run `./gradlew clean build allTests` for unit tests.
 
+### Docs
+
+Run `./gradlew dokkaGenerateHtml` to  generate documentation
 
 ## Getting help
 
