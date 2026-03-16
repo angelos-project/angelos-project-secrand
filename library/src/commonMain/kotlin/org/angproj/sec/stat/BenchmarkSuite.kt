@@ -64,19 +64,4 @@ public class BenchmarkSuite<B>(
         check(this::results.isInitialized) { "Data sampling not finished" }
         return results
     }
-
-    /**
-     * Returns a string representation of the benchmark suite results.
-     *
-     * @return A string containing the reports from all testers, or a message if not run.
-     */
-    override fun toString(): String {
-        if(!this::results.isInitialized) return "No result, still running"
-        return buildString {
-            testersByName.forEach { tester ->
-                append(results[tester]!!.report)
-                appendLine()
-            }
-        }
-    }
 }

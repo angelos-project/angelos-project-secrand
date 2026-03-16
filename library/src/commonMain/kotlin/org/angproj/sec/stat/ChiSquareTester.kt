@@ -55,23 +55,6 @@ public class ChiSquareTester<B, E: BenchmarkArticle<B>>(
             evaluateSampleData(),
             duration,
             totalTakenSamples * atomicSampleByteSize,
-            toString()
         )
-    }
-
-    /**
-     * Returns a string representation of the Chi-Square test results, including the computed Chi-Square value.
-     *
-     * @return A descriptive string of the test results.
-     */
-    override fun toString(): String = buildString {
-        val chiSquare = evaluateSampleData()
-        append("Chi Square at ")
-        append(totalTakenSamples)
-        append(" samples, with value ")
-        append(chiSquare)
-        //append(" with a deviation of ")
-        //append(abs(average - 0.5))
-        append(".")
     }
 }

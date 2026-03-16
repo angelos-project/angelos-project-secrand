@@ -107,11 +107,4 @@ public abstract class BenchmarkTester<B, E: BenchmarkArticle<B>>(
     public fun collectStats(): Statistical {
         return collectStatsImpl()
     }
-
-    /**
-     * Returns a string representation of the tester's results.
-     *
-     * @return A descriptive string of the test results.
-     */
-    public abstract override fun toString(): String
 }

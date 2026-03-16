@@ -33,7 +33,6 @@ object Mocks {
                 evaluateSampleData(),
                 duration,
                 totalTakenSamples * atomicSampleByteSize,
-                toString()
             )
         }
 

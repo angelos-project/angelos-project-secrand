@@ -105,23 +105,6 @@ public class MonteCarloTester<B, E: BenchmarkArticle<B>>(
             evaluateSampleData(),
             duration,
             totalTakenSamples * atomicSampleByteSize,
-            toString()
         )
-    }
-
-    /**
-     * Returns a string representation of the Monte Carlo test results, including the estimated PI value and deviation.
-     *
-     * @return A descriptive string of the test results.
-     */
-    override fun toString(): String = buildString {
-        val piEstimate = evaluateSampleData()
-        append("Monte Carlo at ")
-        append(totalTakenSamples)
-        append(" samples, estimates PI to ")
-        append(piEstimate)
-        append(" with a deviation of ")
-        append(abs(piEstimate - PI))
-        append(".")
     }
 }

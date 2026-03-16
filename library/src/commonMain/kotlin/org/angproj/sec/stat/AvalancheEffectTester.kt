@@ -77,23 +77,6 @@ public class AvalancheEffectTester<B, E: BenchmarkArticle<B>>(
             evaluateSampleData(),
             duration,
             totalTakenSamples * atomicSampleByteSize,
-            toString()
         )
-    }
-
-    /**
-     * Returns a string representation of the avalanche effect test results, including the average bit difference and its deviation from 0.5.
-     *
-     * @return A descriptive string of the test results.
-     */
-    override fun toString(): String = buildString {
-        val average = evaluateSampleData()
-        append("Avalanche Effect at ")
-        append(totalTakenSamples)
-        append(" samples, averages at ")
-        append(average)
-        append(" with a deviation of ")
-        append(abs(average - 0.5))
-        append(".")
     }
 }
