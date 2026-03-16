@@ -80,6 +80,49 @@ public object BenchmarkSpongesKt {
         println(report)
     }
 
+    /**
+     * Theoretical standard deviation for the avalanche effect test.
+     * D ~ Binomial(N, 0.5) → σ = √(N/4)
+     *
+     * N = output bit length of the sponge (e.g. 256, 512, or 1024 from visible state;
+     * bit_mode is only for Monte Carlo testing and is discarded here).
+     */
+    public fun avalancheStandardDeviation(outputBits: Int): Double =
+        sqrt(outputBits / 4.0)
+
+    /**
+     * Recommended acceptance range for average Hamming distance (5σ → >99.99994 % coverage).
+     */
+    public fun avalancheHammingRange(
+        outputBits: Int,
+        trials: Long = 10_000_000,   // matches benchmark `samples`
+        numSigma: Double = 5.0
+    ):  ClosedFloatingPointRange<Double> {
+        val sigmaPerTrial = avalancheStandardDeviation(outputBits)
+        val sigmaMean = sigmaPerTrial / sqrt(trials.toDouble())
+        val mean = outputBits / 2.0
+        val lower = mean - numSigma * sigmaMean
+        val upper = mean + numSigma * sigmaMean
+        return lower..upper
+    }
+
+    public fun avalancheEffectReport(avalanche: Statistical, sponge: Sponge) {
+        val sigma = 2.0
+        val standardDeviation = avalancheHammingRange(sponge.bitSize, avalanche.sampleCount, sigma)
+        val p = sponge.bitSize / 2
+        val isInside = (avalanche.keyValue * sponge.bitSize) in standardDeviation
+        val report = buildString {
+            appendLine("Avalanche Effect Benchmark Results")
+            appendLine("Number of samples: ${avalanche.sampleCount}")
+            appendLine("Expected p: $p")
+            appendLine("Estimated p: ${avalanche.keyValue * sponge.bitSize}")
+            appendLine("Standard error between: ${standardDeviation.start} and ${standardDeviation.endInclusive} with sigma $sigma")
+            appendLine("In between: ${if(isInside) "Yes" else "No"}")
+        }
+        println(report)
+    }
+
+
     public fun healthCheck(sponge: Sponge): Boolean {
         Reseeder(sponge).reseed(JitterEntropy)
 
@@ -95,6 +138,7 @@ public object BenchmarkSpongesKt {
         val results = suite.collectResults()
 
         monteCarloReport(results["MonteCarloTester"]!!)
+        avalancheEffectReport(results["AvalancheEffectTester"]!!, sponge)
         /*val sigma = 2.0
         val standardError = monteCarloPiRange(monteCarlo.sampleCount, sigma)
         val isInside = monteCarlo.keyValue in standardError
