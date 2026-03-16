@@ -1,5 +1,4 @@
 import com.vanniktech.maven.publish.SonatypeHost
-import java.net.URI
 
 object This {
     const val longName = "Secure Random - Angelos Project™"
@@ -136,6 +135,12 @@ dokka {
 
     pluginsConfiguration.html {
         footerMessage.set("Copyright (c) 2024-2026 Kristoffer Paulsson.")
+    }
+
+    dokkaSourceSets.commonMain {
+        sourceLink {
+            remoteUrl(This.url + "/tree/main/library")
+        }
     }
 }
 
