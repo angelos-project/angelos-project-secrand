@@ -138,7 +138,6 @@ public object BenchmarkSpongesKt {
 
 
     public fun healthCheck(sponge: Sponge) {
-        Reseeder(sponge).reseed(JitterEntropy)
 
         val suite = BenchmarkSuiteBuilder.build {
             samples { 10_000_000 }
