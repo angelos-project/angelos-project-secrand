@@ -116,14 +116,28 @@ public object BenchmarkSpongesKt {
             appendLine("Number of samples: ${avalanche.sampleCount}")
             appendLine("Expected p: $p")
             appendLine("Estimated p: ${avalanche.keyValue * sponge.bitSize}")
-            appendLine("Standard error between: ${standardDeviation.start} and ${standardDeviation.endInclusive} with sigma $sigma")
+            appendLine("Standard deviation between: ${standardDeviation.start} and ${standardDeviation.endInclusive} with sigma $sigma")
             appendLine("In between: ${if(isInside) "Yes" else "No"}")
         }
         println(report)
     }
 
+    public fun chiSquareReport(chiSquare: Statistical) {
+        val isInside = chiSquare.keyValue < 293.2478
+        val report = buildString {
+            appendLine("Chi-Square Benchmark Results")
+            appendLine("Number of samples: ${chiSquare.sampleCount}")
+            appendLine("Critical value p: 0.05")
+            appendLine("Degrees of freedom v: 255")
+            appendLine("Estimated chiSquare: ${chiSquare.keyValue}")
+            appendLine("Chi-Square x2: 293.2478")
+            appendLine("Within: ${if(isInside) "Yes" else "No"}")
+        }
+        println(report)
+    }
 
-    public fun healthCheck(sponge: Sponge): Boolean {
+
+    public fun healthCheck(sponge: Sponge) {
         Reseeder(sponge).reseed(JitterEntropy)
 
         val suite = BenchmarkSuiteBuilder.build {
@@ -139,20 +153,7 @@ public object BenchmarkSpongesKt {
 
         monteCarloReport(results["MonteCarloTester"]!!)
         avalancheEffectReport(results["AvalancheEffectTester"]!!, sponge)
-        /*val sigma = 2.0
-        val standardError = monteCarloPiRange(monteCarlo.sampleCount, sigma)
-        val isInside = monteCarlo.keyValue in standardError
-        val report = buildString {
-            appendLine("Monte Carlo Benchmark Results")
-            appendLine("Number of samples: ${monteCarlo.sampleCount}")
-            appendLine("Expected PI: $PI")
-            appendLine("Estimated PI: ${monteCarlo.keyValue}")
-            appendLine("Standard error between: ${standardError.start} and ${standardError.endInclusive} with sigma $sigma")
-            appendLine("In between: ${if(isInside) "Yes" else "No"}")
-        }
-        println(report)*/
-
-        return true
+        chiSquareReport(results["ChiSquareTester"]!!)
     }
 
     @JvmStatic
@@ -170,7 +171,7 @@ public object BenchmarkSpongesKt {
             "AbstractSponge21024" to object : AbstractSponge21024() {}
         ).forEach {
             println("Benchmarking: " + it.key)
-            println("Result: " + healthCheck(it.value))
+            healthCheck(it.value)
             println()
         }
     }
