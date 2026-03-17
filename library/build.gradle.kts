@@ -1,7 +1,7 @@
 import java.io.FileInputStream
 import java.util.Properties
 
-//import com.vanniktech.maven.publish.SonatypeHost
+import com.vanniktech.maven.publish.SonatypeHost
 
 object This {
     const val longName = "Secure Random - Angelos Project™"
@@ -12,10 +12,9 @@ object This {
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-    //alias(libs.plugins.vanniktech.mavenPublish)
+    alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.kover)
     alias(libs.plugins.dokka)
-    `maven-publish`
 }
 
 
@@ -92,7 +91,7 @@ android {
     }
 }
 
-/*mavenPublishing {
+mavenPublishing {
     //publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     //signAllPublications()
 
@@ -101,7 +100,25 @@ android {
      * DO NOT USE FOR SONATYPE NEXUS
      * */
     coordinates(group.toString(), rootProject.name, version.toString())
-    //coordinates(group.toString(), version.toString())
+
+    publishing {
+
+        repositories {
+            maven {
+                name = "Repsy"
+                val localProperties = Properties().apply {
+                    load(FileInputStream(rootProject.file("local.properties")))
+                }
+                val repsyUsername = localProperties.getProperty("REPSY_USERNAME") ?: System.getenv("REPSY_USERNAME") ?: ""
+                val repsyPassword = localProperties.getProperty("REPSY_PASSWORD") ?: System.getenv("REPSY_PASSWORD") ?: ""
+                credentials {
+                    username = repsyUsername
+                    password = repsyPassword
+                }
+                url = uri("https://repo.repsy.io/$repsyUsername/angelos-project")
+            }
+        }
+    }
 
     pom {
         name.set(This.longName)
@@ -127,23 +144,6 @@ android {
             url.set(This.url)
             connection.set("scm:git:git://github.com/angelos-project/angelos-project-secrand.git")
             developerConnection.set("scm:git:ssh://github.com:angelos-project/angelos-project-secrand.git")
-        }
-    }
-}*/
-
-publishing {
-    repositories {
-        maven {
-            val localProperties = Properties().apply {
-                load(FileInputStream(rootProject.file("local.properties")))
-            }
-            val repsyUsername = localProperties.getProperty("REPSY_USERNAME") ?: System.getenv("REPSY_USERNAME") ?: ""
-            val repsyPassword = localProperties.getProperty("REPSY_PASSWORD") ?: System.getenv("REPSY_PASSWORD") ?: ""
-            credentials {
-                username = repsyUsername
-                password = repsyPassword
-            }
-            url = uri("https://repo.repsy.io/$repsyUsername/angelos-project")
         }
     }
 }
