@@ -190,9 +190,14 @@ commands:
           command: ./gradlew dokkaGenerateHtml --no-daemon --stacktrace
   store_docs:
     steps:
+      - run:
+          name: Skapa Gzip-arkiv av dokumentationen
+          command: |
+            # Skapar en komprimerad fil av Dokka-utdatan
+            tar -czvf api-docs.tar.gz -C library/build/dokka/html .
       - store_artifacts:
-          path: library/build/dokka/html
-          destination: api-docs
+          path: api-docs.tar.gz
+          destination: downloads
   prepare:
     steps:
       - checkout
