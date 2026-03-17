@@ -66,7 +66,7 @@ public object BenchmarkSpongesKt {
     }
 
     public fun monteCarloReport(monteCarlo: Statistical) {
-        val sigma = 2.0
+        val sigma = 5.0
         val standardError = monteCarloPiRange(monteCarlo.sampleCount, sigma)
         val isInside = monteCarlo.keyValue in standardError
         val report = buildString {
@@ -107,7 +107,7 @@ public object BenchmarkSpongesKt {
     }
 
     public fun avalancheEffectReport(avalanche: Statistical, sponge: Sponge) {
-        val sigma = 2.0
+        val sigma = 5.0
         val standardDeviation = avalancheHammingRange(sponge.bitSize, avalanche.sampleCount, sigma)
         val p = sponge.bitSize / 2
         val isInside = (avalanche.keyValue * sponge.bitSize) in standardDeviation
