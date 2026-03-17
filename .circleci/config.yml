@@ -269,7 +269,7 @@ jobs:
 parameters:
   action:
     type: enum
-    enum: [test, coverage, report, docs]
+    enum: [test, coverage, report, docs, publish]
     default: docs
   platform:
     type: enum
@@ -302,6 +302,8 @@ workflows:
     jobs:
       - gen-docs
   build-and-publish:
+    when:
+      equal: [ publish, << pipeline.parameters.action >> ]
     jobs:
       - publish-to-repsy:
           filters:
