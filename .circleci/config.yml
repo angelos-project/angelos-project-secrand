@@ -263,7 +263,7 @@ jobs:
       - prepare
       - run:
           name: Publish to Repsy private Maven repository
-          command: ./gradlew publishAllPublicationsToRepsyRepository --no-daemon --stacktrace
+          command: ./gradlew :library:publish --no-daemon --stacktrace
       - cleanup
 
 parameters:
