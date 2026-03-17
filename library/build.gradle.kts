@@ -1,4 +1,4 @@
-import com.vanniktech.maven.publish.SonatypeHost
+// import com.vanniktech.maven.publish.SonatypeHost
 
 object This {
     const val longName = "Secure Random - Angelos Project™"
@@ -89,8 +89,7 @@ android {
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-
+    //publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     //signAllPublications()
 
     /**
@@ -124,6 +123,18 @@ mavenPublishing {
             url.set(This.url)
             connection.set("scm:git:git://github.com/angelos-project/angelos-project-secrand.git")
             developerConnection.set("scm:git:ssh://github.com:angelos-project/angelos-project-secrand.git")
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            url = uri("https://repo.repsy.io/YOUR_REPSY_USERNAME/YOUR_REPO_NAME")
+            credentials {
+                username = System.getenv("REPSY_USERNAME") ?: ""
+                password = System.getenv("REPSY_PASSWORD") ?: ""
+            }
         }
     }
 }

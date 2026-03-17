@@ -255,6 +255,16 @@ jobs:
       - generate_docs
       - store_docs
       - cleanup
+  publish-to-repsy:
+    executor: gradle
+    environment:
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g"
+    steps:
+      - prepare
+      - run:
+          name: Publish to Repsy private Maven repository
+          command: ./gradlew publishAllPublicationsToRepsyRepository --no-daemon --stacktrace
+      - cleanup
 
 parameters:
   action:
@@ -291,3 +301,11 @@ workflows:
       equal: [ docs, << pipeline.parameters.action >> ]
     jobs:
       - gen-docs
+  build-and-publish:
+    jobs:
+      - publish-to-repsy:
+          filters:
+            branches:
+              only: main
+            tags:
+              only: /v.*/
