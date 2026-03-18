@@ -107,7 +107,10 @@ mavenPublishing {
             maven {
                 name = "Repsy"
                 val localProperties = Properties().apply {
-                    load(FileInputStream(rootProject.file("local.properties")))
+                    val file = rootProject.file("local.properties")
+                    if (file.exists()) {
+                        load(FileInputStream(file))
+                    }
                 }
                 val repsyUsername = localProperties.getProperty("REPSY_USERNAME") ?: System.getenv("REPSY_USERNAME") ?: ""
                 val repsyPassword = localProperties.getProperty("REPSY_PASSWORD") ?: System.getenv("REPSY_PASSWORD") ?: ""
