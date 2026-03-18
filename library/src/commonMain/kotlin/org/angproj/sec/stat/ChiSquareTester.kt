@@ -17,15 +17,15 @@ package org.angproj.sec.stat
 import org.angproj.sec.util.TypeSize
 import kotlin.math.max
 
-
 /**
- * Tester for Chi Square of a cryptographic function.
-
+ * A Chi-Square tester for evaluating the uniformity of random byte distributions.
+ * It counts the frequency of each byte value (0-255) in the samples and computes the Chi-Square statistic
+ * to measure how well the observed frequencies match the expected uniform distribution.
  *
- * @param B The type of the benchmark result.
- * @param E The type of the benchmark object, which must extend BenchmarkObject<B>.
- * @property samples The number of samples to collect for the test.
- * @property benchmarkArticle The benchmark object that provides the cryptographic function to be tested.
+ * @param B The type of the benchmark object.
+ * @param E The type of the benchmark article, extending BenchmarkArticle<B>.
+ * @property samples The number of samples to take.
+ * @property benchmarkArticle The benchmark article providing the random samples.
  */
 public class ChiSquareTester<B, E: BenchmarkArticle<B>>(
     samples: Long, benchmarkArticle: E
@@ -55,26 +55,6 @@ public class ChiSquareTester<B, E: BenchmarkArticle<B>>(
             evaluateSampleData(),
             duration,
             totalTakenSamples * atomicSampleByteSize,
-            toString()
         )
-    }
-
-    /**
-     * Provides a string representation of the Avalanche Effect Tester results.
-     *
-     * The string includes the total number of samples taken, the average avalanche effect,
-     * and the deviation from the ideal value of 0.5.
-     *
-     * @return A string summarizing the results of the Avalanche Effect test.
-     */
-    override fun toString(): String = buildString {
-        val chiSquare = evaluateSampleData()
-        append("Chi Square at ")
-        append(totalTakenSamples)
-        append(" samples, with value ")
-        append(chiSquare)
-        //append(" with a deviation of ")
-        //append(abs(average - 0.5))
-        append(".")
     }
 }

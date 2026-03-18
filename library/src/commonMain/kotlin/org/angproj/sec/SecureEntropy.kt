@@ -19,9 +19,8 @@ import org.angproj.sec.rand.AbstractSponge256
 import org.angproj.sec.rand.JitterEntropy
 
 /**
- * SecureEntropy is a singleton object that provides a secure source of entropy
- * using a sponge construction with a size of 256 bits. It revitalizes the sponge
- * with real-time gated entropy and provides methods to read random bytes.
+ * SecureEntropy provides entropy using a 256-bit sponge seeded with jitter entropy.
+ * It automatically reseeds on each export for high security.
  */
 public object SecureEntropy : AbstractSecurity(object : AbstractSponge256() {}) {
     init {

@@ -20,20 +20,14 @@ import kotlin.math.abs
 import kotlin.math.max
 
 /**
- * Tester for the Avalanche Effect of a cryptographic function.
+ * An avalanche effect tester for measuring how much a small change in input affects the output.
+ * It compares consecutive samples by XORing them and counting the number of differing bits,
+ * then averages the bit differences to assess the avalanche effect.
  *
- * The Avalanche Effect is a desirable property of cryptographic algorithms,
- * where a small change in input (e.g., flipping a single bit) results in a significant
- * change in output (e.g., approximately half of the output bits change).
- *
- * This tester collects samples of outputs from the cryptographic function and analyzes
- * how many bits differ between successive samples. It maintains statistics on the number
- * of differing bits and calculates an average to evaluate the strength of the Avalanche Effect.
- *
- * @param B The type of the benchmark result.
- * @param E The type of the benchmark object, which must extend BenchmarkObject<B>.
- * @property samples The number of samples to collect for the test.
- * @property benchmarkArticle The benchmark object that provides the cryptographic function to be tested.
+ * @param B The type of the benchmark object.
+ * @param E The type of the benchmark article, extending BenchmarkArticle<B>.
+ * @property samples The number of samples to take.
+ * @property benchmarkArticle The benchmark article providing the random samples.
  */
 public class AvalancheEffectTester<B, E: BenchmarkArticle<B>>(
     samples: Long, benchmarkArticle: E
@@ -83,26 +77,6 @@ public class AvalancheEffectTester<B, E: BenchmarkArticle<B>>(
             evaluateSampleData(),
             duration,
             totalTakenSamples * atomicSampleByteSize,
-            toString()
         )
-    }
-
-    /**
-     * Provides a string representation of the Avalanche Effect Tester results.
-     *
-     * The string includes the total number of samples taken, the average avalanche effect,
-     * and the deviation from the ideal value of 0.5.
-     *
-     * @return A string summarizing the results of the Avalanche Effect test.
-     */
-    override fun toString(): String = buildString {
-        val average = evaluateSampleData()
-        append("Avalanche Effect at ")
-        append(totalTakenSamples)
-        append(" samples, averages at ")
-        append(average)
-        append(" with a deviation of ")
-        append(abs(average - 0.5))
-        append(".")
     }
 }

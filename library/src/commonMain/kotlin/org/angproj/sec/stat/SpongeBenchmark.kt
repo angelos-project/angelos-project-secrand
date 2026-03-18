@@ -15,22 +15,22 @@
 package org.angproj.sec.stat
 
 import org.angproj.sec.hash.HashHelper
-import org.angproj.sec.hash.HashHelper.HashMode
 import org.angproj.sec.rand.Sponge
 import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 
 /**
- * Benchmark object for the Sponge cryptographic primitive.
+ * A benchmark article for Sponge, generating samples using either bit generation or hash generation modes.
+ * In bit generation mode, it squeezes values from the sponge; in hash generation mode, it absorbs a counter and squeezes.
  *
- * This class extends the BenchmarkObject class and provides functionality
- * to benchmark a Sponge instance. It initializes the Sponge by scrambling it
- * and provides methods to retrieve sample byte size and generate the next sample.
- *
- * @param article The Sponge instance to be benchmarked.
+ * @property article The Sponge instance used for generating samples.
+ * @property generatorMode The mode of generation (BIT_GEN or HASH_GEN).
  */
 public class SpongeBenchmark(article: Sponge, private val generatorMode: GeneratorMode = GeneratorMode.BIT_GEN): BenchmarkArticle<Sponge>(article) {
 
+    /**
+     * Enumeration for the generator modes of the sponge benchmark.
+     */
     public enum class GeneratorMode {
         BIT_GEN, HASH_GEN
     }
@@ -80,6 +80,12 @@ public class SpongeBenchmark(article: Sponge, private val generatorMode: Generat
         }
     }
 
+    /**
+     * Generates the next sample based on the generator mode.
+     * For BIT_GEN, squeezes from the sponge; for HASH_GEN, absorbs a counter and squeezes.
+     *
+     * @return A byte array containing the next sample.
+     */
     override fun nextSample(): ByteArray {
         return allocSampleArray().apply {
             when (generatorMode) {

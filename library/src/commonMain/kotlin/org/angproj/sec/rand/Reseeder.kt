@@ -18,7 +18,12 @@ import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 import org.angproj.sec.util.WriteOctet
 
-
+/**
+ * Reseeder for a sponge-based random number generator.
+ * It reseeds the sponge with entropy from an external source, performing health checks.
+ *
+ * @param sponge the sponge to reseed.
+ */
 public class Reseeder(sponge: Sponge) : AbstractRandom<Sponge, Long>(sponge, sponge.visibleSize){
 
     override fun exportSize(): Int = 1024 / TypeSize.longSize
@@ -40,6 +45,11 @@ public class Reseeder(sponge: Sponge) : AbstractRandom<Sponge, Long>(sponge, spo
         obj.scramble()
     }
 
+    /**
+     * Reseeds the sponge with entropy from the given source.
+     *
+     * @param entropySource the source of entropy.
+     */
     public fun reseed(entropySource: Octet.Producer) {
         innerFill(entropySource::exportLongs) { index, value -> this.absorb(value, index)}
     }

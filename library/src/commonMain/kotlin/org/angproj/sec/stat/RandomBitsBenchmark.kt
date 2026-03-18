@@ -19,17 +19,21 @@ import org.angproj.sec.util.Octet
 import org.angproj.sec.util.TypeSize
 
 /**
- * Benchmark object for the RandomBits cryptographic primitive.
+ * A benchmark article for RandomBits, generating samples by extracting bits from the random bits generator.
+ * It produces byte arrays filled with random integers converted to bytes.
  *
- * This class extends the BenchmarkObject class and provides functionality
- * to benchmark a RandomBits instance.
- *
- * @param article The RandomBits instance to be benchmarked.
+ * @property article The RandomBits instance used for generating samples.
  */
 public class RandomBitsBenchmark(article: RandomBits): BenchmarkArticle<RandomBits>(article) {
 
     override fun byteSizeImpl(): Int = 4
 
+    /**
+     * Generates the next sample by filling a byte array with random bits from the article.
+     * Each sample consists of random integers written as bytes.
+     *
+     * @return A byte array containing the next random sample.
+     */
     override fun nextSample(): ByteArray {
         val sample = allocSampleArray()
         repeat(sampleByteSize / TypeSize.intSize) {

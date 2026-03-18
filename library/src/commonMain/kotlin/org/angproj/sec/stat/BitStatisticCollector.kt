@@ -17,7 +17,12 @@ package org.angproj.sec.stat
 import org.angproj.sec.util.RunState
 import kotlin.math.*
 
-
+/**
+ * Abstract base class for collecting bit statistics from random data.
+ * It implements the BitStatistic interface and provides protected methods to accumulate
+ * statistics such as bit counts, hexadecimal distributions, and run lengths.
+ * Subclasses must manage the state and call the appropriate methods to collect data.
+ */
 public abstract class BitStatisticCollector : BitStatistic {
     protected var _state: RunState = RunState.INITIALIZE
 
@@ -88,15 +93,9 @@ public abstract class BitStatisticCollector : BitStatistic {
             collectBit<Unit>(boolFromIndex<Unit>(it, boolMask, data))
         }
     }
-
-    /**
-     * Calculates a mask with only one bit and places the bit leftmost based on bitSize.
-     */
+    
     protected inline fun<reified E: Any> boolMask(bitSize: Int): Long = 1L shl (bitSize - 1)
-
-    /**
-     * Uses a sing bit mask and returns a bit as boolean based on the index from left to right.
-     * */
+    
     protected inline fun<reified E: Any> boolFromIndex(index: Int, mask: Long, value: Long): Boolean {
         return value and (mask ushr index) != 0L
     }

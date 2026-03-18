@@ -23,37 +23,29 @@ import kotlin.math.PI
 import kotlin.math.abs
 
 /**
- * Tester for estimating the value of Pi using the Monte Carlo method.
+ * A Monte Carlo tester for estimating the value of PI using random sampling.
+ * It receives random points within a unit square and counts how many fall inside the unit circle
+ * to approximate PI using the Monte Carlo method.
  *
- * The Monte Carlo method is a statistical technique that uses random sampling to estimate numerical values.
- * In this tester, random points are generated within a unit square, and the proportion of points that fall
- * within a quarter circle inscribed within that square is used to estimate the value of Pi.
- *
- * @param B The type of the benchmark result.
- * @param E The type of the benchmark object, which must extend BenchmarkObject<B>.
- * @property samples The number of samples to collect for the test.
- * @property mode The mode of operation, determining the size of each sample (32-bit or 64-bit).
- * @property benchmarkArticle The benchmark object that provides the random data for the test.
+ * @param B The type of the benchmark object.
+ * @param E The type of the benchmark article, extending BenchmarkArticle<B>.
+ * @property samples The number of samples to take.
+ * @property mode The mode of operation, determining the bit size for random number generation.
+ * @property benchmarkArticle The benchmark article providing the random samples.
  */
 public class MonteCarloTester<B, E: BenchmarkArticle<B>>(
     samples: Long, mode: Mode, benchmarkArticle: E
 ) : BenchmarkTester<B, E>(samples, mode.size, benchmarkArticle) {
 
+    /**
+     *
+     */
     public enum class Mode(public val size: Int) {
         MODE_32_BIT(TypeSize.intSize * 2), MODE_64_BIT(TypeSize.longSize * 2)
     }
 
     private var insideCircle: Long = 0
 
-    /**
-     * Calculates the distance between two points in a 2D space.
-     *
-     * @param x1 x-coordinate of the first point
-     * @param y1 y-coordinate of the first point
-     * @param x2 x-coordinate of the second point
-     * @param y2 y-coordinate of the second point
-     * @return the distance between the two points
-     */
     private fun getDistance(x1: Double, y1: Double, x2: Double, y2: Double): Double {
         return sqrt((x2 - x1).pow(2.0) + (y2 - y1).pow(2.0))
     }
@@ -113,24 +105,6 @@ public class MonteCarloTester<B, E: BenchmarkArticle<B>>(
             evaluateSampleData(),
             duration,
             totalTakenSamples * atomicSampleByteSize,
-            toString()
         )
-    }
-
-    /**
-     * Provides a string representation of the Monte Carlo tester, including the number of samples taken,
-     * the estimated value of Pi, and the deviation from the actual value of Pi.
-     *
-     * @return A string summarizing the results of the Monte Carlo test.
-     */
-    override fun toString(): String = buildString {
-        val piEstimate = evaluateSampleData()
-        append("Monte Carlo at ")
-        append(totalTakenSamples)
-        append(" samples, estimates PI to ")
-        append(piEstimate)
-        append(" with a deviation of ")
-        append(abs(piEstimate - PI))
-        append(".")
     }
 }

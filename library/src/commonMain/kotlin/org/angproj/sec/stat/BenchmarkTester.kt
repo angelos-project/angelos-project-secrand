@@ -20,15 +20,14 @@ import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 
 /**
- * Abstract base class for running benchmarks on a given object.
+ * An abstract base class for benchmark testers that perform statistical tests on random samples.
+ * It manages the sampling process, timing, and provides methods for calculating and collecting statistics.
  *
- * @param B The type of the object being benchmarked.
- * @param E The type of the BenchmarkObject wrapper.
- * @property samplesAsked The number of samples to collect during benchmarking.
- * @property benchmarkArticle The benchmark object instance, created by the provided config function.
- *
- * Extend this class to implement specific benchmarking logic.
- * Use the config function to initialize the object to be benchmarked.
+ * @param B The type of the benchmark object.
+ * @param E The type of the benchmark article, extending BenchmarkArticle<B>.
+ * @property samplesAsked The number of samples requested.
+ * @property atomicSampleByteSize The byte size of each atomic sample unit.
+ * @property benchmarkArticle The benchmark article providing the samples.
  */
 public abstract class BenchmarkTester<B, E: BenchmarkArticle<B>>(
     public val samplesAsked: Long,
@@ -45,38 +44,53 @@ public abstract class BenchmarkTester<B, E: BenchmarkArticle<B>>(
     protected var duration: Duration = Duration.INFINITE
 
     protected var totalTakenSamples: Long = 0
+
+    /**
+     * The total number of samples taken so far.
+     */
     public val samplesTaken: Long
         get() = totalTakenSamples
 
+    /**
+     * The total byte size of data needed for the requested samples.
+     */
     public val neededSampleDataByteSize: Long
         get() = samplesAsked * atomicSampleByteSize
 
+    /**
+     * The number of samples still left to take.
+     */
     public val samplesLeft: Long
         get() = samplesAsked - samplesTaken
 
     protected fun maxLoops(sampleSize: Int): Int = min(sampleSize.toLong() / atomicSampleByteSize, samplesLeft).toInt()
 
     /**
-     * Starts the benchmark timer.
+     * Starts the timing for the benchmark.
      */
     public fun start() {
         startTime = TimeSource.Monotonic.markNow()
     }
 
     /**
-     * Stops the benchmark timer and calculates the duration.
+     * Stops the timing for the benchmark.
      */
     public fun stop() {
         duration = startTime.elapsedNow() // Duration in nanoseconds
     }
 
     /**
-     * Samples should be counted by their atomic size
-     * */
+     * Abstract method to calculate statistics from a sample.
+     *
+     * @param sample The byte array sample to process.
+     */
     protected abstract fun calculateSampleImpl(sample: ByteArray)
 
     /**
-     * Runs the benchmark and collects data.
+     * Calculates statistics from the provided sample.
+     *
+     * @param sample The byte array sample to process.
+     * @throws IllegalArgumentException if the sample size is not divisible by atomicSampleByteSize.
      */
     public fun calculateSample(sample: ByteArray) {
         check(sample.size % atomicSampleByteSize == 0) { "Sample not divisible by atomic sample size" }
@@ -86,16 +100,11 @@ public abstract class BenchmarkTester<B, E: BenchmarkArticle<B>>(
     protected abstract fun collectStatsImpl(): Statistical
 
     /**
-     * Collects and returns statistical data from the benchmark.
+     * Collects the final statistics after testing.
      *
-     * @return A Statistical object containing the results of the benchmark.
+     * @return A Statistical object containing the results.
      */
     public fun collectStats(): Statistical {
         return collectStatsImpl()
     }
-
-    /**
-     * Returns a string representation of the benchmark results.
-     */
-    public abstract override fun toString(): String
 }

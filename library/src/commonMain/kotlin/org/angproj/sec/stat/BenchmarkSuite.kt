@@ -14,6 +14,13 @@
  */
 package org.angproj.sec.stat
 
+/**
+ * A suite class for running a collection of benchmark tests.
+ * It encapsulates the benchmark session and provides methods to execute the suite and collect results.
+ *
+ * @param B The type of the benchmark object.
+ * @property suiteBuilder The builder used to configure the suite.
+ */
 public class BenchmarkSuite<B>(
     suiteBuilder: BenchmarkSuiteBuilder<B, BenchmarkArticle<B>>) {
 
@@ -34,10 +41,9 @@ public class BenchmarkSuite<B>(
         }
     }
 
-    public suspend fun run() {
-        runBlocking()
-    }
-
+    /**
+     * Runs the benchmark suite in a blocking manner until all samples are collected.
+     */
     public fun runBlocking() {
         benchmarkSession.startRun()
         while(!benchmarkSession.satisfied) {
@@ -48,18 +54,14 @@ public class BenchmarkSuite<B>(
         results = benchmarkSession.finalizeCollecting()
     }
 
+    /**
+     * Collects the results of the benchmark suite.
+     *
+     * @return A map of tester names to their statistical results.
+     * @throws IllegalStateException if the suite has not been run yet.
+     */
     public fun collectResults(): Map<String, Statistical> {
         check(this::results.isInitialized) { "Data sampling not finished" }
         return results
-    }
-
-    override fun toString(): String {
-        if(!this::results.isInitialized) return "No result, still running"
-        return buildString {
-            testersByName.forEach { tester ->
-                append(results[tester]!!.report)
-                appendLine()
-            }
-        }
     }
 }

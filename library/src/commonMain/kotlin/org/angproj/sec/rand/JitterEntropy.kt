@@ -23,28 +23,12 @@ import org.angproj.sec.util.ensure
 import kotlin.math.*
 import kotlin.time.TimeSource
 
-
 /**
- * JitterEntropy provides true random number generation based on timing jitter.
- *
- * This implementation leverages the inherent unpredictability of timing variations in system operations
- * to generate entropy. It uses a monotonic clock to measure elapsed time and derives randomness from
- * the nanosecond and microsecond components of these measurements. The entropy is further processed using
- * trigonometric functions and bitwise operations to enhance randomness.
- *
- * Usage:
- * - Call [exportLongs] to fill a data structure with random [Long] values.
- * - Call [exportBytes] to fill a data structure with random [Byte] values.
- *
- * Limitations:
- * - The maximum length for [exportLongs] is 128 (1KB) to prevent excessive computation time.
- * - The maximum length for [exportBytes] is 1024 (1KB) for the same reason.
+ * JitterEntropy is an entropy source that generates random bits based on timing jitter from the system's monotonic clock.
+ * It measures elapsed time and applies trigonometric functions to derive high-quality entropy, ensuring unpredictability.
  */
 public object JitterEntropy: Octet.Producer {
-
-    /**
-     * Internal state for tracking timing measurements and generating jitter-based entropy.
-     */
+    
     internal class JitterEntropyState : RandomBits {
         // Monotonic clock mark to measure elapsed time for entropy generation
         private val start = TimeSource.Monotonic.markNow()
@@ -53,13 +37,13 @@ public object JitterEntropy: Octet.Producer {
         init {
             ensure<SecureRandomException>(start.hasPassedNow()) { SecureRandomException("Time source is not ticking fast enough!!!") }
         }
-
+        
         /**
-         * Generates a true random [Int] with the specified number of bits (1 to 32) based on timing jitter.
+         * Generates the next random bits using timing jitter from the monotonic clock.
+         * Applies trigonometric transformations to elapsed time measurements for entropy derivation.
          *
-         * @param bits The number of random bits to generate (1–32).
-         * @return A pseudo-random [Int] containing the requested number of bits.
-         * @throws IllegalArgumentException If [bits] is not in the range 1–32.
+         * @param bits the number of bits to generate, between 1 and 32.
+         * @return the generated random bits as an integer.
          */
         override fun nextBits(bits: Int): Int {
             require(bits in 1..32) { "Bits must be between 1 and 32" }
@@ -88,14 +72,13 @@ public object JitterEntropy: Octet.Producer {
     }
 
     /**
-     * Exports true random [Long] values to the provided data structure.
-     * Generates up to 128 [Long] values (1024 bytes) to prevent excessive computation.
+     * Exports longs to the destination using jitter entropy.
+     * Generates random longs based on timing jitter and writes them to the specified destination.
      *
-     * @param dst The target data structure to write to.
-     * @param offset The starting index in the data structure.
-     * @param length The number of [Long] values to generate (max 128).
-     * @param writeOctet The function to write a [Long] value at a specific index.
-     * @throws IllegalArgumentException If [length] exceeds 128.
+     * @param dst the destination object to write to.
+     * @param offset the starting offset in the destination.
+     * @param length the number of longs to export (max 128).
+     * @param writeOctet the function to write each long.
      */
     public override fun <E> exportLongs(dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Long>) {
         require(length <= 128) { "Too large for time-gated entropy! Max 1Kb." }
@@ -108,14 +91,13 @@ public object JitterEntropy: Octet.Producer {
     }
 
     /**
-     * Exports true random [Byte] values to the provided data structure.
-     * Generates up to 1024 [Byte] values to prevent excessive computation.
+     * Exports bytes to the destination using jitter entropy.
+     * Generates random bytes based on timing jitter and writes them to the specified destination.
      *
-     * @param dst The target data structure to write to.
-     * @param offset The starting index in the data structure.
-     * @param length The number of [Byte] values to generate (max 1024).
-     * @param writeOctet The function to write a [Byte] value at a specific index.
-     * @throws IllegalArgumentException If [length] exceeds 1024.
+     * @param dst the destination object to write to.
+     * @param offset the starting offset in the destination.
+     * @param length the number of bytes to export (max 1024).
+     * @param writeOctet the function to write each byte.
      */
     public override fun <E> exportBytes(dst: E, offset: Int, length: Int, writeOctet: WriteOctet<E, Byte>) {
         require(length <= 1024) { "Too large for time-gated entropy! Max 1Kb." }

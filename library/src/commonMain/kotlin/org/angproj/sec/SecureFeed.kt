@@ -22,13 +22,8 @@ import org.angproj.sec.util.ceilDiv
 import org.angproj.sec.util.floorMod
 
 /**
- * SecureFeed is a singleton object that provides a secure random number generator
- * based on the AbstractSponge512 algorithm. It uses a secure entropy source to
- * generate random numbers and provides methods to read random bytes into various
- * data structures.
- *
- * The SecureFeed object is designed to be used in cryptographic applications where
- * high-quality randomness is required.
+ * SecureFeed is the main secure random feed using a 512-bit sponge.
+ * It implements RandomBits and manages reseeding based on usage thresholds.
  */
 public object SecureFeed : AbstractSecurity(object : AbstractSponge512() {}), RandomBits {
 
@@ -37,17 +32,7 @@ public object SecureFeed : AbstractSecurity(object : AbstractSponge512() {}), Ra
     init {
         revitalize(true)
     }
-
-    /**
-     * Rounds the internal counter and checks if reseeding is necessary.
-     * If the counter exceeds the next threshold, it reseeds the sponge
-     * and resets the counter.
-     *
-     * This method should be called whenever bytes are read from the generator
-     * to ensure that the reseeding logic is applied correctly.
-     *
-     * @param count The number of bytes to add to the counter.
-     */
+    
     internal fun revitalize(needed: Boolean) {
         if (needed) {
             seedEntropy(SecureEntropy)
@@ -60,6 +45,12 @@ public object SecureFeed : AbstractSecurity(object : AbstractSponge512() {}), Ra
         return true
     }
 
+    /**
+     * Generates the next random bits.
+     *
+     * @param bits the number of bits to generate.
+     * @return the generated bits as an integer.
+     */
     public override fun nextBits(bits: Int): Int {
         require(bits in 1..TypeSize.intBits) { "Bits must be between 1 and 32" }
         check(reseedPolicy(bits.ceilDiv(TypeSize.byteBits))) { "Export conditions not met" }
