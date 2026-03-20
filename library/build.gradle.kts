@@ -1,4 +1,3 @@
-import java.io.FileInputStream
 import java.util.Properties
 
 import com.vanniktech.maven.publish.SonatypeHost
@@ -102,18 +101,16 @@ mavenPublishing {
     coordinates(group.toString(), rootProject.name, version.toString())
 
     publishing {
-
         repositories {
             maven {
                 name = "Repsy"
-                val localProperties = Properties().apply {
-                    val file = rootProject.file("local.properties")
-                    if (file.exists()) {
-                        load(FileInputStream(file))
-                    }
+                val localProps = Properties()
+                val localPropsFile = file("${rootProject.projectDir.path}/local.properties")
+                if (localPropsFile.exists()) {
+                    localProps.load(localPropsFile.inputStream())
                 }
-                val repsyUsername = localProperties.getProperty("REPSY_USERNAME") ?: System.getenv("REPSY_USERNAME") ?: ""
-                val repsyPassword = localProperties.getProperty("REPSY_PASSWORD") ?: System.getenv("REPSY_PASSWORD") ?: ""
+                val repsyUsername = localProps.getProperty("repsy.username") ?: System.getenv("REPSY_USERNAME") ?: ""
+                val repsyPassword = localProps.getProperty("repsy.password") ?: System.getenv("REPSY_PASSWORD") ?: ""
                 credentials {
                     username = repsyUsername
                     password = repsyPassword

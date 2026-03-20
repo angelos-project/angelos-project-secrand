@@ -85,10 +85,10 @@ commands:
               GRADLE_VERSION=$(sed -n 's/.*gradle-\(.*\)-bin\.zip.*/\1/p' gradle/wrapper/gradle-wrapper.properties)
               # If only major.minor (patch zero missing) → actively add .0
               if [[ $GRADLE_VERSION =~ ^([0-9]+)\.([0-9]+)$ ]]; then
-                GRADLE_VERSION_NEW="${GRADLE_VERSION}.0"
+                GRADLE_VERSION="${GRADLE_VERSION}.0"
               fi
               curl -L --fail --silent -o gradle/wrapper/gradle-wrapper.jar \
-                "https://raw.githubusercontent.com/gradle/gradle/v${GRADLE_VERSION_NEW}/gradle/wrapper/gradle-wrapper.jar"
+                "https://raw.githubusercontent.com/gradle/gradle/v${GRADLE_VERSION}/gradle/wrapper/gradle-wrapper.jar"
             fi
   accept_android_licenses:
     steps:
