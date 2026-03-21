@@ -200,7 +200,7 @@ commands:
     steps:
       - run:
           name: Archive Dokka Docs
-          command: tar -czvf apidocs.tar.gz library/build/dokka/html
+          command: tar -czvf apidocs.tar.gz -C library/build/dokka/html .
       - store_artifacts:
           path: apidocs.tar.gz
   prepare:
