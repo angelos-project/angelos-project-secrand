@@ -44,12 +44,8 @@ commands:
       - run:
           name: Extract Gradle version
           command: |
-            # GRADLE_VERSION=$(grep -o 'gradle-[0-9.]*' gradle/wrapper/gradle-wrapper.properties | cut -d- -f2)
-            # echo "$GRADLE_VERSION" > /tmp/gradle-cache-key.txt
-            GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9][0-9.]*\)-.*/\1/p' gradle/wrapper/gradle-wrapper.properties)
-
+            GRADLE_VERSION=$(grep -o 'gradle-[0-9.]*' gradle/wrapper/gradle-wrapper.properties | cut -d- -f2)
             echo "$GRADLE_VERSION" > /tmp/gradle-cache-key.txt
-            # echo "Extracted & normalized Gradle version: $VERSION (raw was $RAW_VERSION)"
   extract_kotlin_version:
     steps:
       - run:
@@ -198,9 +194,11 @@ commands:
           command: ./gradlew dokkaGenerateHtml --no-daemon --stacktrace
   store_docs:
     steps:
+      - run:
+          name: Archive Dokka Docs
+          command: tar -czvf apidocs.tar.gz -C library/build/dokka/html .
       - store_artifacts:
-          path: library/build/dokka/html
-          destination: documentation
+          path: apidocs.tar.gz
   prepare:
     steps:
       - checkout
@@ -278,7 +276,7 @@ parameters:
   action:
     type: enum
     enum: [test, coverage, report, docs, publish]
-    default: docs
+    default: test
   platform:
     type: enum
     enum: [gradle, macos, windows]
